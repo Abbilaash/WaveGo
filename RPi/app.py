@@ -14,7 +14,19 @@ import threading
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-camera = camera_opencv.Camera()
+camera = None
+camera_error = None
+
+
+def get_camera():
+    global camera, camera_error
+    if camera is None and camera_error is None:
+        try:
+            camera = camera_opencv.Camera()
+        except Exception as exc:
+            camera_error = str(exc)
+            print('Camera unavailable:', camera_error)
+    return camera
 
 def gen(camera):
     """Video streaming generator function."""
@@ -26,7 +38,11 @@ def gen(camera):
 @app.route('/video_feed')
 def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen(camera),
+    camera_obj = get_camera()
+    if camera_obj is None:
+        return ('Camera unavailable: %s' % camera_error, 503)
+
+    return Response(gen(camera_obj),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -61,7 +77,7 @@ def index():
 
 class webapp:
     def __init__(self):
-        self.camera = camera
+        self.camera = get_camera()
 
     def commandInput(self, inputCommand, valueA=None):
         camera_opencv.commandAct(inputCommand, valueA)
@@ -71,7 +87,8 @@ class webapp:
         camera_opencv.Camera.CVMode = 'no'
 
     def colorFindSet(self, H, S, V):
-        camera.colorFindSet(H, S, V)
+        if self.camera is not None:
+            self.camera.colorFindSet(H, S, V)
 
     def thread(self):
         app.run(host='0.0.0.0', threaded=True)
@@ -82,4 +99,5 @@ class webapp:
         fps_threading.start()
 
     def sendIP(self, ipInput):
-        camera.upperIP(ipInput)
+        if self.camera is not None:
+            self.camera.upperIP(ipInput)

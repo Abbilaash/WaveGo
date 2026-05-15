@@ -483,30 +483,80 @@ class Camera(BaseCamera):
         Camera.video_source = source
 
     @staticmethod
-    def frames():
-        camera = cv2.VideoCapture(Camera.video_source, cv2.CAP_V4L2)
-        if not camera.isOpened():
+    def _open_opencv_camera():
+        for backend in (cv2.CAP_V4L2, cv2.CAP_ANY):
+            camera = cv2.VideoCapture(Camera.video_source, backend)
+            if not camera.isOpened():
+                camera.release()
+                continue
+
+            camera.set(3, 640)
+            camera.set(4, 480)
+
+            for _ in range(10):
+                ok, img = camera.read()
+                if ok and img is not None:
+                    return camera
+                time.sleep(0.1)
+
             camera.release()
-            camera = cv2.VideoCapture(Camera.video_source)
-        camera.set(3, 640)
-        camera.set(4, 480)
-        if not camera.isOpened():
-            raise RuntimeError('Could not start camera. Check /dev/video0, OPENCV_CAMERA_SOURCE, and the Pi camera setup.')
+
+        return None
+
+    @staticmethod
+    def _open_picamera2_camera():
+        try:
+            from picamera2 import Picamera2
+        except Exception:
+            return None
+
+        picamera = Picamera2()
+        config = picamera.create_video_configuration(main={"size": (640, 480), "format": "RGB888"})
+        picamera.configure(config)
+        picamera.start()
+        return picamera
+
+    @staticmethod
+    def frames():
+        camera = Camera._open_opencv_camera()
+        if camera is None:
+            picamera = Camera._open_picamera2_camera()
+            if picamera is None:
+                raise RuntimeError('Could not start camera. Install python3-picamera2 for modern Raspberry Pi OS, or expose the camera as /dev/video0 for OpenCV.')
 
         cvt = CVThread()
         cvt.start()
-        failed_reads = 0
+
+        if camera is not None:
+            while True:
+                # read current frame
+                ok, img = camera.read()
+                if not ok or img is None:
+                    raise RuntimeError('Camera started but could not read frames. Check the camera module, /dev/video0, and permissions.')
+
+                if Camera.modeSelect == 'none':
+                    cvt.pause()
+                    robot.buzzerCtrl(0, 0)
+                else:
+                    if cvt.CVThreading:
+                        pass
+                    else:
+                        cvt.mode(Camera.modeSelect, img)
+                        cvt.resume()
+                    try:
+                        img = cvt.elementDraw(img)
+                    except:
+                        pass
+
+                # encode as a jpeg image and return it
+                try:
+                    yield cv2.imencode('.jpg', img)[1].tobytes()
+                except:
+                    pass
 
         while True:
-            # read current frame
-            ok, img = camera.read()
-            if not ok or img is None:
-                failed_reads += 1
-                if failed_reads >= 10:
-                    raise RuntimeError('Camera started but could not read frames. Check the camera module, /dev/video0, and permissions.')
-                time.sleep(0.1)
-                continue
-            failed_reads = 0
+            img = picamera.capture_array()
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
             if Camera.modeSelect == 'none':
                 cvt.pause()
