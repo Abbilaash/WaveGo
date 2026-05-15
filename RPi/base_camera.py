@@ -17,7 +17,7 @@ class CameraEvent(object):
     def __init__(self):
         self.events = {}
 
-    def wait(self):
+    def wait(self, timeout=None):
         """Invoked from each client's thread to wait for the next frame."""
         ident = get_ident()
         if ident not in self.events:
@@ -25,7 +25,7 @@ class CameraEvent(object):
             # add an entry for it in the self.events dict
             # each entry has two elements, a threading.Event() and a timestamp
             self.events[ident] = [threading.Event(), time.time()]
-        return self.events[ident][0].wait()
+        return self.events[ident][0].wait(timeout)
 
     def set(self):
         """Invoked by the camera thread when a new frame is available."""
@@ -68,15 +68,18 @@ class BaseCamera(object):
             BaseCamera.thread.start()
 
             # wait until frames are available
-            while self.get_frame() is None:
+            while self.get_frame(timeout=1) is None:
+                if BaseCamera.thread is not None and not BaseCamera.thread.is_alive():
+                    raise RuntimeError('Could not start camera. Check the camera device and backend configuration.')
                 time.sleep(0)
 
-    def get_frame(self):
+    def get_frame(self, timeout=None):
         """Return the current camera frame."""
         BaseCamera.last_access = time.time()
 
         # wait for a signal from the camera thread
-        BaseCamera.event.wait()
+        if not BaseCamera.event.wait(timeout):
+            return None
         BaseCamera.event.clear()
 
         return BaseCamera.frame

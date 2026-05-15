@@ -484,11 +484,14 @@ class Camera(BaseCamera):
 
     @staticmethod
     def frames():
-        camera = cv2.VideoCapture(Camera.video_source)
+        camera = cv2.VideoCapture(Camera.video_source, cv2.CAP_V4L2)
+        if not camera.isOpened():
+            camera.release()
+            camera = cv2.VideoCapture(Camera.video_source)
         camera.set(3, 640)
         camera.set(4, 480)
         if not camera.isOpened():
-            raise RuntimeError('Could not start camera.')
+            raise RuntimeError('Could not start camera. Check /dev/video0, OPENCV_CAMERA_SOURCE, and the Pi camera setup.')
 
         cvt = CVThread()
         cvt.start()

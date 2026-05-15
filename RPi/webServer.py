@@ -17,7 +17,7 @@ import json
 import app
 
 
-ipaddr_check = "192.168.4.1"
+ipaddr_check = "192.168.137.55"
 
 
 def ap_thread():
