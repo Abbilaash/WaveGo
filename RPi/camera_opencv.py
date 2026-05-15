@@ -495,10 +495,18 @@ class Camera(BaseCamera):
 
         cvt = CVThread()
         cvt.start()
+        failed_reads = 0
 
         while True:
             # read current frame
-            _, img = camera.read()
+            ok, img = camera.read()
+            if not ok or img is None:
+                failed_reads += 1
+                if failed_reads >= 10:
+                    raise RuntimeError('Camera started but could not read frames. Check the camera module, /dev/video0, and permissions.')
+                time.sleep(0.1)
+                continue
+            failed_reads = 0
 
             if Camera.modeSelect == 'none':
                 cvt.pause()
