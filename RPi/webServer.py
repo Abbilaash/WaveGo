@@ -71,7 +71,16 @@ async def recv_msg(websocket):
 			continue
 
 		if isinstance(data,str):
-			flask_app.commandInput(data)
+			try:
+				flask_app.commandInput(data)
+			except Exception as e:
+				print('command execution failed:', e)
+				response['status'] = 'error'
+				response['title'] = 'command_error'
+				response['data'] = str(e)
+				response = json.dumps(response)
+				await websocket.send(response)
+				continue
 
 			if 'get_info' == data:
 				response['title'] = 'get_info'
