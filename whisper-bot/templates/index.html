@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}WAVEGO Dashboard{% endblock %}
+
+{% block content %}
+<section class="grid">
+  <article class="panel hero">
+    <div>
+      <div class="eyebrow">Robot Network Portal</div>
+      <h2 class="title">Hello from WAVEGO</h2>
+    </div>
+
+    <div class="video-shell">
+      <img class="video-feed" src="{{ url_for('video_feed') }}" alt="Live camera feed from WAVEGO">
+      <div class="video-overlay">
+        <span class="video-dot"></span>
+        <span>Live camera feed</span>
+      </div>
+    </div>
+
+    <div class="stats" aria-label="network status">
+      <div class="stat">
+        <div class="stat-label">Mode</div>
+        <div class="stat-value" id="modeValue">{{ state.mode }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">IP Address</div>
+        <div class="stat-value" id="ipValue">{{ state.ip }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Endpoint</div>
+        <div class="stat-value">/api/status</div>
+      </div>
+    </div>
+  </article>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const modeValue = document.getElementById('modeValue');
+  const ipValue = document.getElementById('ipValue');
+  const statusBadgeText = document.getElementById('statusBadgeText');
+
+  async function refreshStatus() {
+    try {
+      const response = await fetch('/api/status', { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error('status request failed');
+      }
+      const data = await response.json();
+      modeValue.textContent = data.mode || 'unknown';
+      ipValue.textContent = data.ip || 'unavailable';
+      statusBadgeText.textContent = data.mode === 'ap' ? 'AP active' : 'Network ready';
+    } catch (error) {
+      statusBadgeText.textContent = 'Offline';
+    }
+  }
+
+  refreshStatus();
+  setInterval(refreshStatus, 4000);
+</script>
+{% endblock %}
