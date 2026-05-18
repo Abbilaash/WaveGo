@@ -9,16 +9,29 @@
       <div class="eyebrow">Robot Network Portal</div>
       <h2 class="title">Hello from WAVEGO</h2>
     </div>
+    <style>
+      .media-row { display:flex; gap:18px; align-items:flex-start; }
+      .video-column { flex: 2; }
+      .control-column { flex: 1; max-width: 320px; }
+      .tilt-grid, .move-grid { display:flex; flex-direction:column; align-items:center; gap:8px; }
+      .tilt-row, .move-row { display:flex; gap:12px; }
+      .tilt-btn, .move-btn, .stop-btn { padding:12px 16px; font-size:20px; font-family:monospace; border-radius:6px; border:1px solid #666; background:#f7f7f7; box-shadow:0 2px 0 #999; cursor:pointer; }
+      .tilt-btn:active, .move-btn:active, .stop-btn:active { transform: translateY(1px); box-shadow:0 1px 0 #666; }
+      .controls { background: #fafafa; padding:10px; border-radius:6px; border:1px solid #eee; }
+      .speed-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+    </style>
 
-    <div class="video-shell">
-      <img class="video-feed" src="{{ url_for('video_feed') }}" alt="Live camera feed from WAVEGO">
-      <div class="video-overlay">
-        <span class="video-dot"></span>
-        <span>Live camera feed</span>
-      </div>
-    </div>
+    <div class="media-row">
+      <div class="video-column">
+        <div class="video-shell">
+          <img class="video-feed" src="{{ url_for('video_feed') }}" alt="Live camera feed from WAVEGO">
+          <div class="video-overlay">
+            <span class="video-dot"></span>
+            <span>Live camera feed</span>
+          </div>
+        </div>
 
-    <div class="stats" aria-label="network status">
+        <div class="stats" aria-label="network status">
       <div class="stat">
         <div class="stat-label">Mode</div>
         <div class="stat-value" id="modeValue">{{ state.mode }}</div>
@@ -43,18 +56,47 @@
         <div class="stat-label">CPU Usage</div>
         <div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div>
       </div>
-    </div>
-    <div class="tilt-section">
-      <h3>Tilt Camera</h3>
-      <div class="tilt-grid">
-        <button id="tiltUp" class="tilt-btn">▲</button>
-        <div class="tilt-row">
-          <button id="tiltLeft" class="tilt-btn">◀</button>
-          <button id="tiltRight" class="tilt-btn">▶</button>
         </div>
-        <button id="tiltDown" class="tilt-btn">▼</button>
       </div>
-      <div id="tiltStatus" class="tilt-status">Ready</div>
+
+      <div class="control-column">
+        <div class="controls">
+          <div class="tilt-section">
+            <h3>Tilt Camera</h3>
+            <div class="tilt-grid">
+              <button id="tiltUp" class="tilt-btn">&uarr;</button>
+              <div class="tilt-row">
+                <button id="tiltLeft" class="tilt-btn">&larr;</button>
+                <button id="tiltRight" class="tilt-btn">&rarr;</button>
+              </div>
+              <button id="tiltDown" class="tilt-btn">&darr;</button>
+            </div>
+            <div id="tiltStatus" class="tilt-status">Ready</div>
+          </div>
+
+          <hr />
+
+          <div class="move-section">
+            <h3>Move Control</h3>
+            <div class="move-grid">
+              <button id="moveUp" class="move-btn">&uarr;</button>
+              <div class="move-row">
+                <button id="moveLeft" class="move-btn">&larr;</button>
+                <button id="moveRight" class="move-btn">&rarr;</button>
+              </div>
+              <button id="moveDown" class="move-btn">&darr;</button>
+              <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+                <button id="moveStop" class="stop-btn">STOP</button>
+                <div class="speed-row">
+                  <label for="speedRange">Speed</label>
+                  <input id="speedRange" type="range" min="10" max="200" value="100">
+                  <span id="speedValue">100</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </article>
 </section>
@@ -119,5 +161,42 @@
   bindTiltBtn('tiltDown', 'down');
   bindTiltBtn('tiltLeft', 'left');
   bindTiltBtn('tiltRight', 'right');
+
+  // Move controls
+  const speedRange = document.getElementById('speedRange');
+  const speedValue = document.getElementById('speedValue');
+  speedRange.addEventListener('input', () => { speedValue.textContent = speedRange.value; });
+
+  async function moveAction(action, speed) {
+    try {
+      const res = await fetch(`/api/move/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ speed: Number(speed) }) });
+      if (!res.ok) throw new Error('move failed');
+      const data = await res.json();
+      // show brief status
+      document.getElementById('tiltStatus').textContent = `move ${data.action} @${data.speed}`;
+    } catch (err) {
+      document.getElementById('tiltStatus').textContent = 'Move error';
+    }
+  }
+
+  function bindMoveBtn(btnId, action) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    const start = () => moveAction(action, speedRange.value);
+    const stop = () => moveAction('stop', speedRange.value);
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('touchstart', start, { passive: true });
+    btn.addEventListener('mouseup', stop);
+    btn.addEventListener('mouseleave', stop);
+    btn.addEventListener('touchend', stop);
+    btn.addEventListener('click', () => { moveAction(action, speedRange.value); setTimeout(() => moveAction('stop', speedRange.value), 150); });
+  }
+
+  bindMoveBtn('moveUp', 'forward');
+  bindMoveBtn('moveDown', 'backward');
+  bindMoveBtn('moveLeft', 'left');
+  bindMoveBtn('moveRight', 'right');
+
+  document.getElementById('moveStop').addEventListener('click', () => moveAction('stop', speedRange.value));
 </script>
 {% endblock %}

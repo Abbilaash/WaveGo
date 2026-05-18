@@ -22,6 +22,7 @@ if RPi_DIR not in sys.path:
 import camera_opencv
 import hardware_info
 import camera_tilt
+import robot
 
 
 AP_DEFAULT_IP = "192.168.12.1"
@@ -185,6 +186,42 @@ def api_tilt(direction, action):
 	if not ok:
 		return jsonify({"success": False, "error": "robot unavailable"}), 503
 	return jsonify({"success": True, "direction": direction, "action": action})
+
+
+@app.route('/api/move/<action>', methods=['POST'])
+def api_move(action):
+	"""Control robot movement. action: forward/backward/left/right/stop. Optional speed param."""
+	action = action.lower()
+	speed = 100
+	try:
+		from flask import request as _flask_request
+		if _flask_request.is_json and _flask_request.json and 'speed' in _flask_request.json:
+			speed = int(_flask_request.json.get('speed', speed))
+		else:
+			speed = int(_flask_request.args.get('speed', speed))
+	except Exception:
+		speed = 100
+
+	if action not in ("forward", "backward", "left", "right", "stop"):
+		return jsonify({"success": False, "error": "invalid action"}), 400
+
+	try:
+		if action == 'forward':
+			robot.forward(speed)
+		elif action == 'backward':
+			robot.backward(speed)
+		elif action == 'left':
+			robot.left(speed)
+		elif action == 'right':
+			robot.right(speed)
+		else:
+			# stop
+			robot.stopLR()
+			robot.stopFB()
+	except Exception as exc:
+		return jsonify({"success": False, "error": str(exc)}), 500
+
+	return jsonify({"success": True, "action": action, "speed": speed})
 
 
 @app.route("/api/img/<path:filename>")
