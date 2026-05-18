@@ -20,6 +20,8 @@ if RPi_DIR not in sys.path:
 	sys.path.insert(0, RPi_DIR)
 
 import camera_opencv
+import hardware_info
+import camera_tilt
 
 
 AP_DEFAULT_IP = "192.168.12.1"
@@ -124,13 +126,21 @@ def ensure_network() -> Tuple[str, str]:
 def get_state() -> dict:
 	with state_lock:
 		if device_state["ip"] and device_state["mode"] != "unknown":
-			return dict(device_state)
+			state = dict(device_state)
+			state["cpu_temp"] = hardware_info.get_cpu_tempfunc()
+			state["cpu_use"] = hardware_info.get_cpu_use()
+			state["ram_info"] = hardware_info.get_ram_info()
+			return state
 
 	ip_address, mode = ensure_network()
 	with state_lock:
 		device_state["ip"] = ip_address
 		device_state["mode"] = mode
-		return dict(device_state)
+		state = dict(device_state)
+		state["cpu_temp"] = hardware_info.get_cpu_tempfunc()
+		state["cpu_use"] = hardware_info.get_cpu_use()
+		state["ram_info"] = hardware_info.get_ram_info()
+		return state
 
 
 @app.route("/")
@@ -151,6 +161,30 @@ def video_feed():
 @app.route("/api/status")
 def api_status():
 	return jsonify(get_state())
+
+
+@app.route('/api/tilt/<direction>/<action>', methods=['POST'])
+def api_tilt(direction, action):
+	"""Control camera tilt. direction: up/down/left/right. action: start/stop."""
+	direction = direction.lower()
+	action = action.lower()
+	if direction not in ("up", "down", "left", "right"):
+		return jsonify({"success": False, "error": "invalid direction"}), 400
+	if action not in ("start", "stop"):
+		return jsonify({"success": False, "error": "invalid action"}), 400
+
+	ok = False
+	try:
+		if action == 'start':
+			ok = camera_tilt.start(direction)
+		else:
+			ok = camera_tilt.stop(direction)
+	except Exception as exc:
+		return jsonify({"success": False, "error": str(exc)}), 500
+
+	if not ok:
+		return jsonify({"success": False, "error": "robot unavailable"}), 503
+	return jsonify({"success": True, "direction": direction, "action": action})
 
 
 @app.route("/api/img/<path:filename>")

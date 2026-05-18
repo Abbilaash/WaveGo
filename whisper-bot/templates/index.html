@@ -31,6 +31,30 @@
         <div class="stat-label">Endpoint</div>
         <div class="stat-value">/api/status</div>
       </div>
+      <div class="stat">
+        <div class="stat-label">CPU Temp</div>
+        <div class="stat-value" id="cpuTempValue">{{ state.cpu_temp }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">RAM Usage</div>
+        <div class="stat-value" id="ramValue">{{ state.ram_info }}%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">CPU Usage</div>
+        <div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div>
+      </div>
+    </div>
+    <div class="tilt-section">
+      <h3>Tilt Camera</h3>
+      <div class="tilt-grid">
+        <button id="tiltUp" class="tilt-btn">▲</button>
+        <div class="tilt-row">
+          <button id="tiltLeft" class="tilt-btn">◀</button>
+          <button id="tiltRight" class="tilt-btn">▶</button>
+        </div>
+        <button id="tiltDown" class="tilt-btn">▼</button>
+      </div>
+      <div id="tiltStatus" class="tilt-status">Ready</div>
     </div>
   </article>
 </section>
@@ -40,6 +64,9 @@
 <script>
   const modeValue = document.getElementById('modeValue');
   const ipValue = document.getElementById('ipValue');
+  const cpuTempValue = document.getElementById('cpuTempValue');
+  const ramValue = document.getElementById('ramValue');
+  const cpuUseValue = document.getElementById('cpuUseValue');
   const statusBadgeText = document.getElementById('statusBadgeText');
 
   async function refreshStatus() {
@@ -51,6 +78,9 @@
       const data = await response.json();
       modeValue.textContent = data.mode || 'unknown';
       ipValue.textContent = data.ip || 'unavailable';
+      cpuTempValue.textContent = (data.cpu_temp || 'unknown') + (data.cpu_temp === 'unknown' ? '' : '°C');
+      ramValue.textContent = (data.ram_info || 'unknown') + (data.ram_info === 'unknown' ? '' : '%');
+      cpuUseValue.textContent = (data.cpu_use || 'unknown') + (data.cpu_use === 'unknown' ? '' : '%');
       statusBadgeText.textContent = data.mode === 'ap' ? 'AP active' : 'Network ready';
     } catch (error) {
       statusBadgeText.textContent = 'Offline';
@@ -59,5 +89,35 @@
 
   refreshStatus();
   setInterval(refreshStatus, 4000);
+
+  // Tilt controls
+  async function tiltAction(direction, action) {
+    try {
+      const res = await fetch(`/api/tilt/${direction}/${action}`, { method: 'POST' });
+      if (!res.ok) throw new Error('tilt failed');
+      const data = await res.json();
+      document.getElementById('tiltStatus').textContent = `${data.direction} ${data.action}`;
+    } catch (err) {
+      document.getElementById('tiltStatus').textContent = 'Tilt error';
+    }
+  }
+
+  function bindTiltBtn(btnId, direction) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    const start = () => tiltAction(direction, 'start');
+    const stop = () => tiltAction(direction, 'stop');
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('touchstart', start, { passive: true });
+    btn.addEventListener('mouseup', stop);
+    btn.addEventListener('mouseleave', stop);
+    btn.addEventListener('touchend', stop);
+    btn.addEventListener('click', () => { tiltAction(direction, 'start'); setTimeout(() => tiltAction(direction, 'stop'), 150); });
+  }
+
+  bindTiltBtn('tiltUp', 'up');
+  bindTiltBtn('tiltDown', 'down');
+  bindTiltBtn('tiltLeft', 'left');
+  bindTiltBtn('tiltRight', 'right');
 </script>
 {% endblock %}
