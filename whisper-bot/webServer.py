@@ -188,6 +188,32 @@ def api_tilt(direction, action):
 	return jsonify({"success": True, "direction": direction, "action": action})
 
 
+def stop_robot() -> None:
+	"""Stop robot motion on both axes."""
+	robot.stopLR()
+	robot.stopFB()
+
+
+@app.route('/api/default/<action>', methods=['POST'])
+def api_default(action):
+	"""Trigger preset robot behaviors: steady, jump, or handshake."""
+	action = action.lower()
+	if action not in ("steady", "jump", "handshake"):
+		return jsonify({"success": False, "error": "invalid action"}), 400
+
+	try:
+		if action == 'steady':
+			robot.steadyMode()
+		elif action == 'jump':
+			robot.jump()
+		else:
+			robot.handShake()
+	except Exception as exc:
+		return jsonify({"success": False, "error": str(exc)}), 500
+
+	return jsonify({"success": True, "action": action})
+
+
 @app.route('/api/move/<action>', methods=['POST'])
 def api_move(action):
 	"""Control robot movement. action: forward/backward/left/right/stop. Optional speed param."""
@@ -215,9 +241,7 @@ def api_move(action):
 		elif action == 'right':
 			robot.right(speed)
 		else:
-			# stop
-			robot.stopLR()
-			robot.stopFB()
+			stop_robot()
 	except Exception as exc:
 		return jsonify({"success": False, "error": str(exc)}), 500
 

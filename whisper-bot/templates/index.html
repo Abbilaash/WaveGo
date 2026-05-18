@@ -1,28 +1,40 @@
 {% extends "base.html" %}
 
-{% block title %}WAVEGO Dashboard{% endblock %}
+{% block title %}Whisper bot Dashboard{% endblock %}
 
 {% block content %}
 <section class="grid">
   <article class="panel hero">
     <div>
       <div class="eyebrow">Robot Network Portal</div>
-      <h2 class="title">Hello from WAVEGO</h2>
+      <h2 class="title">Hello! I am Whisper bot</h2>
     </div>
     <style>
-      .media-row { display:flex; gap:18px; align-items:flex-start; }
-      .video-column { flex: 2; }
-      .control-column { flex: 1; max-width: 320px; }
-      .tilt-grid, .move-grid { display:flex; flex-direction:column; align-items:center; gap:8px; }
-      .tilt-row, .move-row { display:flex; gap:12px; }
-      .tilt-btn, .move-btn, .stop-btn { padding:12px 16px; font-size:20px; font-family:monospace; border-radius:6px; border:1px solid #666; background:#f7f7f7; box-shadow:0 2px 0 #999; cursor:pointer; }
-      .tilt-btn:active, .move-btn:active, .stop-btn:active { transform: translateY(1px); box-shadow:0 1px 0 #666; }
-      .controls { background: #fafafa; padding:10px; border-radius:6px; border:1px solid #eee; }
-      .speed-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+      .grid { grid-template-columns: 1fr; }
+      .hero { width: 100%; }
+      .dashboard-layout { display:grid; grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); gap:20px; align-items:start; }
+      .feed-section, .control-section { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:18px; }
+      .feed-section { min-width:0; }
+      .control-section { display:flex; flex-direction:column; gap:16px; }
+      .section-title { margin:0 0 12px; }
+      .tilt-grid, .move-grid { display:flex; flex-direction:column; align-items:center; gap:10px; }
+      .tilt-row, .move-row { display:flex; gap:10px; }
+      .tilt-btn, .move-btn, .stop-btn { min-width:96px; min-height:36px; padding:4px 14px; font-size:22px; font-family:monospace; border-radius:10px; border:1px solid #666; background: linear-gradient(#fbfbfb, #e8e8e8); box-shadow:0 3px 0 #999; cursor:pointer; user-select:none; }
+      .default-grid { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+      .default-btn { min-width:88px; min-height:34px; padding:4px 10px; font-size:15px; font-family:monospace; border-radius:8px; border:1px solid #666; background: linear-gradient(#fbfbfb, #e8e8e8); box-shadow:0 2px 0 #999; cursor:pointer; user-select:none; }
+      .default-btn:active { transform: translateY(1px); box-shadow:0 1px 0 #666; }
+      .tilt-btn:active, .move-btn:active, .stop-btn:active { transform: translateY(2px); box-shadow:0 1px 0 #666; }
+      .stop-btn { min-width:132px; min-height:36px; font-size:18px; letter-spacing:1px; }
+      .status-line { margin-top:10px; font-size:14px; opacity:0.9; }
+      .speed-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+      .speed-row input[type="range"] { width: 160px; }
+      .status-badge { display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:8px 12px; border-radius:999px; background: rgba(255,255,255,0.08); font-size:13px; }
+      .status-dot { width:10px; height:10px; border-radius:50%; background:#4ade80; display:inline-block; }
     </style>
 
-    <div class="media-row">
-      <div class="video-column">
+    <div class="dashboard-layout">
+      <section class="feed-section" aria-label="live feed section">
+        <h3 class="section-title">Live Feed</h3>
         <div class="video-shell">
           <img class="video-feed" src="{{ url_for('video_feed') }}" alt="Live camera feed from WAVEGO">
           <div class="video-overlay">
@@ -32,71 +44,58 @@
         </div>
 
         <div class="stats" aria-label="network status">
-      <div class="stat">
-        <div class="stat-label">Mode</div>
-        <div class="stat-value" id="modeValue">{{ state.mode }}</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">IP Address</div>
-        <div class="stat-value" id="ipValue">{{ state.ip }}</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Endpoint</div>
-        <div class="stat-value">/api/status</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">CPU Temp</div>
-        <div class="stat-value" id="cpuTempValue">{{ state.cpu_temp }}</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">RAM Usage</div>
-        <div class="stat-value" id="ramValue">{{ state.ram_info }}%</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">CPU Usage</div>
-        <div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div>
-      </div>
+          <div class="stat"><div class="stat-label">Mode</div><div class="stat-value" id="modeValue">{{ state.mode }}</div></div>
+          <div class="stat"><div class="stat-label">IP Address</div><div class="stat-value" id="ipValue">{{ state.ip }}</div></div>
+          <div class="stat"><div class="stat-label">Endpoint</div><div class="stat-value">/api/status</div></div>
+          <div class="stat"><div class="stat-label">CPU Temp</div><div class="stat-value" id="cpuTempValue">{{ state.cpu_temp }}</div></div>
+          <div class="stat"><div class="stat-label">RAM Usage</div><div class="stat-value" id="ramValue">{{ state.ram_info }}%</div></div>
+          <div class="stat"><div class="stat-label">CPU Usage</div><div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div></div>
         </div>
-      </div>
+        <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Network ready</span></div>
+      </section>
 
-      <div class="control-column">
-        <div class="controls">
-          <div class="tilt-section">
-            <h3>Tilt Camera</h3>
+      <aside class="control-section" aria-label="robot controls section">
+        <section class="feed-section">
+          <h3 class="section-title">Tilt Camera</h3>
             <div class="tilt-grid">
               <button id="tiltUp" class="tilt-btn">&uarr;</button>
               <div class="tilt-row">
                 <button id="tiltLeft" class="tilt-btn">&larr;</button>
+                <button id="tiltDown" class="tilt-btn">&darr;</button>
                 <button id="tiltRight" class="tilt-btn">&rarr;</button>
               </div>
-              <button id="tiltDown" class="tilt-btn">&darr;</button>
             </div>
-            <div id="tiltStatus" class="tilt-status">Ready</div>
-          </div>
+        </section>
 
-          <hr />
-
-          <div class="move-section">
-            <h3>Move Control</h3>
+        <section class="feed-section">
+          <h3 class="section-title">Move Control</h3>
             <div class="move-grid">
               <button id="moveUp" class="move-btn">&uarr;</button>
               <div class="move-row">
                 <button id="moveLeft" class="move-btn">&larr;</button>
+                <button id="moveDown" class="move-btn">&darr;</button>
                 <button id="moveRight" class="move-btn">&rarr;</button>
               </div>
-              <button id="moveDown" class="move-btn">&darr;</button>
-              <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+              <div style="margin-top:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;">
                 <button id="moveStop" class="stop-btn">STOP</button>
                 <div class="speed-row">
                   <label for="speedRange">Speed</label>
-                  <input id="speedRange" type="range" min="10" max="200" value="100">
+                  <input id="speedRange" type="range" min="10" max="100" value="100">
                   <span id="speedValue">100</span>
                 </div>
               </div>
             </div>
+        </section>
+
+        <section class="feed-section">
+          <h3 class="section-title">Default Movement</h3>
+          <div class="default-grid">
+            <button id="defaultSteady" class="default-btn">Steady</button>
+            <button id="defaultJump" class="default-btn">Jump</button>
+            <button id="defaultHandshake" class="default-btn">Handshake</button>
           </div>
-        </div>
-      </div>
+        </section>
+      </aside>
     </div>
   </article>
 </section>
@@ -110,6 +109,8 @@
   const ramValue = document.getElementById('ramValue');
   const cpuUseValue = document.getElementById('cpuUseValue');
   const statusBadgeText = document.getElementById('statusBadgeText');
+  const moveStatus = document.getElementById('moveStatus');
+  const defaultStatus = document.getElementById('defaultStatus');
 
   async function refreshStatus() {
     try {
@@ -172,10 +173,9 @@
       const res = await fetch(`/api/move/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ speed: Number(speed) }) });
       if (!res.ok) throw new Error('move failed');
       const data = await res.json();
-      // show brief status
-      document.getElementById('tiltStatus').textContent = `move ${data.action} @${data.speed}`;
+      moveStatus.textContent = `move ${data.action} @${data.speed}`;
     } catch (err) {
-      document.getElementById('tiltStatus').textContent = 'Move error';
+      moveStatus.textContent = 'Move error';
     }
   }
 
@@ -198,5 +198,20 @@
   bindMoveBtn('moveRight', 'right');
 
   document.getElementById('moveStop').addEventListener('click', () => moveAction('stop', speedRange.value));
+
+  async function defaultAction(action) {
+    try {
+      const res = await fetch(`/api/default/${action}`, { method: 'POST' });
+      if (!res.ok) throw new Error('default action failed');
+      const data = await res.json();
+      defaultStatus.textContent = data.action;
+    } catch (err) {
+      defaultStatus.textContent = 'Default action error';
+    }
+  }
+
+  document.getElementById('defaultSteady').addEventListener('click', () => defaultAction('steady'));
+  document.getElementById('defaultJump').addEventListener('click', () => defaultAction('jump'));
+  document.getElementById('defaultHandshake').addEventListener('click', () => defaultAction('handshake'));
 </script>
 {% endblock %}

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101722">
-  <title>{% block title %}WAVEGO Control{% endblock %}</title>
+  <title>{% block title %}Whisper bot Control{% endblock %}</title>
   <style>
     :root {
       --bg: #07111f;
@@ -20,7 +20,6 @@
       --radius-xl: 28px;
       --radius-lg: 20px;
       --radius-md: 14px;
-      --max-width: 1120px;
     }
 
     * {
@@ -60,9 +59,10 @@
 
     .shell {
       position: relative;
-      width: min(var(--max-width), calc(100% - 32px));
-      margin: 0 auto;
-      padding: 32px 0 40px;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 32px 24px 40px;
     }
 
     .topbar {
@@ -334,8 +334,7 @@
 
     @media (max-width: 640px) {
       .shell {
-        width: min(100%, calc(100% - 20px));
-        padding-top: 16px;
+        padding: 16px 10px 28px;
       }
 
       .hero,
