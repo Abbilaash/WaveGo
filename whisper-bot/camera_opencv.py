@@ -403,7 +403,7 @@ class CVThread(threading.Thread):
 
 
 class Camera(BaseCamera):
-    video_source = "/dev/video0"
+    video_source = 0
     modeSelect = 'none'
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
@@ -480,7 +480,13 @@ class Camera(BaseCamera):
 
     @staticmethod
     def set_video_source(source):
-        Camera.video_source = source
+        if isinstance(source, str) and source.strip() == '/dev/video0':
+            Camera.video_source = 0
+            return
+        try:
+            Camera.video_source = int(source)
+        except (TypeError, ValueError):
+            Camera.video_source = source
 
     @staticmethod
     def _open_opencv_camera():
@@ -507,7 +513,7 @@ class Camera(BaseCamera):
     def frames():
         camera = Camera._open_opencv_camera()
         if camera is None:
-            raise RuntimeError('Could not start camera from /dev/video0. Check that the device exists, permissions are correct, and the camera is not busy.')
+            raise RuntimeError('Could not start camera from /dev/video0. OpenCV could not open device index 0. Check that the device exists, permissions are correct, and the camera is not busy.')
 
         cvt = CVThread()
         cvt.start()
