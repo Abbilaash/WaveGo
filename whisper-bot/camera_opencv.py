@@ -403,7 +403,7 @@ class CVThread(threading.Thread):
 
 
 class Camera(BaseCamera):
-    video_source = 0
+    video_source = "/dev/video0"
     modeSelect = 'none'
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
@@ -415,7 +415,7 @@ class Camera(BaseCamera):
 
     def __init__(self):
         if os.environ.get('OPENCV_CAMERA_SOURCE'):
-            Camera.set_video_source(int(os.environ['OPENCV_CAMERA_SOURCE']))
+            Camera.set_video_source(os.environ['OPENCV_CAMERA_SOURCE'])
         super(Camera, self).__init__()
 
     def robotStop(self):
@@ -504,25 +504,10 @@ class Camera(BaseCamera):
         return None
 
     @staticmethod
-    def _open_picamera2_camera():
-        try:
-            from picamera2 import Picamera2
-        except Exception:
-            return None
-
-        picamera = Picamera2()
-        config = picamera.create_video_configuration(main={"size": (640, 480), "format": "RGB888"})
-        picamera.configure(config)
-        picamera.start()
-        return picamera
-
-    @staticmethod
     def frames():
         camera = Camera._open_opencv_camera()
         if camera is None:
-            picamera = Camera._open_picamera2_camera()
-            if picamera is None:
-                raise RuntimeError('Could not start camera. Install python3-picamera2 for modern Raspberry Pi OS, or expose the camera as /dev/video0 for OpenCV.')
+            raise RuntimeError('Could not start camera from /dev/video0. Check that the device exists, permissions are correct, and the camera is not busy.')
 
         cvt = CVThread()
         cvt.start()
@@ -553,30 +538,6 @@ class Camera(BaseCamera):
                     yield cv2.imencode('.jpg', img)[1].tobytes()
                 except:
                     pass
-
-        while True:
-            img = picamera.capture_array()
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-
-            if Camera.modeSelect == 'none':
-                cvt.pause()
-                robot.buzzerCtrl(0, 0)
-            else:
-                if cvt.CVThreading:
-                    pass
-                else:
-                    cvt.mode(Camera.modeSelect, img)
-                    cvt.resume()
-                try:
-                    img = cvt.elementDraw(img)
-                except:
-                    pass
-
-            # encode as a jpeg image and return it
-            try:
-                yield cv2.imencode('.jpg', img)[1].tobytes()
-            except:
-                pass
 
 
 def commandAct(act, inputA):
