@@ -30,18 +30,20 @@
       .speed-row input[type="range"] { width: 160px; }
       .status-badge { display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:8px 12px; border-radius:999px; background: rgba(255,255,255,0.08); font-size:13px; }
       .status-dot { width:10px; height:10px; border-radius:50%; background:#4ade80; display:inline-block; }
+      .feed-note { margin-top:10px; font-size:13px; opacity:0.85; }
     </style>
 
     <div class="dashboard-layout">
       <section class="feed-section" aria-label="live feed section">
-        <h3 class="section-title">Live Feed</h3>
+        <h3 class="section-title">Live Face Detection Feed</h3>
         <div class="video-shell">
-          <img class="video-feed" src="{{ url_for('video_feed') }}" alt="Live camera feed from WAVEGO">
+          <img id="liveFeed" class="video-feed" src="{{ url_for('video_feed') }}" alt="Live camera feed from WAVEGO with face detection boxes">
           <div class="video-overlay">
             <span class="video-dot"></span>
-            <span>Live camera feed</span>
+            <span>Live camera feed with face detection</span>
           </div>
         </div>
+        <div class="feed-note" id="feedNote">Bounding boxes are drawn on the robot-side stream before the page receives each frame.</div>
 
         <div class="stats" aria-label="network status">
           <div class="stat"><div class="stat-label">Mode</div><div class="stat-value" id="modeValue">{{ state.mode }}</div></div>
@@ -109,6 +111,8 @@
   const ramValue = document.getElementById('ramValue');
   const cpuUseValue = document.getElementById('cpuUseValue');
   const statusBadgeText = document.getElementById('statusBadgeText');
+  const liveFeed = document.getElementById('liveFeed');
+  const feedNote = document.getElementById('feedNote');
   const moveStatus = document.getElementById('moveStatus');
   const defaultStatus = document.getElementById('defaultStatus');
 
@@ -132,6 +136,14 @@
 
   refreshStatus();
   setInterval(refreshStatus, 4000);
+
+  if (liveFeed) {
+    liveFeed.addEventListener('error', () => {
+      if (feedNote) {
+        feedNote.textContent = 'Camera stream unavailable. Check picamera2 and the Raspberry Pi camera connection.';
+      }
+    });
+  }
 
   // Tilt controls
   async function tiltAction(direction, action) {

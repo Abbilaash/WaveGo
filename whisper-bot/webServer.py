@@ -23,6 +23,7 @@ import camera_opencv
 import hardware_info
 import camera_tilt
 import robot
+from model.face_detection import FaceDetectionCamera
 
 
 AP_DEFAULT_IP = "192.168.12.1"
@@ -83,7 +84,9 @@ def get_camera():
 	global camera, camera_error
 	if camera is None and camera_error is None:
 		try:
-			camera = camera_opencv.Camera()
+			camera = FaceDetectionCamera()
+			if camera.error is not None:
+				raise camera.error
 		except Exception as exc:
 			camera_error = str(exc)
 			print("Camera unavailable:", camera_error)
