@@ -15,9 +15,16 @@ from flask import Flask, Response, jsonify, render_template, send_from_directory
 
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+if THIS_DIR in sys.path:
+	sys.path.remove(THIS_DIR)
+sys.path.insert(0, THIS_DIR)
+
 RPi_DIR = os.path.normpath(os.path.join(THIS_DIR, "..", "RPi"))
 if RPi_DIR not in sys.path:
-	sys.path.insert(0, RPi_DIR)
+	sys.path.insert(1, RPi_DIR)
+else:
+	sys.path.remove(RPi_DIR)
+	sys.path.insert(1, RPi_DIR)
 
 import camera_opencv
 import hardware_info
