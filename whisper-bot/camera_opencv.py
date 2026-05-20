@@ -490,12 +490,13 @@ class Camera(BaseCamera):
         cvt = CVThread()
         cvt.start()
 
+        print("DEBUG: Running frames() from whisper-bot/camera_opencv.py - Using frame directly")
         while True:
             frame = picam2.capture_array()
             if frame is None:
                 raise RuntimeError('Camera started but could not read frames. Check the Pi camera and Picamera2 configuration.')
 
-            img = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            img = frame
 
             if Camera.modeSelect == 'none':
                 cvt.pause()
