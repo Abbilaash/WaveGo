@@ -403,7 +403,6 @@ class CVThread(threading.Thread):
 
 
 class Camera(BaseCamera):
-    video_source = 0
     modeSelect = 'none'
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
@@ -414,8 +413,6 @@ class Camera(BaseCamera):
     # CVMode = 'no'
 
     def __init__(self):
-        if os.environ.get('OPENCV_CAMERA_SOURCE'):
-            Camera.set_video_source(os.environ['OPENCV_CAMERA_SOURCE'])
         super(Camera, self).__init__()
 
     def robotStop(self):
@@ -479,71 +476,46 @@ class Camera(BaseCamera):
         findLineError = invar
 
     @staticmethod
-    def set_video_source(source):
-        if isinstance(source, str) and source.strip() == '/dev/video0':
-            Camera.video_source = 0
-            return
-        try:
-            Camera.video_source = int(source)
-        except (TypeError, ValueError):
-            Camera.video_source = source
-
-    @staticmethod
-    def _open_opencv_camera():
-        for backend in (cv2.CAP_V4L2, cv2.CAP_ANY):
-            camera = cv2.VideoCapture(Camera.video_source, backend)
-            if not camera.isOpened():
-                camera.release()
-                continue
-
-            camera.set(3, 640)
-            camera.set(4, 480)
-
-            for _ in range(10):
-                ok, img = camera.read()
-                if ok and img is not None:
-                    return camera
-                time.sleep(0.1)
-
-            camera.release()
-
-        return None
-
-    @staticmethod
     def frames():
-        camera = Camera._open_opencv_camera()
-        if camera is None:
-            raise RuntimeError('Could not start camera from /dev/video0. OpenCV could not open device index 0. Check that the device exists, permissions are correct, and the camera is not busy.')
+        from picamera2 import Picamera2
+
+        picam2 = Picamera2()
+        picam2.configure(
+            picam2.create_preview_configuration(
+                main={"format": "RGB888", "size": (640, 480)}
+            )
+        )
+        picam2.start()
 
         cvt = CVThread()
         cvt.start()
 
-        if camera is not None:
-            while True:
-                # read current frame
-                ok, img = camera.read()
-                if not ok or img is None:
-                    raise RuntimeError('Camera started but could not read frames. Check the camera module, /dev/video0, and permissions.')
+        while True:
+            frame = picam2.capture_array()
+            if frame is None:
+                raise RuntimeError('Camera started but could not read frames. Check the Pi camera and Picamera2 configuration.')
 
-                if Camera.modeSelect == 'none':
-                    cvt.pause()
-                    robot.buzzerCtrl(0, 0)
+            img = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+            if Camera.modeSelect == 'none':
+                cvt.pause()
+                robot.buzzerCtrl(0, 0)
+            else:
+                if cvt.CVThreading:
+                    pass
                 else:
-                    if cvt.CVThreading:
-                        pass
-                    else:
-                        cvt.mode(Camera.modeSelect, img)
-                        cvt.resume()
-                    try:
-                        img = cvt.elementDraw(img)
-                    except:
-                        pass
-
-                # encode as a jpeg image and return it
+                    cvt.mode(Camera.modeSelect, img)
+                    cvt.resume()
                 try:
-                    yield cv2.imencode('.jpg', img)[1].tobytes()
+                    img = cvt.elementDraw(img)
                 except:
                     pass
+
+            # encode as a jpeg image and return it
+            try:
+                yield cv2.imencode('.jpg', img)[1].tobytes()
+            except:
+                pass
 
 
 def commandAct(act, inputA):
