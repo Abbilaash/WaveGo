@@ -11,7 +11,7 @@ import threading
 import time
 from typing import Optional, Tuple
 
-from flask import Flask, Response, jsonify, render_template, send_from_directory
+from flask import Flask, Response, jsonify, render_template, send_from_directory, request
 
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -278,6 +278,71 @@ def sendicon(filename):
 @app.route("/fonts/<path:filename>")
 def sendfonts(filename):
 	return send_from_directory(os.path.join(THIS_DIR, "dist", "fonts"), filename)
+
+
+@app.route('/api/face/detect/<action>', methods=['POST'])
+def api_face_detect(action):
+	action = action.lower()
+	if action not in ('start', 'stop'):
+		return jsonify({"success": False, "error": "invalid action"}), 400
+	try:
+		import camera_opencv
+		import robot
+		if action == 'start':
+			camera_opencv.Camera.modeSelect = 'faceDetection'
+		else:
+			camera_opencv.Camera.modeSelect = 'none'
+			robot.buzzerCtrl(0, 0)
+			robot.lightCtrl('blue', 0)
+	except Exception as exc:
+		return jsonify({"success": False, "error": str(exc)}), 500
+	return jsonify({"success": True, "mode": camera_opencv.Camera.modeSelect})
+
+
+@app.route("/api/face/capture", methods=["POST", "GET"])
+def api_face_capture():
+	camera_obj = get_camera()
+	if camera_obj is None:
+		return jsonify({"success": False, "error": "Camera unavailable"}), 503
+	frame_bytes = camera_obj.get_frame()
+	if not frame_bytes:
+		return jsonify({"success": False, "error": "Could not capture frame"}), 500
+	import base64
+	import face_detection
+	has_face = face_detection.has_face(frame_bytes)
+	encoded_image = base64.b64encode(frame_bytes).decode("utf-8")
+	return jsonify({
+		"success": True,
+		"has_face": has_face,
+		"image": encoded_image
+	})
+
+
+@app.route("/api/face/save", methods=["POST"])
+def api_face_save():
+	import base64
+	import face_detection
+	data = request.json
+	if not data or "name" not in data or "images" not in data:
+		return jsonify({"success": False, "error": "Missing name or images"}), 400
+	name = data["name"].strip()
+	if not name:
+		return jsonify({"success": False, "error": "Name cannot be empty"}), 400
+	images_base64 = data["images"]
+	if not isinstance(images_base64, list) or len(images_base64) == 0:
+		return jsonify({"success": False, "error": "Invalid images list"}), 400
+	images_bytes = []
+	for img_b64 in images_base64:
+		try:
+			if "," in img_b64:
+				img_b64 = img_b64.split(",")[1]
+			images_bytes.append(base64.b64decode(img_b64))
+		except Exception:
+			return jsonify({"success": False, "error": "Failed to decode base64 image"}), 400
+	success = face_detection.save_face_data(name, images_bytes)
+	if not success:
+		return jsonify({"success": False, "error": "No faces could be encoded from the captured images"}), 400
+	return jsonify({"success": True, "message": f"Successfully learned face for {name}"})
 
 
 def main() -> None:

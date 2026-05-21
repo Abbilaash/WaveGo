@@ -5,31 +5,231 @@
 {% block content %}
 <section class="grid">
   <article class="panel hero">
-    <div>
-      <div class="eyebrow">Robot Network Portal</div>
-      <h2 class="title">Hello! I am Whisper bot</h2>
-    </div>
     <style>
-      .grid { grid-template-columns: 1fr; }
-      .hero { width: 100%; }
-      .dashboard-layout { display:grid; grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); gap:20px; align-items:start; }
-      .feed-section, .control-section { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:18px; }
-      .feed-section { min-width:0; }
-      .control-section { display:flex; flex-direction:column; gap:16px; }
-      .section-title { margin:0 0 12px; }
-      .tilt-grid, .move-grid { display:flex; flex-direction:column; align-items:center; gap:10px; }
-      .tilt-row, .move-row { display:flex; gap:10px; }
-      .tilt-btn, .move-btn, .stop-btn { min-width:96px; min-height:36px; padding:4px 14px; font-size:22px; font-family:monospace; border-radius:10px; border:1px solid #666; background: linear-gradient(#fbfbfb, #e8e8e8); box-shadow:0 3px 0 #999; cursor:pointer; user-select:none; }
-      .default-grid { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-      .default-btn { min-width:88px; min-height:34px; padding:4px 10px; font-size:15px; font-family:monospace; border-radius:8px; border:1px solid #666; background: linear-gradient(#fbfbfb, #e8e8e8); box-shadow:0 2px 0 #999; cursor:pointer; user-select:none; }
-      .default-btn:active { transform: translateY(1px); box-shadow:0 1px 0 #666; }
-      .tilt-btn:active, .move-btn:active, .stop-btn:active { transform: translateY(2px); box-shadow:0 1px 0 #666; }
-      .stop-btn { min-width:132px; min-height:36px; font-size:18px; letter-spacing:1px; }
-      .status-line { margin-top:10px; font-size:14px; opacity:0.9; }
-      .speed-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-      .speed-row input[type="range"] { width: 160px; }
-      .status-badge { display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:8px 12px; border-radius:999px; background: rgba(255,255,255,0.08); font-size:13px; }
-      .status-dot { width:10px; height:10px; border-radius:50%; background:#4ade80; display:inline-block; }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        width: 100%;
+      }
+
+      .dashboard-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+        gap: 20px;
+        align-items: start;
+      }
+
+      .feed-section,
+      .control-section {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 18px;
+      }
+
+      .feed-section {
+        min-width: 0;
+      }
+
+      .control-section {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .section-title {
+        margin: 0 0 12px;
+      }
+
+      .tilt-grid,
+      .move-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .tilt-row,
+      .move-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .tilt-btn,
+      .move-btn,
+      .stop-btn {
+        min-width: 96px;
+        min-height: 36px;
+        padding: 4px 14px;
+        font-size: 22px;
+        font-family: monospace;
+        border-radius: 10px;
+        border: 1px solid #666;
+        background: linear-gradient(#fbfbfb, #e8e8e8);
+        box-shadow: 0 3px 0 #999;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .default-grid {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .default-btn {
+        min-width: 88px;
+        min-height: 34px;
+        padding: 4px 10px;
+        font-size: 15px;
+        font-family: monospace;
+        border-radius: 8px;
+        border: 1px solid #666;
+        background: linear-gradient(#fbfbfb, #e8e8e8);
+        box-shadow: 0 2px 0 #999;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .default-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 0 #666;
+      }
+
+      .face-grid {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .face-btn {
+        min-width: 88px;
+        min-height: 26px;
+        padding: 2px 10px;
+        font-size: 14px;
+        font-family: monospace;
+        border-radius: 6px;
+        border: 1px solid #666;
+        background: linear-gradient(#fbfbfb, #e8e8e8);
+        box-shadow: 0 1.5px 0 #999;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .face-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 0.5px 0 #666;
+      }
+
+      .learn-preview-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 15px;
+      }
+      .learn-preview-pic {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.3);
+        transition: border-color 0.3s;
+      }
+      .learn-preview-pic.has-face {
+        border-color: #4ade80;
+      }
+      .learn-preview-pic.no-face {
+        border-color: #ef4444;
+      }
+      .learn-save-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+        align-items: center;
+      }
+      .learn-input {
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.4);
+        color: #fff;
+        font-size: 14px;
+        width: 180px;
+        text-align: center;
+      }
+      .learn-save-btn {
+        min-width: 88px;
+        min-height: 28px;
+        padding: 4px 12px;
+        font-size: 13px;
+        font-family: monospace;
+        border-radius: 6px;
+        border: 1px solid #4ade80;
+        background: linear-gradient(#4ade80, #22c55e);
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 1.5px 0 #15803d;
+      }
+      .learn-save-btn:active {
+        transform: translateY(1px);
+        box-shadow: none;
+      }
+
+      .tilt-btn:active,
+      .move-btn:active,
+      .stop-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 #666;
+      }
+
+      .stop-btn {
+        min-width: 132px;
+        min-height: 36px;
+        font-size: 18px;
+        letter-spacing: 1px;
+      }
+
+      .status-line {
+        margin-top: 10px;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .speed-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .speed-row input[type="range"] {
+        width: 160px;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 13px;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #4ade80;
+        display: inline-block;
+      }
     </style>
 
     <div class="dashboard-layout">
@@ -44,12 +244,30 @@
         </div>
 
         <div class="stats" aria-label="network status">
-          <div class="stat"><div class="stat-label">Mode</div><div class="stat-value" id="modeValue">{{ state.mode }}</div></div>
-          <div class="stat"><div class="stat-label">IP Address</div><div class="stat-value" id="ipValue">{{ state.ip }}</div></div>
-          <div class="stat"><div class="stat-label">Endpoint</div><div class="stat-value">/api/status</div></div>
-          <div class="stat"><div class="stat-label">CPU Temp</div><div class="stat-value" id="cpuTempValue">{{ state.cpu_temp }}</div></div>
-          <div class="stat"><div class="stat-label">RAM Usage</div><div class="stat-value" id="ramValue">{{ state.ram_info }}%</div></div>
-          <div class="stat"><div class="stat-label">CPU Usage</div><div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div></div>
+          <div class="stat">
+            <div class="stat-label">Mode</div>
+            <div class="stat-value" id="modeValue">{{ state.mode }}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">IP Address</div>
+            <div class="stat-value" id="ipValue">{{ state.ip }}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Endpoint</div>
+            <div class="stat-value">/api/status</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">CPU Temp</div>
+            <div class="stat-value" id="cpuTempValue">{{ state.cpu_temp }}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">RAM Usage</div>
+            <div class="stat-value" id="ramValue">{{ state.ram_info }}%</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">CPU Usage</div>
+            <div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div>
+          </div>
         </div>
         <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Network ready</span></div>
       </section>
@@ -57,34 +275,35 @@
       <aside class="control-section" aria-label="robot controls section">
         <section class="feed-section">
           <h3 class="section-title">Tilt Camera</h3>
-            <div class="tilt-grid">
-              <button id="tiltUp" class="tilt-btn">&uarr;</button>
-              <div class="tilt-row">
-                <button id="tiltLeft" class="tilt-btn">&larr;</button>
-                <button id="tiltDown" class="tilt-btn">&darr;</button>
-                <button id="tiltRight" class="tilt-btn">&rarr;</button>
-              </div>
+          <div class="tilt-grid">
+            <button id="tiltUp" class="tilt-btn">&uarr;</button>
+            <div class="tilt-row">
+              <button id="tiltLeft" class="tilt-btn">&larr;</button>
+              <button id="tiltDown" class="tilt-btn">&darr;</button>
+              <button id="tiltRight" class="tilt-btn">&rarr;</button>
             </div>
+          </div>
         </section>
 
         <section class="feed-section">
           <h3 class="section-title">Move Control</h3>
-            <div class="move-grid">
-              <button id="moveUp" class="move-btn">&uarr;</button>
-              <div class="move-row">
-                <button id="moveLeft" class="move-btn">&larr;</button>
-                <button id="moveDown" class="move-btn">&darr;</button>
-                <button id="moveRight" class="move-btn">&rarr;</button>
-              </div>
-              <div style="margin-top:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;">
-                <button id="moveStop" class="stop-btn">STOP</button>
-                <div class="speed-row">
-                  <label for="speedRange">Speed</label>
-                  <input id="speedRange" type="range" min="10" max="100" value="100">
-                  <span id="speedValue">100</span>
-                </div>
+          <div class="move-grid">
+            <button id="moveUp" class="move-btn">&uarr;</button>
+            <div class="move-row">
+              <button id="moveLeft" class="move-btn">&larr;</button>
+              <button id="moveDown" class="move-btn">&darr;</button>
+              <button id="moveRight" class="move-btn">&rarr;</button>
+            </div>
+            <div
+              style="margin-top:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;">
+              <button id="moveStop" class="stop-btn">STOP</button>
+              <div class="speed-row">
+                <label for="speedRange">Speed</label>
+                <input id="speedRange" type="range" min="10" max="100" value="100">
+                <span id="speedValue">100</span>
               </div>
             </div>
+          </div>
         </section>
 
         <section class="feed-section">
@@ -93,6 +312,20 @@
             <button id="defaultSteady" class="default-btn">Steady</button>
             <button id="defaultJump" class="default-btn">Jump</button>
             <button id="defaultHandshake" class="default-btn">Handshake</button>
+          </div>
+        </section>
+
+        <section class="feed-section">
+          <h3 class="section-title">Face Recognition</h3>
+          <div class="face-grid">
+            <button id="faceLearn" class="face-btn">Learn</button>
+            <button id="faceDetect" class="face-btn">Detect</button>
+          </div>
+          <div id="learnStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
+          <div id="learnPreviews" class="learn-preview-container" style="display:none;"></div>
+          <div id="learnSaveForm" class="learn-save-form" style="display:none;">
+            <input type="text" id="learnName" class="learn-input" placeholder="Enter person name">
+            <button id="learnSaveBtn" class="learn-save-btn">Save</button>
           </div>
         </section>
       </aside>
@@ -213,5 +446,134 @@
   document.getElementById('defaultSteady').addEventListener('click', () => defaultAction('steady'));
   document.getElementById('defaultJump').addEventListener('click', () => defaultAction('jump'));
   document.getElementById('defaultHandshake').addEventListener('click', () => defaultAction('handshake'));
+
+  // Face Recognition controls
+  let capturedImages = [];
+  let isDetecting = false;
+
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  const faceLearnBtn = document.getElementById('faceLearn');
+  const faceDetectBtn = document.getElementById('faceDetect');
+  const learnStatus = document.getElementById('learnStatus');
+  const learnPreviews = document.getElementById('learnPreviews');
+  const learnSaveForm = document.getElementById('learnSaveForm');
+  const learnNameInput = document.getElementById('learnName');
+  const learnSaveBtn = document.getElementById('learnSaveBtn');
+
+  faceLearnBtn.addEventListener('click', async () => {
+    capturedImages = [];
+    learnStatus.textContent = "Starting capture sequence...";
+    learnPreviews.innerHTML = "";
+    learnPreviews.style.display = "flex";
+    learnSaveForm.style.display = "none";
+    learnNameInput.value = "";
+    faceLearnBtn.disabled = true;
+
+    let anyFace = false;
+
+    for (let i = 0; i < 3; i++) {
+      learnStatus.textContent = `Taking picture ${i + 1} of 3...`;
+      try {
+        const response = await fetch('/api/face/capture');
+        if (!response.ok) throw new Error('Capture failed');
+        const data = await response.json();
+        
+        if (data.success) {
+          const img = document.createElement('img');
+          img.src = `data:image/jpeg;base64,${data.image}`;
+          img.className = `learn-preview-pic ${data.has_face ? 'has-face' : 'no-face'}`;
+          learnPreviews.appendChild(img);
+          
+          capturedImages.push(data.image);
+          if (data.has_face) {
+            anyFace = true;
+          }
+        } else {
+          throw new Error(data.error || 'Unknown error');
+        }
+      } catch (err) {
+        learnStatus.textContent = `Error at pic ${i + 1}: ${err.message}`;
+        faceLearnBtn.disabled = false;
+        return;
+      }
+      
+      if (i < 2) {
+        let secondsLeft = 3;
+        while (secondsLeft > 0) {
+          learnStatus.textContent = `Waiting ${secondsLeft}s before next picture...`;
+          await sleep(1000);
+          secondsLeft--;
+        }
+      }
+    }
+
+    faceLearnBtn.disabled = false;
+
+    if (anyFace) {
+      learnStatus.textContent = "Human face detected! Enter name below:";
+      learnSaveForm.style.display = "flex";
+    } else {
+      learnStatus.textContent = "No human faces detected. Try again!";
+    }
+  });
+
+  learnSaveBtn.addEventListener('click', async () => {
+    const name = learnNameInput.value.trim();
+    if (!name) {
+      alert("Please enter a name.");
+      return;
+    }
+
+    learnStatus.textContent = "Saving face and embeddings...";
+    learnSaveBtn.disabled = true;
+
+    try {
+      const response = await fetch('/api/face/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, images: capturedImages })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Save failed');
+      
+      learnStatus.textContent = `Successfully saved face for ${name}!`;
+      setTimeout(() => {
+        learnPreviews.style.display = "none";
+        learnSaveForm.style.display = "none";
+        learnStatus.textContent = "";
+      }, 3000);
+    } catch (err) {
+      learnStatus.textContent = `Save error: ${err.message}`;
+    } finally {
+      learnSaveBtn.disabled = false;
+    }
+  });
+
+  faceDetectBtn.addEventListener('click', async () => {
+    const action = isDetecting ? 'stop' : 'start';
+    try {
+      const response = await fetch(`/api/face/detect/${action}`, { method: 'POST' });
+      if (!response.ok) throw new Error('Detect toggle failed');
+      const data = await response.json();
+      
+      if (data.success) {
+        isDetecting = !isDetecting;
+        if (isDetecting) {
+          faceDetectBtn.textContent = "Stop Detect";
+          faceDetectBtn.style.border = "1px solid #ef4444";
+          faceDetectBtn.style.background = "linear-gradient(#fca5a5, #f87171)";
+          faceDetectBtn.style.color = "#fff";
+        } else {
+          faceDetectBtn.textContent = "Detect";
+          faceDetectBtn.style.border = "1px solid #666";
+          faceDetectBtn.style.background = "linear-gradient(#fbfbfb, #e8e8e8)";
+          faceDetectBtn.style.color = "";
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
 </script>
 {% endblock %}

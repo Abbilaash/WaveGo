@@ -344,13 +344,8 @@ class CVThread(threading.Thread):
 
 
     def faceDetectCV(self, frame_image):
-        grayGen = cv2.cvtColor(frame_image, cv2.COLOR_BGR2GRAY)
-        self.faces = faceCascade.detectMultiScale(
-                grayGen,     
-                scaleFactor=1.2,
-                minNeighbors=5,     
-                minSize=(20, 20)
-            )
+        import face_detection
+        self.faces = face_detection.detect_faces(frame_image)
         if len(self.faces):
             robot.lightCtrl('red', 0)
             robot.buzzerCtrl(1, 0)
