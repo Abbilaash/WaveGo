@@ -30,6 +30,7 @@ import camera_opencv
 import hardware_info
 import camera_tilt
 import robot
+from logger import log_action
 
 
 AP_DEFAULT_IP = "192.168.12.1"
@@ -40,6 +41,20 @@ FLASK_PORT = 5000
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.jinja_env.auto_reload = True
+
+
+@app.before_request
+def log_request_info():
+	payload = request.get_json(silent=True) or request.form or request.args
+	log_action("API_REQUEST", f"{request.method} {request.path}", f"IP: {request.remote_addr}, Payload: {dict(payload) if payload else None}")
+
+
+@app.after_request
+def log_response_info(response):
+	log_action("API_RESPONSE", f"{request.method} {request.path}", f"Status: {response.status}")
+	return response
+
+
 state_lock = threading.Lock()
 device_state = {
 	"mode": "unknown",
@@ -187,7 +202,9 @@ def api_tilt(direction, action):
 			ok = camera_tilt.start(direction)
 		else:
 			ok = camera_tilt.stop(direction)
+		log_action("BACKEND", "Camera Tilt Command Executed", f"Direction: {direction}, Action: {action}, Success: {ok}")
 	except Exception as exc:
+		log_action("BACKEND", "Camera Tilt Command Error", str(exc))
 		return jsonify({"success": False, "error": str(exc)}), 500
 
 	if not ok:
@@ -215,7 +232,9 @@ def api_default(action):
 			robot.jump()
 		else:
 			robot.handShake()
+		log_action("BACKEND", "Default Action Command Executed", f"Action: {action}")
 	except Exception as exc:
+		log_action("BACKEND", "Default Action Command Error", str(exc))
 		return jsonify({"success": False, "error": str(exc)}), 500
 
 	return jsonify({"success": True, "action": action})
@@ -249,7 +268,9 @@ def api_move(action):
 			robot.right(speed)
 		else:
 			stop_robot()
+		log_action("BACKEND", "Movement Command Executed", f"Action: {action}, Speed: {speed}")
 	except Exception as exc:
+		log_action("BACKEND", "Movement Command Error", str(exc))
 		return jsonify({"success": False, "error": str(exc)}), 500
 
 	return jsonify({"success": True, "action": action, "speed": speed})
@@ -294,7 +315,9 @@ def api_face_detect(action):
 			camera_opencv.Camera.modeSelect = 'none'
 			robot.buzzerCtrl(0, 0)
 			robot.lightCtrl('blue', 0)
+		log_action("BACKEND", "Face Detection Toggle Command Executed", f"Action: {action}, Mode: {camera_opencv.Camera.modeSelect}")
 	except Exception as exc:
+		log_action("BACKEND", "Face Detection Toggle Error", str(exc))
 		return jsonify({"success": False, "error": str(exc)}), 500
 	return jsonify({"success": True, "mode": camera_opencv.Camera.modeSelect})
 
@@ -310,6 +333,7 @@ def api_face_capture():
 	import base64
 	import face_detection
 	has_face = face_detection.has_face(frame_bytes)
+	log_action("BACKEND", "Face Capture Command Executed", f"Has human face: {has_face}")
 	encoded_image = base64.b64encode(frame_bytes).decode("utf-8")
 	return jsonify({
 		"success": True,

@@ -1,0 +1,51 @@
+2026-05-21 23:39:07,645 - INFO - [SYSTEM] Logging System Initiated - Details: Initial test log entry
+2026-05-21 23:41:28,780 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:41:28,781 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:42:03,531 - INFO - [API_REQUEST] POST /api/move/forward - Details: IP: 127.0.0.1, Payload: {'speed': 80}
+2026-05-21 23:42:03,932 - INFO - [ROBOT] forward - Details: speed=80
+2026-05-21 23:42:03,932 - INFO - [BACKEND] Movement Command Executed - Details: Action: forward, Speed: 80
+2026-05-21 23:42:03,933 - INFO - [API_RESPONSE] POST /api/move/forward - Details: Status: 200 OK
+2026-05-21 23:42:09,818 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:42:09,833 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:09,846 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:09,853 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:22,257 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:22,259 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:23,067 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:23,100 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-05-21 23:43:23,150 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:23,152 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:23,154 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:24,167 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-05-21 23:43:26,238 - INFO - [API_REQUEST] GET /api/face/capture - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:26,240 - INFO - [API_RESPONSE] GET /api/face/capture - Details: Status: 503 SERVICE UNAVAILABLE
+2026-05-21 23:43:27,817 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:27,819 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:31,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:31,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:35,813 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:35,814 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:39,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:39,823 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:43,810 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:43,820 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:44,807 - INFO - [API_REQUEST] POST /api/face/detect/start - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:44,807 - INFO - [BACKEND] Face Detection Toggle Command Executed - Details: Action: start, Mode: faceDetection
+2026-05-21 23:43:44,808 - INFO - [API_RESPONSE] POST /api/face/detect/start - Details: Status: 200 OK
+2026-05-21 23:43:47,527 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:47,530 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:48,315 - INFO - [API_REQUEST] POST /api/face/detect/stop - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:48,720 - INFO - [ROBOT] buzzerCtrl - Details: buzzerCtrl=0, cmdInput=0
+2026-05-21 23:43:49,124 - INFO - [ROBOT] lightCtrl - Details: colorName=blue, cmdInput=0
+2026-05-21 23:43:49,124 - INFO - [BACKEND] Face Detection Toggle Command Executed - Details: Action: stop, Mode: none
+2026-05-21 23:43:49,124 - INFO - [API_RESPONSE] POST /api/face/detect/stop - Details: Status: 200 OK
+2026-05-21 23:43:51,815 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:51,816 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:55,815 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:55,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:43:59,148 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:43:59,151 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-05-21 23:50:47,694 - INFO - [API_REQUEST] POST /api/move/forward - Details: IP: 127.0.0.1, Payload: None
+2026-05-21 23:50:48,097 - INFO - [ROBOT] forward - Details: speed=100
+2026-05-21 23:50:48,097 - INFO - [BACKEND] Movement Command Executed - Details: Action: forward, Speed: 100
+2026-05-21 23:50:48,097 - INFO - [API_RESPONSE] POST /api/move/forward - Details: Status: 200 OK

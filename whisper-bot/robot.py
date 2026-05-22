@@ -6,6 +6,12 @@ import json
 import serial
 import threading
 
+try:
+	from logger import log_action
+except ImportError:
+	def log_action(category, action, details=None):
+		pass
+
 SERIAL_PORT = "/dev/ttyS0"
 SERIAL_BAUDRATE = 115200
 ser = None
@@ -59,85 +65,110 @@ def setUpperIP(ipInput):
 	global upperGlobalIP
 	upperGlobalIP = ipInput
 
+
 def forward(speed=100):
 	dataCMD = json.dumps({'var':"move", 'val':1})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "forward", f"speed={speed}")
 	print('robot-forward')
+
 
 def backward(speed=100):
 	dataCMD = json.dumps({'var':"move", 'val':5})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "backward", f"speed={speed}")
 	print('robot-backward')
+
 
 def left(speed=100):
 	dataCMD = json.dumps({'var':"move", 'val':2})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "left", f"speed={speed}")
 	print('robot-left')
+
 
 def right(speed=100):
 	dataCMD = json.dumps({'var':"move", 'val':4})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "right", f"speed={speed}")
 	print('robot-right')
+
 
 def stopLR():
 	dataCMD = json.dumps({'var':"move", 'val':6})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "stopLR")
 	print('robot-stop')
+
 
 def stopFB():
 	dataCMD = json.dumps({'var':"move", 'val':3})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "stopFB")
 	print('robot-stop')
-
 
 
 def lookUp():
 	dataCMD = json.dumps({'var':"ges", 'val':1})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "lookUp")
 	print('robot-lookUp')
+
 
 def lookDown():
 	dataCMD = json.dumps({'var':"ges", 'val':2})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "lookDown")
 	print('robot-lookDown')
+
 
 def lookStopUD():
 	dataCMD = json.dumps({'var':"ges", 'val':3})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "lookStopUD")
 	print('robot-lookStopUD')
+
 
 def lookLeft():
 	dataCMD = json.dumps({'var':"ges", 'val':4})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "lookLeft")
 	print('robot-lookLeft')
+
 
 def lookRight():
 	dataCMD = json.dumps({'var':"ges", 'val':5})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "lookRight")
 	print('robot-lookRight')
+
 
 def lookStopLR():
 	dataCMD = json.dumps({'var':"ges", 'val':6})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "lookStopLR")
 	print('robot-lookStopLR')
-
 
 
 def steadyMode():
 	dataCMD = json.dumps({'var':"funcMode", 'val':1})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "steadyMode")
 	print('robot-steady')
+
 
 def jump():
 	dataCMD = json.dumps({'var':"funcMode", 'val':4})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "jump")
 	print('robot-jump')
+
 
 def handShake():
 	dataCMD = json.dumps({'var':"funcMode", 'val':3})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "handShake")
 	print('robot-handshake')
-
 
 
 def lightCtrl(colorName, cmdInput):
@@ -160,11 +191,13 @@ def lightCtrl(colorName, cmdInput):
 		colorNum = 7
 	dataCMD = json.dumps({'var':"light", 'val':colorNum})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "lightCtrl", f"colorName={colorName}, cmdInput={cmdInput}")
 
 
 def buzzerCtrl(buzzerCtrl, cmdInput):
 	dataCMD = json.dumps({'var':"buzzer", 'val':buzzerCtrl})
 	_serial_write(dataCMD)
+	log_action("ROBOT", "buzzerCtrl", f"buzzerCtrl={buzzerCtrl}, cmdInput={cmdInput}")
 
 
 

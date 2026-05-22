@@ -92,15 +92,20 @@ class CVThread(threading.Thread):
             pass
 
         elif self.CVMode == 'faceDetection':
-            if len(self.faces):
-                if len(self.faces) == 1:
-                    cv2.putText(imgInput,'1 Face Detected',(40,60), CVThread.font, 0.5,(255,255,255),1,cv2.LINE_AA)
-                else:
-                    cv2.putText(imgInput,'%d Faces Detected'%len(self.faces),(40,60), CVThread.font, 0.5,(255,255,255),1,cv2.LINE_AA)
+            if self.faces and len(self.faces):
+                cv2.putText(imgInput, f'{len(self.faces)} Face(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+                for face_info in self.faces:
+                    try:
+                        x, y, w, h = face_info["box"]
+                        name = face_info["name"]
+                        color = (74, 222, 128) if name != "Unknown" else (64, 128, 255) # Green for matched, orange for unknown
+                        cv2.rectangle(imgInput, (x, y), (x + w, y + h), color, 2)
+                        label = f"Hello {name}" if name != "Unknown" else "Unknown"
+                        cv2.putText(imgInput, label, (x, y - 10), CVThread.font, 0.5, color, 1, cv2.LINE_AA)
+                    except (KeyError, TypeError):
+                        pass
             else:
-                cv2.putText(imgInput,'Face Detecting',(40,60), CVThread.font, 0.5,(255,255,255),1,cv2.LINE_AA)
-            for (x,y,w,h) in self.faces:
-                cv2.rectangle(imgInput,(x,y),(x+w,y+h),(64,128,255),2)
+                cv2.putText(imgInput, 'Face Detecting', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
 
         elif self.CVMode == 'findColor':
             if self.findColorDetection:
@@ -345,7 +350,7 @@ class CVThread(threading.Thread):
 
     def faceDetectCV(self, frame_image):
         import face_detection
-        self.faces = face_detection.detect_faces(frame_image)
+        self.faces = face_detection.recognize_faces(frame_image)
         if len(self.faces):
             robot.lightCtrl('red', 0)
             robot.buzzerCtrl(1, 0)
