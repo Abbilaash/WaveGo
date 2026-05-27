@@ -602,37 +602,7 @@ def commandAct(act, inputA):
         Camera.modeSelect = 'none'
         robot.buzzerCtrl(0, 0)
     elif act == 'objectLearn':
-        if hasattr(Camera, 'cvt') and Camera.cvt is not None and Camera.cvt.imgCV is not None:
-            try:
-                frame = Camera.cvt.imgCV.copy()
-                from model import objectDetectYoloNano
-                objects = objectDetectYoloNano.detect_objects(frame)
-                
-                for obj in objects:
-                    x, y, w, h = obj["box"]
-                    label = obj["label"]
-                    confidence = obj["confidence"]
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                    cv2.putText(
-                        frame,
-                        f"{label} {confidence:.2f}",
-                        (x, y - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        (0, 255, 0),
-                        2
-                    )
-                
-                cv2.imwrite("detect_output.jpg", frame)
-                print("Saved detect_output.jpg")
-                
-                robot.buzzerCtrl(1, 0)
-                robot.lightCtrl('red', 0)
-                time.sleep(0.2)
-                robot.buzzerCtrl(0, 0)
-                robot.lightCtrl('blue', 0)
-            except Exception as e:
-                print("Error in objectLearn command:", e)
+        Camera.modeSelect = 'objectDetection'
     elif 'trackLine' == act:
         Camera.modeSelect = 'findlineCV'
         Camera.CVMode = 'run'
