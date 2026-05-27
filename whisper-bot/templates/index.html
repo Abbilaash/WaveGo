@@ -328,6 +328,15 @@
             <button id="learnSaveBtn" class="learn-save-btn">Save</button>
           </div>
         </section>
+
+        <section class="feed-section">
+          <h3 class="section-title">Object Detection</h3>
+          <div class="face-grid">
+            <button id="objectLearn" class="face-btn">Learn</button>
+            <button id="objectDetect" class="face-btn">Detect</button>
+          </div>
+          <div id="objectStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
+        </section>
       </aside>
     </div>
   </article>
@@ -575,5 +584,71 @@
       console.error(err);
     }
   });
+
+  // Object Detection controls
+  const objectLearnBtn = document.getElementById('objectLearn');
+  const objectDetectBtn = document.getElementById('objectDetect');
+  const objectStatus = document.getElementById('objectStatus');
+  let isObjectDetecting = false;
+
+  if (objectLearnBtn && objectDetectBtn && objectStatus) {
+    objectLearnBtn.addEventListener('click', async () => {
+      objectStatus.textContent = "Capturing and learning current objects...";
+      objectStatus.style.color = "#4ade80";
+      objectLearnBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/object/learn', { method: 'POST' });
+        const data = await response.json();
+        if (!response.ok || !data.success) throw new Error(data.error || 'Learning failed');
+        
+        if (data.detected && data.detected.length > 0) {
+          objectStatus.textContent = `Learned: ${data.detected.join(', ')}! Saved detect_output.jpg`;
+        } else {
+          objectStatus.textContent = "No objects detected to learn, but saved detect_output.jpg!";
+        }
+        objectStatus.style.color = "#4ade80";
+      } catch (err) {
+        objectStatus.textContent = `Error: ${err.message}`;
+        objectStatus.style.color = "#ef4444";
+      } finally {
+        objectLearnBtn.disabled = false;
+        setTimeout(() => { objectStatus.textContent = ""; }, 5000);
+      }
+    });
+
+    objectDetectBtn.addEventListener('click', async () => {
+      const action = isObjectDetecting ? 'stop' : 'start';
+      try {
+        const response = await fetch(`/api/object/detect/${action}`, { method: 'POST' });
+        if (!response.ok) throw new Error('Detect toggle failed');
+        const data = await response.json();
+        
+        if (data.success) {
+          isObjectDetecting = !isObjectDetecting;
+          if (isObjectDetecting) {
+            objectDetectBtn.textContent = "Stop Detect";
+            objectDetectBtn.style.border = "1px solid #ef4444";
+            objectDetectBtn.style.background = "linear-gradient(#fca5a5, #f87171)";
+            objectDetectBtn.style.color = "#fff";
+            objectStatus.textContent = "Object Detection started.";
+            objectStatus.style.color = "#4ade80";
+          } else {
+            objectDetectBtn.textContent = "Detect";
+            objectDetectBtn.style.border = "1px solid #666";
+            objectDetectBtn.style.background = "linear-gradient(#fbfbfb, #e8e8e8)";
+            objectDetectBtn.style.color = "";
+            objectStatus.textContent = "Object Detection stopped.";
+            objectStatus.style.color = "#4ade80";
+          }
+        }
+      } catch (err) {
+        objectStatus.textContent = `Error: ${err.message}`;
+        objectStatus.style.color = "#ef4444";
+      } finally {
+        setTimeout(() => { objectStatus.textContent = ""; }, 3000);
+      }
+    });
+  }
 </script>
 {% endblock %}

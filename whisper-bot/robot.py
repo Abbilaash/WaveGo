@@ -197,7 +197,6 @@ def lightCtrl(colorName, cmdInput):
 def buzzerCtrl(buzzerCtrl, cmdInput):
 	dataCMD = json.dumps({'var':"buzzer", 'val':buzzerCtrl})
 	_serial_write(dataCMD)
-	log_action("ROBOT", "buzzerCtrl", f"buzzerCtrl={buzzerCtrl}, cmdInput={cmdInput}")
 
 
 

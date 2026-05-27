@@ -107,6 +107,14 @@ def save_face_data(name, images_bytes):
             
     if not embeddings:
         log_action("BACKEND", "Save Face Data Failed", "No valid embeddings found in any images.")
+        # Cleanup newly written files if we failed to save them as a face
+        for i in range(len(images_bytes)):
+            img_path = os.path.join(MODEL_DIR, f"{name}_{i+1}.jpg")
+            if os.path.exists(img_path):
+                try:
+                    os.remove(img_path)
+                except Exception:
+                    pass
         return False
         
     avg_embedding = np.mean(embeddings, axis=0)
@@ -123,7 +131,27 @@ def save_face_data(name, images_bytes):
         except Exception as e:
             log_action("BACKEND", "Load PKL Failed (Creating new list)", str(e))
             
+    # Filter out existing face with same name to avoid duplicates and preserve queue order
     faces = [f for f in faces if f.get("name", "").lower() != name.lower()]
+    
+    # If we already have 5 faces in the queue, we must remove the oldest one
+    if len(faces) >= 5:
+        oldest_face = faces[0]
+        oldest_name = oldest_face.get("name", "")
+        faces.pop(0)
+        log_action("BACKEND", "Face Queue Limit Exceeded", f"Removing oldest face '{oldest_name}' from database.")
+        
+        if oldest_name:
+            import glob
+            oldest_images_pattern = os.path.join(MODEL_DIR, f"{oldest_name}_*.jpg")
+            oldest_images = glob.glob(oldest_images_pattern)
+            for img_file in oldest_images:
+                try:
+                    os.remove(img_file)
+                    log_action("BACKEND", "Image Deleted", f"Deleted {os.path.basename(img_file)}")
+                except Exception as e:
+                    log_action("BACKEND", "Image Deletion Error", f"Failed to delete {os.path.basename(img_file)}: {str(e)}")
+                    
     faces.append({"name": name, "encoding": avg_embedding})
     
     with open(PKL_PATH, "wb") as f:
