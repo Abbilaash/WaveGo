@@ -585,84 +585,22 @@
     }
   });
 
-  // Object Detection controls
+  // Object Detection controls (Placeholder / Initial implementation)
   const objectLearnBtn = document.getElementById('objectLearn');
   const objectDetectBtn = document.getElementById('objectDetect');
   const objectStatus = document.getElementById('objectStatus');
-  let isObjectDetecting = false;
 
   if (objectLearnBtn && objectDetectBtn && objectStatus) {
-    let isObjectLearning = false;
-
-    objectLearnBtn.addEventListener('click', async () => {
-      const action = isObjectLearning ? 'stop' : 'start';
-      objectStatus.textContent = isObjectLearning ? "Stopping live object learning..." : "Starting live object learning...";
+    objectLearnBtn.addEventListener('click', () => {
+      objectStatus.textContent = "Object Learning starting... (Feature coming soon)";
       objectStatus.style.color = "#4ade80";
-
-      try {
-        if (!isObjectLearning) {
-          const response = await fetch('/api/object/learn', { method: 'POST' });
-          const data = await response.json();
-          if (!response.ok || !data.success) throw new Error(data.error || 'Learning failed');
-          
-          isObjectLearning = true;
-          objectLearnBtn.textContent = "Stop Learn";
-          objectLearnBtn.style.border = "1px solid #ef4444";
-          objectLearnBtn.style.background = "linear-gradient(#fca5a5, #f87171)";
-          objectLearnBtn.style.color = "#fff";
-          objectStatus.textContent = "Object Learning started! Live bounding boxes are rendering.";
-        } else {
-          const response = await fetch('/api/object/detect/stop', { method: 'POST' });
-          const data = await response.json();
-          if (!response.ok || !data.success) throw new Error(data.error || 'Stop failed');
-          
-          isObjectLearning = false;
-          objectLearnBtn.textContent = "Learn";
-          objectLearnBtn.style.border = "1px solid #666";
-          objectLearnBtn.style.background = "linear-gradient(#fbfbfb, #e8e8e8)";
-          objectLearnBtn.style.color = "";
-          objectStatus.textContent = "Object Learning stopped.";
-        }
-        objectStatus.style.color = "#4ade80";
-      } catch (err) {
-        objectStatus.textContent = `Error: ${err.message}`;
-        objectStatus.style.color = "#ef4444";
-      } finally {
-        setTimeout(() => { objectStatus.textContent = ""; }, 4000);
-      }
+      setTimeout(() => { objectStatus.textContent = ""; }, 3000);
     });
 
-    objectDetectBtn.addEventListener('click', async () => {
-      const action = isObjectDetecting ? 'stop' : 'start';
-      try {
-        const response = await fetch(`/api/object/detect/${action}`, { method: 'POST' });
-        if (!response.ok) throw new Error('Detect toggle failed');
-        const data = await response.json();
-        
-        if (data.success) {
-          isObjectDetecting = !isObjectDetecting;
-          if (isObjectDetecting) {
-            objectDetectBtn.textContent = "Stop Detect";
-            objectDetectBtn.style.border = "1px solid #ef4444";
-            objectDetectBtn.style.background = "linear-gradient(#fca5a5, #f87171)";
-            objectDetectBtn.style.color = "#fff";
-            objectStatus.textContent = "Object Detection started.";
-            objectStatus.style.color = "#4ade80";
-          } else {
-            objectDetectBtn.textContent = "Detect";
-            objectDetectBtn.style.border = "1px solid #666";
-            objectDetectBtn.style.background = "linear-gradient(#fbfbfb, #e8e8e8)";
-            objectDetectBtn.style.color = "";
-            objectStatus.textContent = "Object Detection stopped.";
-            objectStatus.style.color = "#4ade80";
-          }
-        }
-      } catch (err) {
-        objectStatus.textContent = `Error: ${err.message}`;
-        objectStatus.style.color = "#ef4444";
-      } finally {
-        setTimeout(() => { objectStatus.textContent = ""; }, 3000);
-      }
+    objectDetectBtn.addEventListener('click', () => {
+      objectStatus.textContent = "Object Detection starting... (Feature coming soon)";
+      objectStatus.style.color = "#4ade80";
+      setTimeout(() => { objectStatus.textContent = ""; }, 3000);
     });
   }
 </script>

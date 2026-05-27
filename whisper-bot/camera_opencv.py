@@ -44,7 +44,6 @@ class CVThread(threading.Thread):
         self.CVMode = 'none'
         self.imgCV = None
         self.faces = None
-        self.objects = None
 
         self.mov_x = None
         self.mov_y = None
@@ -107,21 +106,6 @@ class CVThread(threading.Thread):
                         pass
             else:
                 cv2.putText(imgInput, 'Face Detecting', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
-
-        elif self.CVMode == 'objectDetection':
-            if self.objects and len(self.objects):
-                cv2.putText(imgInput, f'{len(self.objects)} Object(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
-                for obj in self.objects:
-                    try:
-                        x, y, w, h = obj["box"]
-                        label = obj["label"]
-                        confidence = obj["confidence"]
-                        cv2.rectangle(imgInput, (x, y), (x + w, y + h), (74, 222, 128), 2)
-                        cv2.putText(imgInput, f"{label} {confidence:.2f}", (x, y - 10), CVThread.font, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
-                    except (KeyError, TypeError):
-                        pass
-            else:
-                cv2.putText(imgInput, 'Object Detecting', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
 
         elif self.CVMode == 'findColor':
             if self.findColorDetection:
@@ -373,15 +357,6 @@ class CVThread(threading.Thread):
             robot.lightCtrl('blue', 0)
         self.pause()
 
-    def objectDetectCV(self, frame_image):
-        try:
-            from model import objectDetectYoloNano
-            self.objects = objectDetectYoloNano.detect_objects(frame_image)
-        except Exception as e:
-            print("Error in objectDetectCV inference:", e)
-            self.objects = []
-        self.pause()
-
 
     def pause(self):
         self.__flag.clear()
@@ -422,11 +397,6 @@ class CVThread(threading.Thread):
             elif self.CVMode == 'faceDetection':
                 self.CVThreading = 1
                 self.faceDetectCV(self.imgCV)
-                self.CVThreading = 0
-
-            elif self.CVMode == 'objectDetection':
-                self.CVThreading = 1
-                self.objectDetectCV(self.imgCV)
                 self.CVThreading = 0
 
 
@@ -517,7 +487,6 @@ class Camera(BaseCamera):
 
         cvt = CVThread()
         cvt.start()
-        Camera.cvt = cvt
 
         print("DEBUG: Running frames() from whisper-bot/camera_opencv.py - Using frame directly")
         while True:
@@ -596,13 +565,6 @@ def commandAct(act, inputA):
     elif act == 'faceDetectionOff':
         Camera.modeSelect = 'none'
         robot.buzzerCtrl(0, 0)
-    elif act == 'objectDetection':
-        Camera.modeSelect = 'objectDetection'
-    elif act == 'objectDetectionOff':
-        Camera.modeSelect = 'none'
-        robot.buzzerCtrl(0, 0)
-    elif act == 'objectLearn':
-        Camera.modeSelect = 'objectDetection'
     elif 'trackLine' == act:
         Camera.modeSelect = 'findlineCV'
         Camera.CVMode = 'run'
