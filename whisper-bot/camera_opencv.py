@@ -28,12 +28,13 @@ speedMove = 100
 
 
 _onnx_session = None
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def get_onnx_session():
     global _onnx_session
     if _onnx_session is None:
         import onnxruntime as ort
-        model_path = os.path.join(thisPath, "mobilenetv3_embedding.onnx")
+        model_path = os.path.join(BASE_DIR, "mobilenetv3_embedding.onnx")
         _onnx_session = ort.InferenceSession(
             model_path,
             providers=["CPUExecutionProvider"]
@@ -43,7 +44,7 @@ def get_onnx_session():
 
 def load_learned_objects():
     import pickle
-    pkl_path = os.path.join(thisPath, "ObjectLearning", "storage.pkl")
+    pkl_path = os.path.join(BASE_DIR, "ObjectLearning", "storage.pkl")
     if os.path.exists(pkl_path):
         try:
             with open(pkl_path, "rb") as f:
