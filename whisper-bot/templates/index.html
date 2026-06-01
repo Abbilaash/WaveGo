@@ -1024,7 +1024,39 @@
     }
   });
 
-  // Object Learn trigger (takes 3 pictures with 1-second gap)
+  // Web Audio mechanical camera shutter click synthesizer
+  function playClickSound() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const bufferSize = audioCtx.sampleRate * 0.12; // ~120ms
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+      
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1200;
+      filter.Q.value = 3;
+      
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      
+      noise.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      noise.start();
+    } catch (e) {
+      console.warn("Audio Context not supported or blocked: ", e);
+    }
+  }
+
+  // Object Learn trigger (takes 3 pictures one-by-one, each with a 1-second prepare gap)
   if (objectLearnBtn && objectStatus) {
     objectLearnBtn.addEventListener('click', async () => {
       capturedObjImages = [];
@@ -1034,7 +1066,30 @@
       objectStatus.textContent = "Starting capture sequence...";
 
       for (let i = 0; i < 3; i++) {
+        // Wait 1 second clicking/preparing gap BEFORE taking each picture
+        let secondsLeft = 1;
+        while (secondsLeft > 0) {
+          objectStatus.textContent = `Preparing picture ${i + 1} of 3 in ${secondsLeft}s...`;
+          await sleep(1000);
+          secondsLeft--;
+        }
+
         objectStatus.textContent = `Taking picture ${i + 1} of 3...`;
+        
+        // Synthesize camera click audio
+        playClickSound();
+        
+        // Shutter visual flash animation on the camera feed
+        const liveFeed = document.querySelector('.video-feed');
+        if (liveFeed) {
+          liveFeed.style.transition = 'none';
+          liveFeed.style.opacity = '0.2';
+          setTimeout(() => {
+            liveFeed.style.transition = 'opacity 0.25s ease-out';
+            liveFeed.style.opacity = '1';
+          }, 60);
+        }
+
         try {
           const response = await fetch('/api/object/capture');
           if (!response.ok) throw new Error('Capture failed');
@@ -1051,15 +1106,6 @@
           objectStatus.style.color = "#ef4444";
           objectLearnBtn.disabled = false;
           return;
-        }
-
-        if (i < 2) {
-          let secondsLeft = 1;
-          while (secondsLeft > 0) {
-            objectStatus.textContent = `Waiting ${secondsLeft}s before next picture...`;
-            await sleep(1000);
-            secondsLeft--;
-          }
         }
       }
 
