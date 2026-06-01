@@ -433,8 +433,8 @@ def api_object_submit():
 	import pickle
 	import time
 	
-	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning", object_name)
-	os.makedirs(object_learning_dir, exist_ok=True)
+	object_detection_dir = os.path.join(THIS_DIR, "ObjectDetection", object_name)
+	os.makedirs(object_detection_dir, exist_ok=True)
 	
 	# Decode, crop and generate MobileNetV3 embeddings for each image
 	new_embeddings = []
@@ -471,15 +471,15 @@ def api_object_submit():
 				# Crop
 				cropped_img = img[y : y + h, x : x + w]
 				
-				# Save cropped image to ObjectLearning/crop_<timestamp>_<index>.jpg
+				# Save cropped image to ObjectDetection/crop_<timestamp>_<index>.jpg
 				img_filename = f"crop_{int(time.time())}_{i+1}.jpg"
-				img_path = os.path.join(object_learning_dir, img_filename)
+				img_path = os.path.join(object_detection_dir, img_filename)
 				cv2.imwrite(img_path, cropped_img)
 				log_action("BACKEND", "Object Crop Saved", f"Saved cropped image {i+1}")
 			else:
-				# If no bounding box was drawn, save the full image inside ObjectLearning/
+				# If no bounding box was drawn, save the full image inside ObjectDetection/
 				img_filename = f"crop_full_{int(time.time())}_{i+1}.jpg"
-				img_path = os.path.join(object_learning_dir, img_filename)
+				img_path = os.path.join(object_detection_dir, img_filename)
 				cv2.imwrite(img_path, img)
 				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1}")
 				
@@ -504,9 +504,9 @@ def api_object_submit():
 		except Exception as e:
 			log_action("BACKEND", "Object Crop/Save Error", f"Failed to crop/save image {i+1}: {str(e)}")
 			
-	# If we have successfully generated any embeddings, append them to objects.pkl
+	# If we have successfully generated any embeddings, append them to storage.pkl
 	if new_embeddings:
-		pkl_path = os.path.join(THIS_DIR, "ObjectLearning", "objects.pkl")
+		pkl_path = os.path.join(THIS_DIR, "ObjectDetection", "storage.pkl")
 		
 		# Load existing embeddings
 		existing_objects = []
@@ -519,7 +519,7 @@ def api_object_submit():
 					elif isinstance(data, dict):
 						existing_objects = [data]
 			except Exception as pkl_load_err:
-				log_action("BACKEND", "PKL Load Error", f"Failed to load objects.pkl: {str(pkl_load_err)}")
+				log_action("BACKEND", "PKL Load Error", f"Failed to load storage.pkl: {str(pkl_load_err)}")
 				existing_objects = []
 				
 		# Remove any existing object with the same name to overwrite and update the queue order
@@ -537,10 +537,10 @@ def api_object_submit():
 			# Evict the oldest object (the first one)
 			evicted_obj = existing_objects.pop(0)
 			evicted_name = evicted_obj.get("name", "unnamed_object")
-			log_action("BACKEND", "Object Queue Evicted", f"Evicted oldest object '{evicted_name}' from objects.pkl queue")
+			log_action("BACKEND", "Object Queue Evicted", f"Evicted oldest object '{evicted_name}' from storage.pkl queue")
 			
 			# Also clean up the evicted folder on disk to keep everything perfectly in sync
-			evicted_dir = os.path.join(THIS_DIR, "ObjectLearning", evicted_name)
+			evicted_dir = os.path.join(THIS_DIR, "ObjectDetection", evicted_name)
 			if os.path.exists(evicted_dir):
 				import shutil
 				try:
@@ -549,13 +549,13 @@ def api_object_submit():
 				except Exception as clean_err:
 					log_action("BACKEND", "Object Folder Delete Error", f"Failed to delete {evicted_name} directory: {str(clean_err)}")
 					
-		# Save updated database list to objects.pkl
+		# Save updated database list to storage.pkl
 		try:
 			with open(pkl_path, "wb") as f:
 				pickle.dump(existing_objects if len(existing_objects) > 1 else existing_objects[0], f)
-			log_action("BACKEND", "PKL Save Success", f"Successfully saved object '{object_name}' with {len(new_embeddings)} embeddings to objects.pkl")
+			log_action("BACKEND", "PKL Save Success", f"Successfully saved object '{object_name}' with {len(new_embeddings)} embeddings to storage.pkl")
 		except Exception as pkl_save_err:
-			log_action("BACKEND", "PKL Save Error", f"Failed to write objects.pkl: {str(pkl_save_err)}")
+			log_action("BACKEND", "PKL Save Error", f"Failed to write storage.pkl: {str(pkl_save_err)}")
 			
 	return jsonify({"success": True, "message": "bounding success"})
 
