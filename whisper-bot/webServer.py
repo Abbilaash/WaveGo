@@ -426,20 +426,18 @@ def api_object_capture():
 	})
 
 
-mobilenet_model = None
+onnx_session = None
 
-def get_mobilenet_model():
-	global mobilenet_model
-	if mobilenet_model is None:
-		from tensorflow.keras.applications import MobileNetV3Small
-		import os
-		os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-		mobilenet_model = MobileNetV3Small(
-			weights="imagenet",
-			include_top=False,
-			pooling="avg"
+def get_onnx_session():
+	global onnx_session
+	if onnx_session is None:
+		import onnxruntime as ort
+		model_path = os.path.join(THIS_DIR, "mobilenetv3_embedding.onnx")
+		onnx_session = ort.InferenceSession(
+			model_path,
+			providers=["CPUExecutionProvider"]
 		)
-	return mobilenet_model
+	return onnx_session
 
 
 @app.route("/api/object/submit", methods=["POST"])
@@ -519,19 +517,38 @@ def api_object_submit():
 			# Generate MobileNetV3 embedding for the saved image
 			if img_path and os.path.exists(img_path):
 				try:
-					from tensorflow.keras.applications.mobilenet_v3 import preprocess_input
-					from tensorflow.keras.preprocessing import image as keras_image
+					session = get_onnx_session()
+					input_name = session.get_inputs()[0].name
 					
-					model_mnet = get_mobilenet_model()
+					# Load and process image exactly as user specified
+					img_loaded = cv2.imread(img_path)
+					if img_loaded is None:
+						raise Exception("Image not found")
 					
-					img_loaded = keras_image.load_img(img_path, target_size=(224, 224))
-					img_array = keras_image.img_to_array(img_loaded)
-					img_array = np.expand_dims(img_array, axis=0)
-					img_array = preprocess_input(img_array)
+					img_loaded = cv2.cvtColor(img_loaded, cv2.COLOR_BGR2RGB)
+					img_loaded = cv2.resize(img_loaded, (224, 224))
+					img_loaded = img_loaded.astype(np.float32) / 255.0
 					
-					embedding = model_mnet.predict(img_array, verbose=0)[0]
+					mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+					std  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+					img_loaded = (img_loaded - mean) / std
+					
+					# HWC -> CHW
+					img_loaded = np.transpose(img_loaded, (2, 0, 1))
+					
+					# Add batch dimension
+					img_loaded = np.expand_dims(img_loaded, axis=0)
+					img_loaded = np.ascontiguousarray(img_loaded)
+					
+					# ONNX Inference
+					embedding = session.run(None, {input_name: img_loaded})[0]
+					embedding = embedding.squeeze()
+					
+					# L2 Normalize
+					embedding = embedding / np.linalg.norm(embedding)
+					
 					new_embeddings.append(embedding)
-					log_action("BACKEND", "Object Embedding Success", f"Generated MobileNetV3 embedding for image {i+1}")
+					log_action("BACKEND", "Object Embedding Success", f"Generated ONNX MobileNetV3 embedding for image {i+1}")
 				except Exception as mnet_err:
 					log_action("BACKEND", "Object Embedding Error", f"Failed to generate embedding for image {i+1}: {str(mnet_err)}")
 		except Exception as e:
