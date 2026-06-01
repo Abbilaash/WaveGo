@@ -369,6 +369,91 @@ def api_face_save():
 	return jsonify({"success": True, "message": f"Successfully learned face for {name}"})
 
 
+@app.route("/api/object/capture", methods=["POST", "GET"])
+def api_object_capture():
+	camera_obj = get_camera()
+	if camera_obj is None:
+		return jsonify({"success": False, "error": "Camera unavailable"}), 503
+	frame_bytes = camera_obj.get_frame()
+	if not frame_bytes:
+		return jsonify({"success": False, "error": "Could not capture frame"}), 500
+	import base64
+	encoded_image = base64.b64encode(frame_bytes).decode("utf-8")
+	return jsonify({
+		"success": True,
+		"image": encoded_image
+	})
+
+
+@app.route("/api/object/submit", methods=["POST"])
+def api_object_submit():
+	data = request.json
+	if not data or "images" not in data or "boxes" not in data:
+		return jsonify({"success": False, "error": "Missing images or boxes"}), 400
+	
+	images = data["images"]
+	boxes = data["boxes"]
+	
+	if not isinstance(images, list) or not isinstance(boxes, list) or len(images) != 3 or len(boxes) != 3:
+		return jsonify({"success": False, "error": "Invalid images or boxes length"}), 400
+	
+	import base64
+	import cv2
+	import numpy as np
+	
+	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning")
+	os.makedirs(object_learning_dir, exist_ok=True)
+	
+	# Decode and crop each image using the bounding box
+	for i, (img_b64, box) in enumerate(zip(images, boxes)):
+		if not img_b64:
+			continue
+		try:
+			if "," in img_b64:
+				img_b64 = img_b64.split(",")[1]
+			img_bytes = base64.b64decode(img_b64)
+			
+			# Decode image with OpenCV
+			nparr = np.frombuffer(img_bytes, np.uint8)
+			img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+			if img is None:
+				log_action("BACKEND", "Object Crop Error", f"Failed to decode image {i+1}")
+				continue
+			
+			# Crop if a bounding box was drawn
+			if box and isinstance(box, dict) and all(k in box for k in ("x", "y", "w", "h")):
+				x = int(box["x"])
+				y = int(box["y"])
+				w = int(box["w"])
+				h = int(box["h"])
+				
+				# Ensure coordinates are within image boundaries
+				img_h, img_w = img.shape[:2]
+				x = max(0, min(x, img_w - 1))
+				y = max(0, min(y, img_h - 1))
+				w = max(1, min(w, img_w - x))
+				h = max(1, min(h, img_h - y))
+				
+				# Crop
+				cropped_img = img[y : y + h, x : x + w]
+				
+				# Save cropped image to ObjectLearning/crop_<timestamp>_<index>.jpg
+				img_filename = f"crop_{int(time.time())}_{i+1}.jpg"
+				img_path = os.path.join(object_learning_dir, img_filename)
+				cv2.imwrite(img_path, cropped_img)
+				log_action("BACKEND", "Object Crop Saved", f"Saved cropped image {i+1} to {img_path}")
+			else:
+				# If no bounding box was drawn, save the full image inside ObjectLearning/
+				img_filename = f"crop_full_{int(time.time())}_{i+1}.jpg"
+				img_path = os.path.join(object_learning_dir, img_filename)
+				cv2.imwrite(img_path, img)
+				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1} to {img_path}")
+		except Exception as e:
+			log_action("BACKEND", "Object Crop/Save Error", f"Failed to crop/save image {i+1}: {str(e)}")
+			
+	return jsonify({"success": True, "message": "bounding success"})
+
+
 def main() -> None:
 	if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
 		state = get_state()

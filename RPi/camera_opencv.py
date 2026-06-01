@@ -554,9 +554,9 @@ class Camera(BaseCamera):
                 except:
                     pass
 
+        print("DEBUG: Running frames() from RPi/camera_opencv.py - Using picamera capture_array directly")
         while True:
             img = picamera.capture_array()
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
             if Camera.modeSelect == 'none':
                 cvt.pause()

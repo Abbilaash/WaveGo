@@ -230,6 +230,180 @@
         background: #4ade80;
         display: inline-block;
       }
+
+      /* Modal Overlay */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(7, 17, 31, 0.85);
+        backdrop-filter: blur(8px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease both;
+      }
+
+      /* Modal Content Box */
+      .modal-content {
+        background: var(--panel-strong);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        width: 90%;
+        max-width: 640px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      }
+
+      /* Header */
+      .modal-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .modal-close {
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        color: var(--muted);
+        transition: color 0.2s;
+      }
+      .modal-close:hover {
+        color: #ef4444;
+      }
+
+      /* Body */
+      .modal-body {
+        padding: 20px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .modal-status-text {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--accent-2);
+        letter-spacing: 0.05em;
+      }
+      .canvas-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        max-width: 580px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1.5px solid var(--border);
+        background: #02070d;
+      }
+      #objectCanvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: crosshair;
+      }
+      .modal-instructions {
+        font-size: 0.9rem;
+        color: var(--muted);
+        text-align: center;
+      }
+      .modal-notification {
+        font-size: 0.95rem;
+        padding: 6px 12px;
+        border-radius: 6px;
+        background: rgba(125, 211, 252, 0.15);
+        color: var(--accent-2);
+        border: 1px solid rgba(125, 211, 252, 0.3);
+        text-align: center;
+        transition: opacity 0.3s ease;
+        width: 100%;
+        max-width: 580px;
+      }
+
+      /* Footer & Buttons */
+      .modal-footer {
+        padding: 18px 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .modal-btn {
+        min-width: 90px;
+        padding: 8px 16px;
+        font-size: 0.95rem;
+        font-family: monospace;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.1s, box-shadow 0.1s;
+      }
+      .modal-btn:active {
+        transform: translateY(1.5px);
+      }
+
+      .undo-btn {
+        border: 1px solid #666;
+        background: linear-gradient(#fbfbfb, #e8e8e8);
+        color: #333;
+      }
+      .undo-btn:hover {
+        background: linear-gradient(#ffffff, #f0f0f0);
+      }
+
+      .save-btn {
+        border: 1px solid var(--accent-2);
+        background: linear-gradient(rgba(125, 211, 252, 0.2), rgba(125, 211, 252, 0.05));
+        color: var(--accent-2);
+        box-shadow: 0 1.5px 0 rgba(125, 211, 252, 0.2);
+      }
+      .save-btn:hover {
+        background: linear-gradient(rgba(125, 211, 252, 0.3), rgba(125, 211, 252, 0.1));
+      }
+
+      .next-btn {
+        border: 1px solid var(--accent);
+        background: linear-gradient(rgba(77, 227, 183, 0.2), rgba(77, 227, 183, 0.05));
+        color: var(--accent);
+        box-shadow: 0 1.5px 0 rgba(77, 227, 183, 0.2);
+      }
+      .next-btn:hover {
+        background: linear-gradient(rgba(77, 227, 183, 0.3), rgba(77, 227, 183, 0.1));
+      }
+
+      .submit-btn {
+        border: 1px solid #10b981;
+        background: linear-gradient(#10b981, #059669);
+        color: #fff;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+      }
+      .submit-btn:hover {
+        background: linear-gradient(#059669, #047857);
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes scaleUp {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
     </style>
 
     <div class="dashboard-layout">
@@ -337,10 +511,35 @@
           </div>
           <div id="objectStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
         </section>
-      </aside>
     </div>
   </article>
 </section>
+
+<!-- Object Learning Modal -->
+<div id="objectModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Object Learning</h3>
+      <span class="modal-close" id="modalClose">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div id="modalStatusText" class="modal-status-text">Image 1 of 3</div>
+      <div id="modalNotification" class="modal-notification" style="opacity: 0; margin-bottom: 8px;">Notification</div>
+      <div class="canvas-container">
+        <canvas id="objectCanvas" width="640" height="480"></canvas>
+      </div>
+      <div class="modal-instructions">
+        Click and drag on the image above to draw a rectangular box around the object.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="modalUndo" class="modal-btn undo-btn">Undo</button>
+      <button id="modalSave" class="modal-btn save-btn">Save</button>
+      <button id="modalNext" class="modal-btn next-btn">Next</button>
+      <button id="modalSubmit" class="modal-btn submit-btn">Submit</button>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -585,21 +784,295 @@
     }
   });
 
-  // Object Detection controls (Placeholder / Initial implementation)
+  // Object Detection controls & Labeling Modal Implementation
   const objectLearnBtn = document.getElementById('objectLearn');
   const objectDetectBtn = document.getElementById('objectDetect');
   const objectStatus = document.getElementById('objectStatus');
 
-  if (objectLearnBtn && objectDetectBtn && objectStatus) {
-    objectLearnBtn.addEventListener('click', () => {
-      objectStatus.textContent = "Object Learning starting... (Feature coming soon)";
-      objectStatus.style.color = "#4ade80";
-      setTimeout(() => { objectStatus.textContent = ""; }, 3000);
+  // Modal elements
+  const objectModal = document.getElementById('objectModal');
+  const modalClose = document.getElementById('modalClose');
+  const modalStatusText = document.getElementById('modalStatusText');
+  const modalNotification = document.getElementById('modalNotification');
+  const canvas = document.getElementById('objectCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const modalUndo = document.getElementById('modalUndo');
+  const modalSave = document.getElementById('modalSave');
+  const modalNext = document.getElementById('modalNext');
+  const modalSubmit = document.getElementById('modalSubmit');
+
+  // Object Learning state variables
+  let capturedObjImages = [];
+  let objBoundingBoxes = [null, null, null];
+  let currentObjIndex = 0;
+  let isDrawingObj = false;
+  let startObjX = 0;
+  let startObjY = 0;
+  let currentObjImageElement = null;
+  let notificationTimeout = null;
+
+  // Helper: display notifications inside modal
+  function showModalNotification(text, isError = false) {
+    if (notificationTimeout) clearTimeout(notificationTimeout);
+    modalNotification.textContent = text;
+    modalNotification.style.opacity = "1";
+    if (isError) {
+      modalNotification.style.background = "rgba(239, 68, 68, 0.15)";
+      modalNotification.style.color = "#fca5a5";
+      modalNotification.style.borderColor = "rgba(239, 68, 68, 0.3)";
+    } else {
+      modalNotification.style.background = "rgba(125, 211, 252, 0.15)";
+      modalNotification.style.color = "var(--accent-2)";
+      modalNotification.style.borderColor = "rgba(125, 211, 252, 0.3)";
+    }
+    notificationTimeout = setTimeout(() => {
+      modalNotification.style.opacity = "0";
+    }, 3000);
+  }
+
+  // Draw current image + rectangle box on canvas
+  function drawCurrentBox(tempBox = null) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (currentObjImageElement) {
+      ctx.drawImage(currentObjImageElement, 0, 0, canvas.width, canvas.height);
+    }
+    const box = tempBox || objBoundingBoxes[currentObjIndex];
+    if (box) {
+      ctx.strokeStyle = tempBox ? "#7dd3fc" : "#4ade80"; // blue when drawing, green when saved
+      ctx.lineWidth = 3;
+      ctx.strokeRect(box.x, box.y, box.w, box.h);
+
+      ctx.fillStyle = tempBox ? "rgba(125, 211, 252, 0.15)" : "rgba(74, 222, 128, 0.15)";
+      ctx.fillRect(box.x, box.y, box.w, box.h);
+
+      ctx.fillStyle = tempBox ? "#7dd3fc" : "#4ade80";
+      ctx.font = "bold 16px monospace";
+      ctx.fillText(tempBox ? "Drawing..." : "Object Box", box.x + 5, box.y + 20);
+    }
+  }
+
+  // Load the current image frame onto canvas
+  function loadCurrentImage() {
+    if (currentObjIndex < 0 || currentObjIndex >= capturedObjImages.length) return;
+    modalStatusText.textContent = `Image ${currentObjIndex + 1} of 3`;
+    
+    currentObjImageElement = new Image();
+    currentObjImageElement.onload = function() {
+      drawCurrentBox();
+    };
+    currentObjImageElement.src = "data:image/jpeg;base64," + capturedObjImages[currentObjIndex];
+  }
+
+  // Canvas interaction logic (Mouse / Touch support)
+  function getCoords(e) {
+    const rect = canvas.getBoundingClientRect();
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    return {
+      x: Math.round((clientX - rect.left) * (canvas.width / rect.width)),
+      y: Math.round((clientY - rect.top) * (canvas.height / rect.height))
+    };
+  }
+
+  canvas.addEventListener('mousedown', (e) => {
+    if (!currentObjImageElement) return;
+    const coords = getCoords(e);
+    startObjX = coords.x;
+    startObjY = coords.y;
+    isDrawingObj = true;
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawingObj) return;
+    const coords = getCoords(e);
+    const w = coords.x - startObjX;
+    const h = coords.y - startObjY;
+    drawCurrentBox({ x: startObjX, y: startObjY, w: w, h: h });
+  });
+
+  canvas.addEventListener('mouseup', (e) => {
+    if (!isDrawingObj) return;
+    isDrawingObj = false;
+    const coords = getCoords(e);
+    let w = coords.x - startObjX;
+    let h = coords.y - startObjY;
+
+    if (Math.abs(w) < 5 || Math.abs(h) < 5) {
+      drawCurrentBox();
+      return;
+    }
+
+    const x = Math.min(startObjX, coords.x);
+    const y = Math.min(startObjY, coords.y);
+    w = Math.abs(w);
+    h = Math.abs(h);
+
+    objBoundingBoxes[currentObjIndex] = { x, y, w, h };
+    drawCurrentBox();
+  });
+
+  // Touch Support
+  canvas.addEventListener('touchstart', (e) => {
+    if (!currentObjImageElement) return;
+    e.preventDefault();
+    const coords = getCoords(e);
+    startObjX = coords.x;
+    startObjY = coords.y;
+    isDrawingObj = true;
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (!isDrawingObj) return;
+    e.preventDefault();
+    const coords = getCoords(e);
+    const w = coords.x - startObjX;
+    const h = coords.y - startObjY;
+    drawCurrentBox({ x: startObjX, y: startObjY, w: w, h: h });
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', (e) => {
+    if (!isDrawingObj) return;
+    isDrawingObj = false;
+    const coords = getCoords(e);
+    let w = coords.x - startObjX;
+    let h = coords.y - startObjY;
+
+    if (Math.abs(w) < 5 || Math.abs(h) < 5) {
+      drawCurrentBox();
+      return;
+    }
+
+    const x = Math.min(startObjX, coords.x);
+    const y = Math.min(startObjY, coords.y);
+    w = Math.abs(w);
+    h = Math.abs(h);
+
+    objBoundingBoxes[currentObjIndex] = { x, y, w, h };
+    drawCurrentBox();
+  });
+
+  // Modal Action Listeners
+  function openObjectModal() {
+    objectModal.style.display = "flex";
+    currentObjIndex = 0;
+    loadCurrentImage();
+    showModalNotification("Draw a rectangular box on the object.");
+  }
+
+  function closeObjectModal() {
+    objectModal.style.display = "none";
+    currentObjImageElement = null;
+    capturedObjImages = [];
+    objBoundingBoxes = [null, null, null];
+  }
+
+  modalClose.addEventListener('click', closeObjectModal);
+  objectModal.addEventListener('click', (e) => {
+    if (e.target === objectModal) {
+      closeObjectModal();
+    }
+  });
+
+  modalUndo.addEventListener('click', () => {
+    objBoundingBoxes[currentObjIndex] = null;
+    drawCurrentBox();
+    showModalNotification("Removed rectangle drawing.");
+  });
+
+  modalSave.addEventListener('click', () => {
+    const box = objBoundingBoxes[currentObjIndex];
+    if (box) {
+      showModalNotification(`Saved box coordinates for Image ${currentObjIndex + 1}!`);
+    } else {
+      showModalNotification("No box drawn to save yet!", true);
+    }
+  });
+
+  modalNext.addEventListener('click', () => {
+    currentObjIndex = (currentObjIndex + 1) % 3;
+    loadCurrentImage();
+    showModalNotification(`Navigated to Image ${currentObjIndex + 1}`);
+  });
+
+  modalSubmit.addEventListener('click', async () => {
+    modalSubmit.disabled = true;
+    showModalNotification("Submitting bounding boxes...");
+    try {
+      const response = await fetch('/api/object/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images: capturedObjImages, boxes: objBoundingBoxes })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Submit failed');
+      
+      closeObjectModal();
+    } catch (err) {
+      showModalNotification(`Submission error: ${err.message}`, true);
+    } finally {
+      modalSubmit.disabled = false;
+    }
+  });
+
+  // Object Learn trigger (takes 3 pictures with 1-second gap)
+  if (objectLearnBtn && objectStatus) {
+    objectLearnBtn.addEventListener('click', async () => {
+      capturedObjImages = [];
+      objBoundingBoxes = [null, null, null];
+      objectLearnBtn.disabled = true;
+      objectStatus.style.color = "var(--accent)";
+      objectStatus.textContent = "Starting capture sequence...";
+
+      for (let i = 0; i < 3; i++) {
+        objectStatus.textContent = `Taking picture ${i + 1} of 3...`;
+        try {
+          const response = await fetch('/api/object/capture');
+          if (!response.ok) throw new Error('Capture failed');
+          const data = await response.json();
+
+          if (data.success) {
+            capturedObjImages.push(data.image);
+            objectStatus.textContent = `Captured picture ${i + 1} of 3!`;
+          } else {
+            throw new Error(data.error || 'Unknown error');
+          }
+        } catch (err) {
+          objectStatus.textContent = `Capture error: ${err.message}`;
+          objectStatus.style.color = "#ef4444";
+          objectLearnBtn.disabled = false;
+          return;
+        }
+
+        if (i < 2) {
+          let secondsLeft = 1;
+          while (secondsLeft > 0) {
+            objectStatus.textContent = `Waiting ${secondsLeft}s before next picture...`;
+            await sleep(1000);
+            secondsLeft--;
+          }
+        }
+      }
+
+      objectStatus.textContent = "Images captured! Opening popup window...";
+      await sleep(500);
+      objectLearnBtn.disabled = false;
+      objectStatus.textContent = "";
+      openObjectModal();
     });
 
     objectDetectBtn.addEventListener('click', () => {
       objectStatus.textContent = "Object Detection starting... (Feature coming soon)";
-      objectStatus.style.color = "#4ade80";
+      objectStatus.style.color = "var(--accent)";
       setTimeout(() => { objectStatus.textContent = ""; }, 3000);
     });
   }
