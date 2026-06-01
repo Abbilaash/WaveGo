@@ -46,7 +46,15 @@ app.jinja_env.auto_reload = True
 @app.before_request
 def log_request_info():
 	payload = request.get_json(silent=True) or request.form or request.args
-	log_action("API_REQUEST", f"{request.method} {request.path}", f"IP: {request.remote_addr}, Payload: {dict(payload) if payload else None}")
+	logged_payload = None
+	if payload:
+		logged_payload = dict(payload)
+		if "images" in logged_payload:
+			if isinstance(logged_payload["images"], list):
+				logged_payload["images"] = [f"<base64_img_{idx+1}_data_length_{len(str(img))}>" for idx, img in enumerate(logged_payload["images"])]
+			else:
+				logged_payload["images"] = "<stripped_base64_data>"
+	log_action("API_REQUEST", f"{request.method} {request.path}", f"IP: {request.remote_addr}, Payload: {logged_payload}")
 
 
 @app.after_request
@@ -441,13 +449,13 @@ def api_object_submit():
 				img_filename = f"crop_{int(time.time())}_{i+1}.jpg"
 				img_path = os.path.join(object_learning_dir, img_filename)
 				cv2.imwrite(img_path, cropped_img)
-				log_action("BACKEND", "Object Crop Saved", f"Saved cropped image {i+1} to {img_path}")
+				log_action("BACKEND", "Object Crop Saved", f"Saved cropped image {i+1}")
 			else:
 				# If no bounding box was drawn, save the full image inside ObjectLearning/
 				img_filename = f"crop_full_{int(time.time())}_{i+1}.jpg"
 				img_path = os.path.join(object_learning_dir, img_filename)
 				cv2.imwrite(img_path, img)
-				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1} to {img_path}")
+				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1}")
 		except Exception as e:
 			log_action("BACKEND", "Object Crop/Save Error", f"Failed to crop/save image {i+1}: {str(e)}")
 			
