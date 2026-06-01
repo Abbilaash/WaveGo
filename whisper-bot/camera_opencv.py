@@ -27,6 +27,35 @@ colorLower = np.array([24, 100, 100])
 speedMove = 100
 
 
+_onnx_session = None
+
+def get_onnx_session():
+    global _onnx_session
+    if _onnx_session is None:
+        import onnxruntime as ort
+        model_path = os.path.join(thisPath, "mobilenetv3_embedding.onnx")
+        _onnx_session = ort.InferenceSession(
+            model_path,
+            providers=["CPUExecutionProvider"]
+        )
+    return _onnx_session
+
+
+def load_learned_objects():
+    import pickle
+    pkl_path = os.path.join(thisPath, "ObjectLearning", "storage.pkl")
+    if os.path.exists(pkl_path):
+        try:
+            with open(pkl_path, "rb") as f:
+                data = pickle.load(f)
+                if isinstance(data, list):
+                    return data
+                elif isinstance(data, dict):
+                    return [data]
+        except Exception as e:
+            print("Failed to load storage.pkl:", e)
+    return []
+
 
 class CVThread(threading.Thread):
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -44,6 +73,7 @@ class CVThread(threading.Thread):
         self.CVMode = 'none'
         self.imgCV = None
         self.faces = None
+        self.detected_objects = None
 
         self.mov_x = None
         self.mov_y = None
@@ -129,6 +159,23 @@ class CVThread(threading.Thread):
                         pass
             else:
                 cv2.putText(imgInput, f'Searching for {Camera.followName}...', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+
+        elif self.CVMode == 'objectDetection':
+            if hasattr(self, 'detected_objects') and self.detected_objects:
+                cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+                for obj in self.detected_objects:
+                    try:
+                        x, y, w, h = obj["box"]
+                        name = obj["name"]
+                        sim = obj["similarity"]
+                        color = (77, 227, 183) # Premium teal accent matching dashboard
+                        cv2.rectangle(imgInput, (x, y), (x + w, y + h), color, 2)
+                        label = f"{name} ({int(sim * 100)}%)"
+                        cv2.putText(imgInput, label, (x, y - 10), CVThread.font, 0.5, color, 1, cv2.LINE_AA)
+                    except Exception:
+                        pass
+            else:
+                cv2.putText(imgInput, 'Object Detecting', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
 
         elif self.CVMode == 'findColor':
             if self.findColorDetection:
@@ -426,6 +473,89 @@ class CVThread(threading.Thread):
         self.pause()
 
 
+    def objectDetectCV(self, frame_image):
+        self.detected_objects = []
+        try:
+            # 1. Load learned objects from storage.pkl
+            learned = load_learned_objects()
+            if not learned:
+                self.pause()
+                return
+
+            # 2. Convert frame to gray & pre-process to find contours
+            gray = cv2.cvtColor(frame_image, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+            
+            # Use thresholding to find high contrast boundaries / objects
+            _, thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+            dilated = cv2.dilate(thresh, None, iterations=2)
+            
+            cnts, _ = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            
+            # 3. Load ONNX model for feature extraction
+            session = get_onnx_session()
+            input_name = session.get_inputs()[0].name
+            
+            # Loop over contours to find candidates
+            candidates = []
+            for c in cnts:
+                x, y, w, h = cv2.boundingRect(c)
+                area = w * h
+                # Filter noise by min/max area and bounding aspect ratio
+                if area > 3000 and area < 160000 and w > 40 and h > 40:
+                    candidates.append((x, y, w, h))
+
+            # Sort candidates by area descending and keep up to 4 largest
+            candidates = sorted(candidates, key=lambda x: x[2] * x[3], reverse=True)[:4]
+
+            for x, y, w, h in candidates:
+                # Crop candidate region
+                crop = frame_image[y : y + h, x : x + w]
+                
+                # Preprocess image exactly as ONNX MobileNetV3 expects
+                crop_rgb = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+                crop_resized = cv2.resize(crop_rgb, (224, 224))
+                crop_norm = crop_resized.astype(np.float32) / 255.0
+                
+                mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+                std  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+                crop_prep = (crop_norm - mean) / std
+                crop_prep = np.transpose(crop_prep, (2, 0, 1))
+                crop_batch = np.expand_dims(crop_prep, axis=0)
+                crop_batch = np.ascontiguousarray(crop_batch)
+                
+                # Extract candidate embedding
+                emb = session.run(None, {input_name: crop_batch})[0]
+                emb = emb.squeeze()
+                emb = emb / np.linalg.norm(emb)
+                
+                # 4. Compare with all stored object embeddings
+                best_name = "Unknown"
+                best_sim = 0.0
+                
+                for obj in learned:
+                    name = obj.get("name", "unnamed_object")
+                    embeddings = obj.get("embeddings", [])
+                    for stored_emb in embeddings:
+                        # Cosine similarity (dot product of L2 normalized vectors)
+                        sim = np.dot(emb, stored_emb)
+                        if sim > best_sim:
+                            best_sim = sim
+                            best_name = name
+                
+                # Match threshold
+                if best_sim > 0.60:
+                    self.detected_objects.append({
+                        "box": (x, y, w, h),
+                        "name": best_name,
+                        "similarity": best_sim
+                    })
+        except Exception as e:
+            print("Object detection error:", e)
+            
+        self.pause()
+
+
     def pause(self):
         self.__flag.clear()
 
@@ -472,6 +602,11 @@ class CVThread(threading.Thread):
             elif self.CVMode == 'faceFollowing':
                 self.CVThreading = 1
                 self.faceFollowingCV(self.imgCV)
+                self.CVThreading = 0
+
+            elif self.CVMode == 'objectDetection':
+                self.CVThreading = 1
+                self.objectDetectCV(self.imgCV)
                 self.CVThreading = 0
 
 
