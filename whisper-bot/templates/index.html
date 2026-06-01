@@ -531,6 +531,7 @@
       <div class="modal-instructions">
         Click and drag on the image above to draw a rectangular box around the object.
       </div>
+      <input type="text" id="objectNameInput" class="learn-input" placeholder="Enter object name" style="margin-top: 12px; width: 100%; max-width: 580px;">
     </div>
     <div class="modal-footer">
       <button id="modalUndo" class="modal-btn undo-btn">Undo</button>
@@ -974,6 +975,8 @@
     currentObjImageElement = null;
     capturedObjImages = [];
     objBoundingBoxes = [null, null, null];
+    const nameInput = document.getElementById('objectNameInput');
+    if (nameInput) nameInput.value = "";
   }
 
   modalClose.addEventListener('click', closeObjectModal);
@@ -1005,13 +1008,20 @@
   });
 
   modalSubmit.addEventListener('click', async () => {
+    const nameInput = document.getElementById('objectNameInput');
+    const objectName = nameInput ? nameInput.value.trim() : "";
+    if (!objectName) {
+      showModalNotification("Please enter an object name first!", true);
+      return;
+    }
+
     modalSubmit.disabled = true;
     showModalNotification("Submitting bounding boxes...");
     try {
       const response = await fetch('/api/object/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ images: capturedObjImages, boxes: objBoundingBoxes })
+        body: JSON.stringify({ images: capturedObjImages, boxes: objBoundingBoxes, name: objectName })
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Submit failed');

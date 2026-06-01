@@ -393,6 +393,22 @@ def api_object_capture():
 	})
 
 
+mobilenet_model = None
+
+def get_mobilenet_model():
+	global mobilenet_model
+	if mobilenet_model is None:
+		from tensorflow.keras.applications import MobileNetV3Small
+		import os
+		os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+		mobilenet_model = MobileNetV3Small(
+			weights="imagenet",
+			include_top=False,
+			pooling="avg"
+		)
+	return mobilenet_model
+
+
 @app.route("/api/object/submit", methods=["POST"])
 def api_object_submit():
 	data = request.json
@@ -401,6 +417,12 @@ def api_object_submit():
 	
 	images = data["images"]
 	boxes = data["boxes"]
+	object_name = data.get("name", "unnamed_object").strip().replace(" ", "_")
+	
+	# Sanitize the object name to prevent directory traversal or invalid characters
+	object_name = "".join(c for c in object_name if c.isalnum() or c in ("-", "_"))
+	if not object_name:
+		object_name = "unnamed_object"
 	
 	if not isinstance(images, list) or not isinstance(boxes, list) or len(images) != 3 or len(boxes) != 3:
 		return jsonify({"success": False, "error": "Invalid images or boxes length"}), 400
@@ -408,11 +430,14 @@ def api_object_submit():
 	import base64
 	import cv2
 	import numpy as np
+	import pickle
+	import time
 	
-	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning")
+	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning", object_name)
 	os.makedirs(object_learning_dir, exist_ok=True)
 	
-	# Decode and crop each image using the bounding box
+	# Decode, crop and generate MobileNetV3 embeddings for each image
+	new_embeddings = []
 	for i, (img_b64, box) in enumerate(zip(images, boxes)):
 		if not img_b64:
 			continue
@@ -428,6 +453,7 @@ def api_object_submit():
 				log_action("BACKEND", "Object Crop Error", f"Failed to decode image {i+1}")
 				continue
 			
+			img_path = None
 			# Crop if a bounding box was drawn
 			if box and isinstance(box, dict) and all(k in box for k in ("x", "y", "w", "h")):
 				x = int(box["x"])
@@ -456,8 +482,80 @@ def api_object_submit():
 				img_path = os.path.join(object_learning_dir, img_filename)
 				cv2.imwrite(img_path, img)
 				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1}")
+				
+			# Generate MobileNetV3 embedding for the saved image
+			if img_path and os.path.exists(img_path):
+				try:
+					from tensorflow.keras.applications.mobilenet_v3 import preprocess_input
+					from tensorflow.keras.preprocessing import image as keras_image
+					
+					model_mnet = get_mobilenet_model()
+					
+					img_loaded = keras_image.load_img(img_path, target_size=(224, 224))
+					img_array = keras_image.img_to_array(img_loaded)
+					img_array = np.expand_dims(img_array, axis=0)
+					img_array = preprocess_input(img_array)
+					
+					embedding = model_mnet.predict(img_array, verbose=0)[0]
+					new_embeddings.append(embedding)
+					log_action("BACKEND", "Object Embedding Success", f"Generated MobileNetV3 embedding for image {i+1}")
+				except Exception as mnet_err:
+					log_action("BACKEND", "Object Embedding Error", f"Failed to generate embedding for image {i+1}: {str(mnet_err)}")
 		except Exception as e:
 			log_action("BACKEND", "Object Crop/Save Error", f"Failed to crop/save image {i+1}: {str(e)}")
+			
+	# If we have successfully generated any embeddings, append them to objects.pkl
+	if new_embeddings:
+		pkl_path = os.path.join(THIS_DIR, "ObjectLearning", "objects.pkl")
+		
+		# Load existing embeddings
+		existing_objects = []
+		if os.path.exists(pkl_path):
+			try:
+				with open(pkl_path, "rb") as f:
+					data = pickle.load(f)
+					if isinstance(data, list):
+						existing_objects = data
+					elif isinstance(data, dict):
+						existing_objects = [data]
+			except Exception as pkl_load_err:
+				log_action("BACKEND", "PKL Load Error", f"Failed to load objects.pkl: {str(pkl_load_err)}")
+				existing_objects = []
+				
+		# Remove any existing object with the same name to overwrite and update the queue order
+		existing_objects = [obj for obj in existing_objects if obj.get("name", "").lower() != object_name.lower()]
+		
+		# Add new object data
+		new_obj_entry = {
+			"name": object_name,
+			"embeddings": new_embeddings
+		}
+		existing_objects.append(new_obj_entry)
+		
+		# Enforce the maximum limit of 10 objects (30 embeddings)
+		if len(existing_objects) > 10:
+			# Evict the oldest object (the first one)
+			evicted_obj = existing_objects.pop(0)
+			evicted_name = evicted_obj.get("name", "unnamed_object")
+			log_action("BACKEND", "Object Queue Evicted", f"Evicted oldest object '{evicted_name}' from objects.pkl queue")
+			
+			# Also clean up the evicted folder on disk to keep everything perfectly in sync
+			evicted_dir = os.path.join(THIS_DIR, "ObjectLearning", evicted_name)
+			if os.path.exists(evicted_dir):
+				import shutil
+				try:
+					shutil.rmtree(evicted_dir)
+					log_action("BACKEND", "Object Folder Deleted", f"Deleted folder for evicted object '{evicted_name}'")
+				except Exception as clean_err:
+					log_action("BACKEND", "Object Folder Delete Error", f"Failed to delete {evicted_name} directory: {str(clean_err)}")
+					
+		# Save updated database list to objects.pkl
+		try:
+			with open(pkl_path, "wb") as f:
+				pickle.dump(existing_objects if len(existing_objects) > 1 else existing_objects[0], f)
+			log_action("BACKEND", "PKL Save Success", f"Successfully saved object '{object_name}' with {len(new_embeddings)} embeddings to objects.pkl")
+		except Exception as pkl_save_err:
+			log_action("BACKEND", "PKL Save Error", f"Failed to write objects.pkl: {str(pkl_save_err)}")
 			
 	return jsonify({"success": True, "message": "bounding success"})
 
