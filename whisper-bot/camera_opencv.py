@@ -107,6 +107,29 @@ class CVThread(threading.Thread):
             else:
                 cv2.putText(imgInput, 'Face Detecting', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
 
+        elif self.CVMode == 'faceFollowing':
+            target_name = Camera.followName.strip().lower()
+            if self.faces and len(self.faces):
+                cv2.putText(imgInput, f'Following: {Camera.followName}', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+                for face_info in self.faces:
+                    try:
+                        x, y, w, h = face_info["box"]
+                        name = face_info["name"]
+                        if name.lower() == target_name:
+                            color = (74, 222, 128) # Active bright green for the target being followed
+                            label = f"Target: {name}"
+                            cv2.rectangle(imgInput, (x, y), (x + w, y + h), color, 2)
+                            cv2.putText(imgInput, label, (x, y - 10), CVThread.font, 0.5, color, 1, cv2.LINE_AA)
+                        else:
+                            color = (128, 128, 128) # Muted gray for other recognized/unknown faces
+                            label = name
+                            cv2.rectangle(imgInput, (x, y), (x + w, y + h), color, 1)
+                            cv2.putText(imgInput, label, (x, y - 10), CVThread.font, 0.4, color, 1, cv2.LINE_AA)
+                    except (KeyError, TypeError):
+                        pass
+            else:
+                cv2.putText(imgInput, f'Searching for {Camera.followName}...', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+
         elif self.CVMode == 'findColor':
             if self.findColorDetection:
                 cv2.putText(imgInput,'Target Detected',(40,60), CVThread.font, 0.5,(255,255,255),1,cv2.LINE_AA)
@@ -358,6 +381,51 @@ class CVThread(threading.Thread):
         self.pause()
 
 
+    def faceFollowingCV(self, frame_image):
+        import face_detection
+        self.faces = face_detection.recognize_faces(frame_image)
+        
+        target_face = None
+        target_name = Camera.followName.strip().lower()
+        
+        for face in self.faces:
+            name = face.get("name", "Unknown")
+            if name.lower() == target_name:
+                target_face = face
+                break
+                
+        if target_face:
+            robot.lightCtrl('red', 0)
+            x, y, w, h = target_face["box"]
+            X = int(x + w / 2)
+            Y = int(y + h / 2)
+            
+            # Deadzone tolerance
+            tor = CVThread.tor
+            
+            # Control Y axis (tilt up / down / stop)
+            if Y < 240 - tor:
+                robot.lookUp()
+            elif Y > 240 + tor:
+                robot.lookDown()
+            else:
+                robot.lookStopUD()
+                
+            # Control X axis (pan left / right / stop)
+            if X < 320 - tor:
+                robot.lookLeft()
+            elif X > 320 + tor:
+                robot.lookRight()
+            else:
+                robot.lookStopLR()
+        else:
+            robot.lightCtrl('blue', 0)
+            robot.lookStopUD()
+            robot.lookStopLR()
+            
+        self.pause()
+
+
     def pause(self):
         self.__flag.clear()
 
@@ -373,6 +441,8 @@ class CVThread(threading.Thread):
             if self.CVMode == 'none':
                 robot.stopLR()
                 robot.stopFB()
+                robot.lookStopUD()
+                robot.lookStopLR()
                 robot.buzzerCtrl(0, 0)
                 robot.lightCtrl('blue', 0)
                 self.pause()
@@ -399,9 +469,15 @@ class CVThread(threading.Thread):
                 self.faceDetectCV(self.imgCV)
                 self.CVThreading = 0
 
+            elif self.CVMode == 'faceFollowing':
+                self.CVThreading = 1
+                self.faceFollowingCV(self.imgCV)
+                self.CVThreading = 0
+
 
 class Camera(BaseCamera):
     modeSelect = 'none'
+    followName = ''
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
     # modeSelect = 'watchDog'

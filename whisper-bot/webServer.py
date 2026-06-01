@@ -330,6 +330,39 @@ def api_face_detect(action):
 	return jsonify({"success": True, "mode": camera_opencv.Camera.modeSelect})
 
 
+@app.route('/api/face/follow/<action>', methods=['POST'])
+def api_face_follow(action):
+	action = action.lower()
+	if action not in ('start', 'stop'):
+		return jsonify({"success": False, "error": "invalid action"}), 400
+	try:
+		import camera_opencv
+		import robot
+		if action == 'start':
+			data = request.json
+			if not data or "name" not in data:
+				return jsonify({"success": False, "error": "Missing name"}), 400
+			name = data["name"].strip()
+			if not name:
+				return jsonify({"success": False, "error": "Name cannot be empty"}), 400
+			camera_opencv.Camera.followName = name
+			camera_opencv.Camera.modeSelect = 'faceFollowing'
+			log_action("BACKEND", "Face Follow Start", f"Started face following for: {name}")
+			return jsonify({"success": True, "action": action, "name": name})
+		else:
+			camera_opencv.Camera.modeSelect = 'none'
+			camera_opencv.Camera.followName = ''
+			robot.buzzerCtrl(0, 0)
+			robot.lightCtrl('blue', 0)
+			robot.lookStopUD()
+			robot.lookStopLR()
+			log_action("BACKEND", "Face Follow Stop", "Stopped face following")
+			return jsonify({"success": True, "action": action})
+	except Exception as exc:
+		log_action("BACKEND", "Face Follow Toggle Error", str(exc))
+		return jsonify({"success": False, "error": str(exc)}), 500
+
+
 @app.route("/api/face/capture", methods=["POST", "GET"])
 def api_face_capture():
 	camera_obj = get_camera()
@@ -433,8 +466,8 @@ def api_object_submit():
 	import pickle
 	import time
 	
-	object_detection_dir = os.path.join(THIS_DIR, "ObjectDetection", object_name)
-	os.makedirs(object_detection_dir, exist_ok=True)
+	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning", object_name)
+	os.makedirs(object_learning_dir, exist_ok=True)
 	
 	# Decode, crop and generate MobileNetV3 embeddings for each image
 	new_embeddings = []
@@ -471,15 +504,15 @@ def api_object_submit():
 				# Crop
 				cropped_img = img[y : y + h, x : x + w]
 				
-				# Save cropped image to ObjectDetection/crop_<timestamp>_<index>.jpg
+				# Save cropped image to ObjectLearning/crop_<timestamp>_<index>.jpg
 				img_filename = f"crop_{int(time.time())}_{i+1}.jpg"
-				img_path = os.path.join(object_detection_dir, img_filename)
+				img_path = os.path.join(object_learning_dir, img_filename)
 				cv2.imwrite(img_path, cropped_img)
 				log_action("BACKEND", "Object Crop Saved", f"Saved cropped image {i+1}")
 			else:
-				# If no bounding box was drawn, save the full image inside ObjectDetection/
+				# If no bounding box was drawn, save the full image inside ObjectLearning/
 				img_filename = f"crop_full_{int(time.time())}_{i+1}.jpg"
-				img_path = os.path.join(object_detection_dir, img_filename)
+				img_path = os.path.join(object_learning_dir, img_filename)
 				cv2.imwrite(img_path, img)
 				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1}")
 				
@@ -506,7 +539,7 @@ def api_object_submit():
 			
 	# If we have successfully generated any embeddings, append them to storage.pkl
 	if new_embeddings:
-		pkl_path = os.path.join(THIS_DIR, "ObjectDetection", "storage.pkl")
+		pkl_path = os.path.join(THIS_DIR, "ObjectLearning", "storage.pkl")
 		
 		# Load existing embeddings
 		existing_objects = []
@@ -540,7 +573,7 @@ def api_object_submit():
 			log_action("BACKEND", "Object Queue Evicted", f"Evicted oldest object '{evicted_name}' from storage.pkl queue")
 			
 			# Also clean up the evicted folder on disk to keep everything perfectly in sync
-			evicted_dir = os.path.join(THIS_DIR, "ObjectDetection", evicted_name)
+			evicted_dir = os.path.join(THIS_DIR, "ObjectLearning", evicted_name)
 			if os.path.exists(evicted_dir):
 				import shutil
 				try:

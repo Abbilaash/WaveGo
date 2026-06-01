@@ -494,12 +494,17 @@
           <div class="face-grid">
             <button id="faceLearn" class="face-btn">Learn</button>
             <button id="faceDetect" class="face-btn">Detect</button>
+            <button id="faceFollow" class="face-btn">Follow</button>
           </div>
           <div id="learnStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
           <div id="learnPreviews" class="learn-preview-container" style="display:none;"></div>
           <div id="learnSaveForm" class="learn-save-form" style="display:none;">
             <input type="text" id="learnName" class="learn-input" placeholder="Enter person name">
             <button id="learnSaveBtn" class="learn-save-btn">Save</button>
+          </div>
+          <div id="followSaveForm" class="learn-save-form" style="display:none; margin-top: 15px;">
+            <input type="text" id="followName" class="learn-input" placeholder="Enter name to follow">
+            <button id="followSaveBtn" class="learn-save-btn">Submit</button>
           </div>
         </section>
 
@@ -782,6 +787,84 @@
       }
     } catch (err) {
       console.error(err);
+    }
+  });
+
+  // Face Following controls
+  let isFollowing = false;
+  const faceFollowBtn = document.getElementById('faceFollow');
+  const followSaveForm = document.getElementById('followSaveForm');
+  const followNameInput = document.getElementById('followName');
+  const followSaveBtn = document.getElementById('followSaveBtn');
+
+  faceFollowBtn.addEventListener('click', async () => {
+    if (isFollowing) {
+      // If already following, clicking "Stop Following" stops the action
+      try {
+        const response = await fetch('/api/face/follow/stop', { method: 'POST' });
+        if (!response.ok) throw new Error('Stop follow failed');
+        const data = await response.json();
+        
+        if (data.success) {
+          isFollowing = false;
+          faceFollowBtn.textContent = "Follow";
+          faceFollowBtn.style.border = "1px solid #666";
+          faceFollowBtn.style.background = "linear-gradient(#fbfbfb, #e8e8e8)";
+          faceFollowBtn.style.color = "";
+          learnStatus.textContent = "";
+          followSaveForm.style.display = "none";
+          followNameInput.value = "";
+        }
+      } catch (err) {
+        console.error(err);
+        learnStatus.textContent = `Error: ${err.message}`;
+      }
+    } else {
+      // If not following, toggle name input field visibility
+      if (followSaveForm.style.display === "none") {
+        followSaveForm.style.display = "flex";
+        followNameInput.value = "";
+        followNameInput.focus();
+      } else {
+        followSaveForm.style.display = "none";
+      }
+    }
+  });
+
+  followSaveBtn.addEventListener('click', async () => {
+    const name = followNameInput.value.trim();
+    if (!name) {
+      alert("Please enter a name to follow.");
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/face/follow/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name })
+      });
+      if (!response.ok) throw new Error('Start follow failed');
+      const data = await response.json();
+      
+      if (data.success) {
+        isFollowing = true;
+        followSaveForm.style.display = "none";
+        
+        // Update Follow button to Stop Following red button
+        faceFollowBtn.textContent = "Stop Following";
+        faceFollowBtn.style.border = "1px solid #ef4444";
+        faceFollowBtn.style.background = "linear-gradient(#fca5a5, #f87171)";
+        faceFollowBtn.style.color = "#fff";
+        
+        // Show following message
+        learnStatus.textContent = `Following ${name}...`;
+        learnStatus.style.color = "#4ade80";
+      }
+    } catch (err) {
+      console.error(err);
+      learnStatus.textContent = `Error: ${err.message}`;
+      learnStatus.style.color = "#ef4444";
     }
   });
 
