@@ -410,24 +410,6 @@ def api_face_save():
 	return jsonify({"success": True, "message": f"Successfully learned face for {name}"})
 
 
-@app.route('/api/object/detect/<action>', methods=['POST'])
-def api_object_detect(action):
-	action = action.lower()
-	if action not in ('start', 'stop'):
-		return jsonify({"success": False, "error": "invalid action"}), 400
-	try:
-		import camera_opencv
-		if action == 'start':
-			camera_opencv.Camera.modeSelect = 'objectDetection'
-		else:
-			camera_opencv.Camera.modeSelect = 'none'
-		log_action("BACKEND", "Object Detection Toggle Command Executed", f"Action: {action}, Mode: {camera_opencv.Camera.modeSelect}")
-	except Exception as exc:
-		log_action("BACKEND", "Object Detection Toggle Error", str(exc))
-		return jsonify({"success": False, "error": str(exc)}), 500
-	return jsonify({"success": True, "mode": camera_opencv.Camera.modeSelect})
-
-
 @app.route("/api/object/capture", methods=["POST", "GET"])
 def api_object_capture():
 	camera_obj = get_camera()
@@ -565,6 +547,13 @@ def api_object_submit():
 					# L2 Normalize
 					embedding = embedding / np.linalg.norm(embedding)
 					
+					# Save individual embedding to ObjectLearning/<image_basename>_embedding.npy
+					image_basename = os.path.splitext(img_filename)[0]
+					npy_filename = f"{image_basename}_embedding.npy"
+					npy_path = os.path.join(THIS_DIR, "ObjectLearning", npy_filename)
+					np.save(npy_path, embedding)
+					log_action("BACKEND", "Object NPY Saved", f"Saved embedding file: {npy_filename}")
+					
 					new_embeddings.append(embedding)
 					log_action("BACKEND", "Object Embedding Success", f"Generated ONNX MobileNetV3 embedding for image {i+1}")
 				except Exception as mnet_err:
@@ -610,6 +599,18 @@ def api_object_submit():
 			# Also clean up the evicted folder on disk to keep everything perfectly in sync
 			evicted_dir = os.path.join(THIS_DIR, "ObjectLearning", evicted_name)
 			if os.path.exists(evicted_dir):
+				# Find and delete associated .npy files inside ObjectLearning/
+				try:
+					for fn in os.listdir(evicted_dir):
+						if fn.endswith(".jpg"):
+							base = os.path.splitext(fn)[0]
+							npy_file = os.path.join(THIS_DIR, "ObjectLearning", f"{base}_embedding.npy")
+							if os.path.exists(npy_file):
+								os.remove(npy_file)
+								log_action("BACKEND", "Object NPY Deleted", f"Deleted evicted embedding file: {npy_file}")
+				except Exception as npy_del_err:
+					log_action("BACKEND", "Object NPY Delete Error", f"Failed to delete evicted npy files: {str(npy_del_err)}")
+				
 				import shutil
 				try:
 					shutil.rmtree(evicted_dir)
