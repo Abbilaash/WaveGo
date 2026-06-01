@@ -330,6 +330,27 @@ def api_face_detect(action):
 	return jsonify({"success": True, "mode": camera_opencv.Camera.modeSelect})
 
 
+@app.route('/api/object/detect/<action>', methods=['POST'])
+def api_object_detect(action):
+	action = action.lower()
+	if action not in ('start', 'stop'):
+		return jsonify({"success": False, "error": "invalid action"}), 400
+	try:
+		import camera_opencv
+		import robot
+		if action == 'start':
+			camera_opencv.Camera.modeSelect = 'objectDetection'
+		else:
+			camera_opencv.Camera.modeSelect = 'none'
+			robot.buzzerCtrl(0, 0)
+			robot.lightCtrl('blue', 0)
+		log_action("BACKEND", "Object Detection Toggle Command Executed", f"Action: {action}, Mode: {camera_opencv.Camera.modeSelect}")
+	except Exception as exc:
+		log_action("BACKEND", "Object Detection Toggle Error", str(exc))
+		return jsonify({"success": False, "error": str(exc)}), 500
+	return jsonify({"success": True, "mode": camera_opencv.Camera.modeSelect})
+
+
 @app.route('/api/face/follow/<action>', methods=['POST'])
 def api_face_follow(action):
 	action = action.lower()

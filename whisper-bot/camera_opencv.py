@@ -44,6 +44,8 @@ class CVThread(threading.Thread):
         self.CVMode = 'none'
         self.imgCV = None
         self.faces = None
+        self.detected_objects = []
+        self.object_templates = None
 
         self.mov_x = None
         self.mov_y = None
@@ -129,6 +131,26 @@ class CVThread(threading.Thread):
                         pass
             else:
                 cv2.putText(imgInput, f'Searching for {Camera.followName}...', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+
+        elif self.CVMode == 'objectDetection':
+            if hasattr(self, 'detected_objects') and self.detected_objects:
+                cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+                for obj in self.detected_objects:
+                    try:
+                        dst = obj["box"]
+                        name = obj["name"]
+                        matches = obj["matches"]
+                        
+                        # Draw green bounding box around the detected object using cv2.polylines
+                        cv2.polylines(imgInput, [np.int32(dst)], True, (74, 222, 128), 3, cv2.LINE_AA)
+                        
+                        # Put label near the top-left corner of the box
+                        top_left = dst[0][0]
+                        cv2.putText(imgInput, f"{name} ({matches} matches)", (int(top_left[0]), int(top_left[1]) - 10), CVThread.font, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
+                    except Exception:
+                        pass
+            else:
+                cv2.putText(imgInput, 'Object Detecting', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
 
         elif self.CVMode == 'findColor':
             if self.findColorDetection:
@@ -426,6 +448,100 @@ class CVThread(threading.Thread):
         self.pause()
 
 
+    def load_object_templates(self):
+        import glob
+        import os
+        import cv2
+        
+        self.object_templates = []
+        object_learning_root = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "ObjectLearning"))
+        if not os.path.exists(object_learning_root):
+            return
+            
+        # Scan folders inside ObjectLearning
+        for entry in os.listdir(object_learning_root):
+            entry_path = os.path.join(object_learning_root, entry)
+            if os.path.isdir(entry_path) and entry != "__pycache__":
+                jpg_files = glob.glob(os.path.join(entry_path, "crop_*.jpg"))
+                for img_p in jpg_files:
+                    try:
+                        img = cv2.imread(img_p)
+                        if img is not None:
+                            orb = cv2.ORB_create(1000)
+                            kp, des = orb.detectAndCompute(img, None)
+                            if des is not None and len(des) > 10:
+                                self.object_templates.append({
+                                    "name": entry,
+                                    "kp": kp,
+                                    "des": des,
+                                    "shape": img.shape
+                                })
+                    except Exception as e:
+                        print(f"Error loading template {img_p}: {e}")
+        
+        # Also let's check for individual watch.pkl files or watch folders directly in ObjectLearning/
+        # Since the user requested: "the files generated are: storage.pkl, watch folder, watch.pkl."
+        # Scanning directories guarantees we find all folder-stored cropped template frames.
+
+
+    def objectDetectCV(self, frame_image):
+        import cv2
+        import numpy as np
+        
+        self.detected_objects = []
+        if not self.object_templates:
+            self.pause()
+            return
+            
+        try:
+            orb = cv2.ORB_create(1000)
+            kp2, des2 = orb.detectAndCompute(frame_image, None)
+            
+            if des2 is not None and len(des2) > 10:
+                bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+                
+                # Match against each loaded template
+                for template in self.object_templates:
+                    des1 = template["des"]
+                    kp1 = template["kp"]
+                    shape = template["shape"]
+                    name = template["name"]
+                    
+                    if des1 is not None and len(des1) > 10:
+                        matches = bf.knnMatch(des1, des2, k=2)
+                        
+                        # Lowe's ratio test
+                        good_matches = []
+                        for m_n in matches:
+                            if len(m_n) == 2:
+                                m, n = m_n
+                                if m.distance < 0.75 * n.distance:
+                                    good_matches.append(m)
+                                    
+                        if len(good_matches) >= 12: # robust homography match threshold
+                            src_pts = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+                            dst_pts = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+                            
+                            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+                            
+                            if M is not None:
+                                h_temp, w_temp = shape[:2]
+                                pts = np.float32([[0, 0], [0, h_temp - 1], [w_temp - 1, h_temp - 1], [w_temp - 1, 0]]).reshape(-1, 1, 2)
+                                dst = cv2.perspectiveTransform(pts, M)
+                                
+                                self.detected_objects.append({
+                                    "name": name,
+                                    "box": dst,
+                                    "matches": len(good_matches)
+                                })
+                                # Trigger visual alert via lights
+                                robot.lightCtrl('green', 0)
+        except Exception as err:
+            pass
+            
+        self.pause()
+
+
     def pause(self):
         self.__flag.clear()
 
@@ -439,6 +555,7 @@ class CVThread(threading.Thread):
 
             self.__flag.wait()
             if self.CVMode == 'none':
+                self.object_templates = None
                 robot.stopLR()
                 robot.stopFB()
                 robot.lookStopUD()
@@ -472,6 +589,13 @@ class CVThread(threading.Thread):
             elif self.CVMode == 'faceFollowing':
                 self.CVThreading = 1
                 self.faceFollowingCV(self.imgCV)
+                self.CVThreading = 0
+
+            elif self.CVMode == 'objectDetection':
+                self.CVThreading = 1
+                if self.object_templates is None:
+                    self.load_object_templates()
+                self.objectDetectCV(self.imgCV)
                 self.CVThreading = 0
 
 

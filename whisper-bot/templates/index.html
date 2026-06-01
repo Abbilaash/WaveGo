@@ -1209,10 +1209,36 @@
       openObjectModal();
     });
 
-    objectDetectBtn.addEventListener('click', () => {
-      objectStatus.textContent = "Object Detection starting... (Feature coming soon)";
-      objectStatus.style.color = "var(--accent)";
-      setTimeout(() => { objectStatus.textContent = ""; }, 3000);
+    let isDetectingObjects = false;
+    objectDetectBtn.addEventListener('click', async () => {
+      const action = isDetectingObjects ? 'stop' : 'start';
+      try {
+        const response = await fetch(`/api/object/detect/${action}`, { method: 'POST' });
+        if (!response.ok) throw new Error('Object detect toggle failed');
+        const data = await response.json();
+        
+        if (data.success) {
+          isDetectingObjects = !isDetectingObjects;
+          if (isDetectingObjects) {
+            objectDetectBtn.textContent = "Stop Detect";
+            objectDetectBtn.style.border = "1px solid #ef4444";
+            objectDetectBtn.style.background = "linear-gradient(#fca5a5, #f87171)";
+            objectDetectBtn.style.color = "#fff";
+            objectStatus.textContent = "Object Detection active";
+            objectStatus.style.color = "#4ade80";
+          } else {
+            objectDetectBtn.textContent = "Detect";
+            objectDetectBtn.style.border = "1px solid #666";
+            objectDetectBtn.style.background = "linear-gradient(#fbfbfb, #e8e8e8)";
+            objectDetectBtn.style.color = "";
+            objectStatus.textContent = "";
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        objectStatus.textContent = `Error: ${err.message}`;
+        objectStatus.style.color = "#ef4444";
+      }
     });
   }
 </script>
