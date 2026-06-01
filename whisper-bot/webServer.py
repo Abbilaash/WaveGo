@@ -426,18 +426,20 @@ def api_object_capture():
 	})
 
 
-onnx_session = None
+mobilenet_model = None
 
-def get_onnx_session():
-	global onnx_session
-	if onnx_session is None:
-		import onnxruntime as ort
-		model_path = os.path.join(THIS_DIR, "mobilenetv3_embedding.onnx")
-		onnx_session = ort.InferenceSession(
-			model_path,
-			providers=["CPUExecutionProvider"]
+def get_mobilenet_model():
+	global mobilenet_model
+	if mobilenet_model is None:
+		from tensorflow.keras.applications import MobileNetV3Small
+		import os
+		os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+		mobilenet_model = MobileNetV3Small(
+			weights="imagenet",
+			include_top=False,
+			pooling="avg"
 		)
-	return onnx_session
+	return mobilenet_model
 
 
 @app.route("/api/object/submit", methods=["POST"])
@@ -467,8 +469,12 @@ def api_object_submit():
 	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning", object_name)
 	os.makedirs(object_learning_dir, exist_ok=True)
 	
-	# Decode, crop and generate MobileNetV3 embeddings for each image
-	new_embeddings = []
+	# Decode, crop and generate ORB features for each image
+	new_descriptors = []
+	new_shapes = []
+	last_img_loaded = None
+	last_des = None
+	
 	for i, (img_b64, box) in enumerate(zip(images, boxes)):
 		if not img_b64:
 			continue
@@ -514,58 +520,32 @@ def api_object_submit():
 				cv2.imwrite(img_path, img)
 				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1}")
 				
-			# Generate MobileNetV3 embedding for the saved image
+			# Generate ORB descriptors for the saved image
 			if img_path and os.path.exists(img_path):
 				try:
-					session = get_onnx_session()
-					input_name = session.get_inputs()[0].name
-					
-					# Load and process image exactly as user specified
 					img_loaded = cv2.imread(img_path)
-					if img_loaded is None:
-						raise Exception("Image not found")
-					
-					img_loaded = cv2.cvtColor(img_loaded, cv2.COLOR_BGR2RGB)
-					img_loaded = cv2.resize(img_loaded, (224, 224))
-					img_loaded = img_loaded.astype(np.float32) / 255.0
-					
-					mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
-					std  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
-					img_loaded = (img_loaded - mean) / std
-					
-					# HWC -> CHW
-					img_loaded = np.transpose(img_loaded, (2, 0, 1))
-					
-					# Add batch dimension
-					img_loaded = np.expand_dims(img_loaded, axis=0)
-					img_loaded = np.ascontiguousarray(img_loaded)
-					
-					# ONNX Inference
-					embedding = session.run(None, {input_name: img_loaded})[0]
-					embedding = embedding.squeeze()
-					
-					# L2 Normalize
-					embedding = embedding / np.linalg.norm(embedding)
-					
-					# Save individual embedding to ObjectLearning/<image_basename>_embedding.npy
-					image_basename = os.path.splitext(img_filename)[0]
-					npy_filename = f"{image_basename}_embedding.npy"
-					npy_path = os.path.join(THIS_DIR, "ObjectLearning", npy_filename)
-					np.save(npy_path, embedding)
-					log_action("BACKEND", "Object NPY Saved", f"Saved embedding file: {npy_filename}")
-					
-					new_embeddings.append(embedding)
-					log_action("BACKEND", "Object Embedding Success", f"Generated ONNX MobileNetV3 embedding for image {i+1}")
-				except Exception as mnet_err:
-					log_action("BACKEND", "Object Embedding Error", f"Failed to generate embedding for image {i+1}: {str(mnet_err)}")
+					if img_loaded is not None:
+						orb = cv2.ORB_create(1000)
+						kp, des = orb.detectAndCompute(img_loaded, None)
+						
+						new_descriptors.append(des)
+						new_shapes.append(img_loaded.shape)
+						
+						last_img_loaded = img_loaded
+						last_des = des
+						log_action("BACKEND", "Object ORB Success", f"Generated ORB descriptors for image {i+1}: Keypoints: {len(kp)}")
+					else:
+						log_action("BACKEND", "Object ORB Error", f"Failed to load image {img_path} for ORB processing")
+				except Exception as orb_err:
+					log_action("BACKEND", "Object ORB Error", f"Failed to generate ORB for image {i+1}: {str(orb_err)}")
 		except Exception as e:
 			log_action("BACKEND", "Object Crop/Save Error", f"Failed to crop/save image {i+1}: {str(e)}")
 			
-	# If we have successfully generated any embeddings, append them to storage.pkl
-	if new_embeddings:
+	# If we have successfully generated any descriptors, append them to storage.pkl
+	if new_descriptors:
 		pkl_path = os.path.join(THIS_DIR, "ObjectLearning", "storage.pkl")
 		
-		# Load existing embeddings
+		# Load existing database
 		existing_objects = []
 		if os.path.exists(pkl_path):
 			try:
@@ -585,11 +565,12 @@ def api_object_submit():
 		# Add new object data
 		new_obj_entry = {
 			"name": object_name,
-			"embeddings": new_embeddings
+			"descriptors": new_descriptors,
+			"shapes": new_shapes
 		}
 		existing_objects.append(new_obj_entry)
 		
-		# Enforce the maximum limit of 10 objects (30 embeddings)
+		# Enforce the maximum limit of 10 objects
 		if len(existing_objects) > 10:
 			# Evict the oldest object (the first one)
 			evicted_obj = existing_objects.pop(0)
@@ -599,18 +580,6 @@ def api_object_submit():
 			# Also clean up the evicted folder on disk to keep everything perfectly in sync
 			evicted_dir = os.path.join(THIS_DIR, "ObjectLearning", evicted_name)
 			if os.path.exists(evicted_dir):
-				# Find and delete associated .npy files inside ObjectLearning/
-				try:
-					for fn in os.listdir(evicted_dir):
-						if fn.endswith(".jpg"):
-							base = os.path.splitext(fn)[0]
-							npy_file = os.path.join(THIS_DIR, "ObjectLearning", f"{base}_embedding.npy")
-							if os.path.exists(npy_file):
-								os.remove(npy_file)
-								log_action("BACKEND", "Object NPY Deleted", f"Deleted evicted embedding file: {npy_file}")
-				except Exception as npy_del_err:
-					log_action("BACKEND", "Object NPY Delete Error", f"Failed to delete evicted npy files: {str(npy_del_err)}")
-				
 				import shutil
 				try:
 					shutil.rmtree(evicted_dir)
@@ -618,14 +587,43 @@ def api_object_submit():
 				except Exception as clean_err:
 					log_action("BACKEND", "Object Folder Delete Error", f"Failed to delete {evicted_name} directory: {str(clean_err)}")
 					
+			evicted_pkl = os.path.normpath(os.path.join(THIS_DIR, "ObjectLearning", f"{evicted_name}.pkl"))
+			if os.path.exists(evicted_pkl):
+				try:
+					os.remove(evicted_pkl)
+					log_action("BACKEND", "Object PKL Deleted", f"Deleted pkl file for evicted object '{evicted_name}'")
+				except Exception as del_err:
+					log_action("BACKEND", "Object PKL Delete Error", f"Failed to delete {evicted_name}.pkl file: {str(del_err)}")
+					
 		# Save updated database list to storage.pkl
 		try:
 			with open(pkl_path, "wb") as f:
 				pickle.dump(existing_objects if len(existing_objects) > 1 else existing_objects[0], f)
-			log_action("BACKEND", "PKL Save Success", f"Successfully saved object '{object_name}' with {len(new_embeddings)} embeddings to storage.pkl")
+			log_action("BACKEND", "PKL Save Success", f"Successfully saved object '{object_name}' with {len(new_descriptors)} descriptor arrays to storage.pkl")
 		except Exception as pkl_save_err:
 			log_action("BACKEND", "PKL Save Error", f"Failed to write storage.pkl: {str(pkl_save_err)}")
 			
+		# Also save individual pkl files as requested by the user: {object_name}.pkl
+		if last_img_loaded is not None:
+			individual_pkl_paths = [
+				os.path.normpath(os.path.join(object_learning_dir, f"{object_name}.pkl")),
+				os.path.normpath(os.path.join(THIS_DIR, "ObjectLearning", f"{object_name}.pkl"))
+			]
+			for pkl_p in individual_pkl_paths:
+				try:
+					with open(pkl_p, "wb") as f:
+						pickle.dump(
+							{
+								"name": object_name,
+								"descriptors": last_des,
+								"shape": last_img_loaded.shape
+							},
+							f
+						)
+					log_action("BACKEND", "Individual PKL Save Success", f"Successfully saved individual ORB pkl to {pkl_p}")
+				except Exception as ind_pkl_err:
+					log_action("BACKEND", "Individual PKL Save Error", f"Failed to save {pkl_p}: {str(ind_pkl_err)}")
+					
 	return jsonify({"success": True, "message": "bounding success"})
 
 
