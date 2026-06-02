@@ -13,51 +13,11 @@ def get_rgb_image(img_input):
         img_input = cv2.imdecode(np.frombuffer(img_input, np.uint8), cv2.IMREAD_COLOR)
     return cv2.cvtColor(img_input, cv2.COLOR_BGR2RGB)
 
-db_faces_cache = None
-db_cache_time = 0
-
-def load_cached_faces():
-    global db_faces_cache, db_cache_time
-    if not os.path.exists(PKL_PATH):
-        return [], []
-        
-    mtime = os.path.getmtime(PKL_PATH)
-    if db_faces_cache is None or mtime > db_cache_time:
-        try:
-            with open(PKL_PATH, "rb") as f:
-                data = pickle.load(f)
-                if isinstance(data, list):
-                    db_faces = data
-                elif isinstance(data, dict):
-                    db_faces = [data]
-                else:
-                    db_faces = []
-                
-                known_names = []
-                known_encodings = []
-                for face_info in db_faces:
-                    known_names.append(face_info.get("name", "Unknown"))
-                    known_encodings.append(face_info.get("encoding"))
-                
-                db_faces_cache = (known_names, known_encodings)
-                db_cache_time = mtime
-        except Exception as e:
-            log_action("BACKEND", "Load PKL Failed", str(e))
-            return [], []
-            
-    return db_faces_cache
-
 def detect_faces(img_input):
     try:
-        if isinstance(img_input, bytes):
-            img_input = cv2.imdecode(np.frombuffer(img_input, np.uint8), cv2.IMREAD_COLOR)
-            
-        # Downscale for 16x speedup
-        small_frame = cv2.resize(img_input, (0, 0), fx=0.25, fy=0.25)
-        rgb_small = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
-        
-        locations = face_recognition.face_locations(rgb_small)
-        faces = [(left * 4, top * 4, (right - left) * 4, (bottom - top) * 4) for top, right, bottom, left in locations]
+        rgb = get_rgb_image(img_input)
+        locations = face_recognition.face_locations(rgb)
+        faces = [(left, top, right - left, bottom - top) for top, right, bottom, left in locations]
         log_action("BACKEND", "Face Detection Run", f"Detected {len(faces)} faces.")
         return faces
     except Exception as e:
@@ -66,25 +26,30 @@ def detect_faces(img_input):
 
 def recognize_faces(img_input):
     try:
-        if isinstance(img_input, bytes):
-            img_input = cv2.imdecode(np.frombuffer(img_input, np.uint8), cv2.IMREAD_COLOR)
-            
-        # 1. Resize frame to 1/4 size for fast processing
-        small_frame = cv2.resize(img_input, (0, 0), fx=0.25, fy=0.25)
-        
-        # Convert BGR to RGB
-        rgb_small = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
-        
-        # 2. Detect face locations on small image
-        locations = face_recognition.face_locations(rgb_small)
+        rgb = get_rgb_image(img_input)
+        locations = face_recognition.face_locations(rgb)
         if not locations:
             return []
             
-        # 3. Calculate encodings on small image
-        encodings = face_recognition.face_encodings(rgb_small, locations)
+        encodings = face_recognition.face_encodings(rgb, locations)
         
-        # 4. Load cached database faces
-        known_names, known_encodings = load_cached_faces()
+        known_names = []
+        known_encodings = []
+        if os.path.exists(PKL_PATH):
+            try:
+                with open(PKL_PATH, "rb") as f:
+                    data = pickle.load(f)
+                    if isinstance(data, list):
+                        db_faces = data
+                    elif isinstance(data, dict):
+                        db_faces = [data]
+                    else:
+                        db_faces = []
+                    for face_info in db_faces:
+                        known_names.append(face_info.get("name", "Unknown"))
+                        known_encodings.append(face_info.get("encoding"))
+            except Exception as e:
+                log_action("BACKEND", "Load PKL inside recognize_faces Failed", str(e))
         
         results = []
         for (top, right, bottom, left), face_encoding in zip(locations, encodings):
@@ -97,14 +62,14 @@ def recognize_faces(img_input):
                     if matches[best_match_index]:
                         name = known_names[best_match_index]
             
+            # Print Hello <name> as requested
             if name != "Unknown":
                 print(f"Hello {name}")
-                log_action("BACKEND", f"Hello {name}", f"Recognized face at box ({left*4}, {top*4}, {right*4}, {bottom*4})")
+                log_action("BACKEND", f"Hello {name}", f"Recognized face at box ({left}, {top}, {right}, {bottom})")
             else:
-                log_action("BACKEND", "Unknown Face Detected", f"Box ({left*4}, {top*4}, {right*4}, {bottom*4})")
+                log_action("BACKEND", "Unknown Face Detected", f"Box ({left}, {top}, {right}, {bottom})")
             
-            # Scale coordinates back up by multiplying by 4
-            box = (left * 4, top * 4, (right - left) * 4, (bottom - top) * 4)
+            box = (left, top, right - left, bottom - top)
             results.append({"box": box, "name": name})
             
         return results
