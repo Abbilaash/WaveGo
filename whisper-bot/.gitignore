@@ -2,5 +2,7 @@ __pycache__/
 venv/
 model/__pycache__/
 mobilenetv3_embedding.onnx
+MiniLM/all-MiniLM.onnx
 intentdbBuild.py
 testIntentDb.py
+MiniLM/

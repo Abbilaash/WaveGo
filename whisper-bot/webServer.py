@@ -284,27 +284,16 @@ def api_move(action):
 	return jsonify({"success": True, "action": action, "speed": speed})
 
 
-chatbot_model = None
-chatbot_db = None
+chatbot_predict = None
 chatbot_lock = threading.Lock()
 
-def get_chatbot_model_and_db():
-	global chatbot_model, chatbot_db
+def get_chatbot_predict():
+	global chatbot_predict
 	with chatbot_lock:
-		if chatbot_model is None:
-			from sentence_transformers import SentenceTransformer
-			import pickle
-			
-			db_path = os.path.normpath(os.path.join(THIS_DIR, "CommandUnit", "intent_db.pkl"))
-			if not os.path.exists(db_path):
-				raise FileNotFoundError(f"Intent database not found at {db_path}. Please build it first.")
-				
-			with open(db_path, "rb") as f:
-				chatbot_db = pickle.load(f)
-				
-			chatbot_model = SentenceTransformer("all-MiniLM-L6-v2")
-			
-	return chatbot_model, chatbot_db
+		if chatbot_predict is None:
+			import MiniLM
+			chatbot_predict = MiniLM.predict_intent
+	return chatbot_predict
 
 
 @app.route('/api/chatbot/command', methods=['POST'])
@@ -317,30 +306,16 @@ def api_chatbot_command():
 	if not command_text:
 		return jsonify({"success": False, "error": "Command string cannot be empty"}), 400
 		
-	import numpy as np
-	
 	try:
-		model_obj, db_obj = get_chatbot_model_and_db()
+		predict_fn = get_chatbot_predict()
 	except Exception as exc:
 		log_action("BACKEND", "Chatbot Initialization Error", str(exc))
 		return jsonify({"success": False, "error": f"Failed to initialize chatbot model: {str(exc)}"}), 500
 		
 	try:
-		# Run encoding
-		query_vector = model_obj.encode([command_text])[0]
+		# Run ONNX inference via local MiniLM package
+		best_intent, best_score = predict_fn(command_text)
 		
-		best_intent = None
-		best_score = -1.0
-		
-		for intent, vectors in db_obj.items():
-			for v in vectors:
-				score = np.dot(query_vector, v) / (
-					np.linalg.norm(query_vector) * np.linalg.norm(v)
-				)
-				if score > best_score:
-					best_score = float(score)
-					best_intent = intent
-					
 		# Execute the matched intent if it passes the threshold
 		CONFIDENCE_THRESHOLD = 0.4
 		action_msg = ""
@@ -350,6 +325,9 @@ def api_chatbot_command():
 			if best_intent == "MOVE_FORWARD":
 				robot.forward(100)
 				action_msg = "Moving forward at default speed 100."
+			elif best_intent == "MOVE_BACKWARD":
+				robot.backward(100)
+				action_msg = "Moving backward at speed 100."
 			elif best_intent == "TURN_LEFT":
 				robot.left(100)
 				action_msg = "Turning left at speed 100."
@@ -359,6 +337,12 @@ def api_chatbot_command():
 			elif best_intent == "STOP":
 				stop_robot()
 				action_msg = "Stopped all robot motion."
+			elif best_intent == "SIT":
+				robot.steadyMode()
+				action_msg = "Robot sitting down (stabilized steady mode)."
+			elif best_intent == "STAND":
+				robot.steadyMode()
+				action_msg = "Robot standing up (stabilized steady mode)."
 			else:
 				execution_success = False
 				action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
