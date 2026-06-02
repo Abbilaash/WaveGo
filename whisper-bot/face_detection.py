@@ -13,25 +13,49 @@ def get_rgb_image(img_input):
         img_input = cv2.imdecode(np.frombuffer(img_input, np.uint8), cv2.IMREAD_COLOR)
     return cv2.cvtColor(img_input, cv2.COLOR_BGR2RGB)
 
+import threading
+
+# Thread-safe frame caching and skipping variables
+_recognition_cache = []
+_frame_counter = 0
+_cache_lock = threading.Lock()
+
 def detect_faces(img_input):
     try:
         rgb = get_rgb_image(img_input)
-        locations = face_recognition.face_locations(rgb)
-        faces = [(left, top, right - left, bottom - top) for top, right, bottom, left in locations]
+        # Downscale image to 1/4 size (16x fewer pixels) for extremely fast CPU face detection
+        small_rgb = cv2.resize(rgb, (0, 0), fx=0.25, fy=0.25)
+        locations = face_recognition.face_locations(small_rgb)
+        # Scale bounding box coordinates back up
+        faces = [(left * 4, top * 4, (right - left) * 4, (bottom - top) * 4) for top, right, bottom, left in locations]
         log_action("BACKEND", "Face Detection Run", f"Detected {len(faces)} faces.")
         return faces
     except Exception as e:
         log_action("BACKEND", "Face Detection Error", str(e))
         return []
 
-def recognize_faces(img_input):
+def recognize_faces(img_input, force_refresh=False):
+    global _frame_counter, _recognition_cache
+    
+    with _cache_lock:
+        _frame_counter += 1
+        # Decimate frame rate: only run heavy face recognition every 3rd frame to reduce CPU load by 66%
+        if not force_refresh and _frame_counter % 3 != 0 and _recognition_cache:
+            return _recognition_cache
+            
     try:
         rgb = get_rgb_image(img_input)
-        locations = face_recognition.face_locations(rgb)
+        # Run detection on downscaled image for high-speed tracking
+        small_rgb = cv2.resize(rgb, (0, 0), fx=0.25, fy=0.25)
+        locations = face_recognition.face_locations(small_rgb)
         if not locations:
+            with _cache_lock:
+                _recognition_cache = []
             return []
             
-        encodings = face_recognition.face_encodings(rgb, locations)
+        # Scale coordinates back to original size for high-precision face encoding
+        scaled_locations = [(top * 4, right * 4, bottom * 4, left * 4) for top, right, bottom, left in locations]
+        encodings = face_recognition.face_encodings(rgb, scaled_locations)
         
         known_names = []
         known_encodings = []
@@ -52,7 +76,7 @@ def recognize_faces(img_input):
                 log_action("BACKEND", "Load PKL inside recognize_faces Failed", str(e))
         
         results = []
-        for (top, right, bottom, left), face_encoding in zip(locations, encodings):
+        for (top, right, bottom, left), face_encoding in zip(scaled_locations, encodings):
             name = "Unknown"
             if known_encodings:
                 matches = face_recognition.compare_faces(known_encodings, face_encoding, tolerance=0.6)
@@ -72,6 +96,8 @@ def recognize_faces(img_input):
             box = (left, top, right - left, bottom - top)
             results.append({"box": box, "name": name})
             
+        with _cache_lock:
+            _recognition_cache = results
         return results
     except Exception as e:
         log_action("BACKEND", "recognize_faces Error", str(e))
