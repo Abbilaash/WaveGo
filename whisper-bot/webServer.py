@@ -343,6 +343,21 @@ def api_chatbot_command():
 			elif best_intent == "STAND":
 				robot.steadyMode()
 				action_msg = "Robot standing up (stabilized steady mode)."
+			elif best_intent == "FOLLOW_RED":
+				active_follow_color = "red"
+				camera_opencv.Camera.modeSelect = 'followColor'
+				camera_opencv.Camera.followColor = "red"
+				action_msg = "Started color tracking mode following the 'red' ball."
+			elif best_intent == "FOLLOW_GREEN":
+				active_follow_color = "green"
+				camera_opencv.Camera.modeSelect = 'followColor'
+				camera_opencv.Camera.followColor = "green"
+				action_msg = "Started color tracking mode following the 'green' ball."
+			elif best_intent == "FOLLOW_BLUE":
+				active_follow_color = "blue"
+				camera_opencv.Camera.modeSelect = 'followColor'
+				camera_opencv.Camera.followColor = "blue"
+				action_msg = "Started color tracking mode following the 'blue' ball."
 			else:
 				execution_success = False
 				action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
