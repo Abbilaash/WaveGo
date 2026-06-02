@@ -730,7 +730,53 @@ def api_object_submit():
 	return jsonify({"success": True, "message": "bounding success"})
 
 
+active_follow_color = None
+
+@app.route("/api/color/follow/<color>", methods=["POST"])
+def api_color_follow(color):
+	global active_follow_color
+	color_lower = color.lower()
+	if color_lower not in ("green", "blue", "red", "none"):
+		return jsonify({"success": False, "error": "Invalid color option"}), 400
+	
+	try:
+		if color_lower == "none":
+			active_follow_color = None
+			camera_opencv.Camera.modeSelect = 'none'
+			camera_opencv.Camera.followColor = 'none'
+			robot.stopFB()
+			robot.stopLR()
+			status = "deactivated"
+		else:
+			active_follow_color = color_lower
+			camera_opencv.Camera.modeSelect = 'followColor'
+			camera_opencv.Camera.followColor = color_lower
+			status = "activated"
+			
+		log_action("BACKEND", "Follow Color", f"Color: {color_lower}, Status: {status}")
+		return jsonify({
+			"success": True,
+			"color": color_lower,
+			"status": status,
+			"active_color": active_follow_color
+		})
+	except Exception as exc:
+		log_action("BACKEND", "Follow Color Toggle Error", str(exc))
+		return jsonify({"success": False, "error": str(exc)}), 500
+
+
 def main() -> None:
+	if not os.environ.get("WERKZEUG_RUN_MAIN"):
+		# Execute the pycache cleanup commands requested by user
+		if os.name != "nt":
+			try:
+				print("Cleaning pycache directories...")
+				subprocess.run("find /home/rpi/WaveGo -type d -name \"__pycache__\" -exec rm -rf {} +", shell=True, check=False)
+				subprocess.run("find ~/.local/lib/python3.13 -type d -name \"__pycache__\" -exec rm -rf {} +", shell=True, check=False)
+				print("Cleaned pycache successfully.")
+			except Exception as e:
+				print("Failed to clean pycache:", e)
+
 	if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
 		state = get_state()
 		print("network mode:", state["mode"])

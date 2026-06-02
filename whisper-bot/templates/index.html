@@ -231,6 +231,30 @@
         display: inline-block;
       }
 
+      /* Follow Color Buttons */
+      .color-btn.active-green {
+        background: linear-gradient(#34d399, #10b981) !important;
+        border-color: #059669 !important;
+        color: #fff !important;
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
+      }
+      .color-btn.active-blue {
+        background: linear-gradient(#60a5fa, #3b82f6) !important;
+        border-color: #2563eb !important;
+        color: #fff !important;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.4) !important;
+      }
+      .color-btn.active-red {
+        background: linear-gradient(#f87171, #ef4444) !important;
+        border-color: #dc2626 !important;
+        color: #fff !important;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.4) !important;
+      }
+      .color-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
       /* Chatbot System Styles */
       .chat-container {
         display: flex;
@@ -650,6 +674,16 @@
             <button id="objectDetect" class="face-btn">Detect</button>
           </div>
           <div id="objectStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
+        </section>
+
+        <section class="feed-section" id="followColorSection">
+          <h3 class="section-title">Follow Color</h3>
+          <div class="face-grid" style="display: flex; gap: 10px; justify-content: center;">
+            <button id="followColorGreen" class="face-btn color-btn" data-color="green" style="min-width: 80px; transition: all 0.3s ease;">Green</button>
+            <button id="followColorBlue" class="face-btn color-btn" data-color="blue" style="min-width: 80px; transition: all 0.3s ease;">Blue</button>
+            <button id="followColorRed" class="face-btn color-btn" data-color="red" style="min-width: 80px; transition: all 0.3s ease;">Red</button>
+          </div>
+          <div id="followColorStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: var(--accent-2);">No color followed yet</div>
         </section>
     </div>
   </article>
@@ -1507,5 +1541,79 @@
       }
     });
   }
+
+  // --- Follow Color Frontend Logic ---
+  const colorButtons = document.querySelectorAll('.color-btn');
+  const followColorStatus = document.getElementById('followColorStatus');
+  let currentActiveColor = null;
+
+  async function handleColorClick(e) {
+    const btn = e.currentTarget;
+    const color = btn.getAttribute('data-color');
+    
+    // Toggle state logic
+    const isDeactivating = (currentActiveColor === color);
+    const colorToRequest = isDeactivating ? 'none' : color;
+    
+    // Block buttons during request
+    colorButtons.forEach(b => b.disabled = true);
+    followColorStatus.textContent = isDeactivating ? `Stopping color follow...` : `Activating ${color} follow...`;
+    
+    try {
+      const response = await fetch(`/api/color/follow/${colorToRequest}`, {
+        method: 'POST'
+      });
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Failed to toggle color follow.");
+      }
+      
+      if (data.active_color === null || data.status === 'deactivated') {
+        // Deactivated state
+        currentActiveColor = null;
+        followColorStatus.textContent = "No color followed yet";
+        followColorStatus.style.color = "var(--accent-2)";
+        
+        // Remove all active CSS classes and unlock all buttons
+        colorButtons.forEach(b => {
+          b.className = "face-btn color-btn";
+          b.disabled = false;
+        });
+      } else {
+        // Activated state
+        currentActiveColor = data.active_color;
+        followColorStatus.textContent = `Following ${currentActiveColor} color!`;
+        followColorStatus.style.color = "#4ade80"; // green text
+        
+        // Style active button and keep others blocked
+        colorButtons.forEach(b => {
+          const btnColor = b.getAttribute('data-color');
+          if (btnColor === currentActiveColor) {
+            b.className = `face-btn color-btn active-${currentActiveColor}`;
+            b.disabled = false;
+          } else {
+            b.className = "face-btn color-btn";
+            b.disabled = true;
+          }
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      followColorStatus.textContent = `Error: ${err.message}`;
+      followColorStatus.style.color = "#ef4444"; // red text
+      
+      // Reset state to unlocked if it fails
+      currentActiveColor = null;
+      colorButtons.forEach(b => {
+        b.className = "face-btn color-btn";
+        b.disabled = false;
+      });
+    }
+  }
+
+  colorButtons.forEach(btn => {
+    btn.addEventListener('click', handleColorClick);
+  });
 </script>
 {% endblock %}

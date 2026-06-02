@@ -763,3 +763,76 @@
 2026-06-02 11:22:45,354 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
 2026-06-02 11:22:49,362 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
 2026-06-02 11:22:49,362 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:18:35,763 - INFO - [API_REQUEST] GET / - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:35,808 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-02 16:18:35,851 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:35,854 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:35,856 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:18:37,050 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:38,063 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-02 16:18:39,849 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:39,853 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:18:43,856 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:43,856 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:18:44,834 - INFO - [API_REQUEST] POST /api/color/follow/green - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:44,836 - INFO - [API_RESPONSE] POST /api/color/follow/green - Details: Status: 404 NOT FOUND
+2026-06-02 16:18:47,851 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:47,851 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:18:52,357 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:52,357 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:18:55,842 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:55,842 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:18:56,346 - INFO - [API_REQUEST] POST /api/color/follow/blue - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:56,347 - INFO - [API_RESPONSE] POST /api/color/follow/blue - Details: Status: 404 NOT FOUND
+2026-06-02 16:18:58,136 - INFO - [API_REQUEST] POST /api/color/follow/red - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:18:58,137 - INFO - [API_RESPONSE] POST /api/color/follow/red - Details: Status: 404 NOT FOUND
+2026-06-02 16:19:00,366 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:00,367 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:04,358 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:04,360 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:08,147 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:08,148 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:12,378 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:12,378 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:14,464 - INFO - [API_REQUEST] POST /api/color/follow/green - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:14,464 - INFO - [BACKEND] Follow Color - Details: Color: green, Status: activated
+2026-06-02 16:19:14,464 - INFO - [API_RESPONSE] POST /api/color/follow/green - Details: Status: 200 OK
+2026-06-02 16:19:15,853 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:15,856 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:15,998 - INFO - [API_REQUEST] POST /api/color/follow/none - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:15,998 - INFO - [BACKEND] Follow Color - Details: Color: none, Status: deactivated
+2026-06-02 16:19:15,998 - INFO - [API_RESPONSE] POST /api/color/follow/none - Details: Status: 200 OK
+2026-06-02 16:19:16,686 - INFO - [API_REQUEST] POST /api/color/follow/blue - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:16,686 - INFO - [BACKEND] Follow Color - Details: Color: blue, Status: activated
+2026-06-02 16:19:16,686 - INFO - [API_RESPONSE] POST /api/color/follow/blue - Details: Status: 200 OK
+2026-06-02 16:19:17,393 - INFO - [API_REQUEST] POST /api/color/follow/none - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:17,393 - INFO - [BACKEND] Follow Color - Details: Color: none, Status: deactivated
+2026-06-02 16:19:17,393 - INFO - [API_RESPONSE] POST /api/color/follow/none - Details: Status: 200 OK
+2026-06-02 16:19:17,957 - INFO - [API_REQUEST] POST /api/color/follow/red - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:17,958 - INFO - [BACKEND] Follow Color - Details: Color: red, Status: activated
+2026-06-02 16:19:17,959 - INFO - [API_RESPONSE] POST /api/color/follow/red - Details: Status: 200 OK
+2026-06-02 16:19:19,728 - INFO - [API_REQUEST] POST /api/color/follow/none - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:19,728 - INFO - [BACKEND] Follow Color - Details: Color: none, Status: deactivated
+2026-06-02 16:19:19,728 - INFO - [API_RESPONSE] POST /api/color/follow/none - Details: Status: 200 OK
+2026-06-02 16:19:19,843 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:19,843 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:24,360 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:24,360 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:28,354 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:28,354 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:32,378 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:32,379 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:36,369 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:36,373 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:40,436 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:40,438 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:44,375 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:44,381 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:47,854 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:47,854 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:51,851 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:51,851 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:19:55,849 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:19:55,849 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-02 16:20:00,355 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.220.132, Payload: None
+2026-06-02 16:20:00,356 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK

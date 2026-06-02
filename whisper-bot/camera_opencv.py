@@ -163,6 +163,16 @@ class CVThread(threading.Thread):
             if self.radius > 10 and self.drawing:
                 cv2.rectangle(imgInput,(int(self.box_x-self.radius),int(self.box_y+self.radius)),(int(self.box_x+self.radius),int(self.box_y-self.radius)),(255,255,255),1)
 
+        elif self.CVMode == 'followColor':
+            if hasattr(self, 'follow_circle') and self.follow_circle:
+                x, y, radius, action = self.follow_circle
+                cv2.circle(imgInput, (int(x), int(y)), int(radius), (74, 222, 128), 2)
+                cv2.circle(imgInput, (int(x), int(y)), 3, (64, 128, 255), -1)
+                cv2.putText(imgInput, f"{action}  R={radius}", (40, 60), CVThread.font, 0.6, (74, 222, 128), 2, cv2.LINE_AA)
+            else:
+                target_color = getattr(Camera, 'followColor', 'none').upper()
+                cv2.putText(imgInput, f"SEARCHING {target_color}", (40, 60), CVThread.font, 0.6, (64, 128, 255), 2, cv2.LINE_AA)
+
         elif self.CVMode == 'findlineCV':
             if frameRender:
                 imgInput = cv2.cvtColor(imgInput, cv2.COLOR_BGR2GRAY)
@@ -542,6 +552,100 @@ class CVThread(threading.Thread):
         self.pause()
 
 
+    def followColorCV(self, frame_image):
+        target_color = getattr(Camera, 'followColor', 'none').lower()
+        
+        COLORS = {
+            "red": [
+                ((0, 120, 70), (10, 255, 255)),
+                ((170, 120, 70), (180, 255, 255))
+            ],
+            "green": [
+                ((35, 50, 50), (85, 255, 255))
+            ],
+            "blue": [
+                ((90, 50, 50), (130, 255, 255))
+            ],
+            "yellow": [
+                ((20, 100, 100), (35, 255, 255))
+            ]
+        }
+        
+        if target_color not in COLORS or target_color == "none":
+            self.follow_circle = None
+            robot.stopFB()
+            robot.stopLR()
+            self.pause()
+            return
+            
+        try:
+            hsv = cv2.cvtColor(frame_image, cv2.COLOR_BGR2HSV)
+            masks = []
+            for lower, upper in COLORS[target_color]:
+                mask = cv2.inRange(hsv, np.array(lower), np.array(upper))
+                masks.append(mask)
+                
+            if not masks:
+                self.follow_circle = None
+                self.pause()
+                return
+                
+            mask = masks[0]
+            for m in masks[1:]:
+                mask |= m
+                
+            kernel = np.ones((5, 5), np.uint8)
+            mask = cv2.erode(mask, kernel, iterations=2)
+            mask = cv2.dilate(mask, kernel, iterations=2)
+            
+            circles = cv2.HoughCircles(
+                mask,
+                cv2.HOUGH_GRADIENT,
+                dp=1.2,
+                minDist=50,
+                param1=100,
+                param2=20,
+                minRadius=10,
+                maxRadius=200
+            )
+            
+            action = "SEARCH"
+            if circles is not None:
+                circles = np.round(circles[0, :]).astype("int")
+                largest = max(circles, key=lambda c: c[2])
+                x, y, radius = largest
+                
+                center_x = frame_image.shape[1] // 2
+                error = x - center_x
+                
+                # STOP_RADIUS = 100, CENTER_TOLERANCE = 50
+                if radius > 100:
+                    action = "STOP"
+                    robot.stopFB()
+                    robot.stopLR()
+                else:
+                    if abs(error) < 50:
+                        action = "FORWARD"
+                        robot.forward()
+                    elif error < 0:
+                        action = "LEFT"
+                        robot.left()
+                    else:
+                        action = "RIGHT"
+                        robot.right()
+                        
+                self.follow_circle = (x, y, radius, action)
+            else:
+                action = "SEARCH"
+                robot.left() # slow rotation to search for the ball
+                self.follow_circle = None
+        except Exception as e:
+            print("Error in followColorCV:", e)
+            self.follow_circle = None
+            
+        self.pause()
+
+
     def pause(self):
         self.__flag.clear()
 
@@ -598,10 +702,16 @@ class CVThread(threading.Thread):
                 self.objectDetectCV(self.imgCV)
                 self.CVThreading = 0
 
+            elif self.CVMode == 'followColor':
+                self.CVThreading = 1
+                self.followColorCV(self.imgCV)
+                self.CVThreading = 0
+
 
 class Camera(BaseCamera):
     modeSelect = 'none'
     followName = ''
+    followColor = 'none'
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
     # modeSelect = 'watchDog'
