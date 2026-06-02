@@ -335,8 +335,11 @@ def api_chatbot_command():
 				robot.right(100)
 				action_msg = "Turning right at speed 100."
 			elif best_intent == "STOP":
+				active_follow_color = None
+				camera_opencv.Camera.modeSelect = 'none'
+				camera_opencv.Camera.followColor = 'none'
 				stop_robot()
-				action_msg = "Stopped all robot motion."
+				action_msg = "Stopped all robot motion and openCV modes."
 			elif best_intent == "SIT":
 				robot.steadyMode()
 				action_msg = "Robot sitting down (stabilized steady mode)."
