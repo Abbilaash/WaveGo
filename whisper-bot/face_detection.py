@@ -16,8 +16,12 @@ def get_rgb_image(img_input):
 def detect_faces(img_input):
     try:
         rgb = get_rgb_image(img_input)
-        locations = face_recognition.face_locations(rgb)
-        faces = [(left, top, right - left, bottom - top) for top, right, bottom, left in locations]
+        # Resize to 1/4 size for 16x fewer pixels and 10x-15x faster processing
+        small_rgb = cv2.resize(rgb, (0, 0), fx=0.25, fy=0.25)
+        locations = face_recognition.face_locations(small_rgb)
+        
+        # Scale back up by 4x
+        faces = [(left * 4, top * 4, (right - left) * 4, (bottom - top) * 4) for top, right, bottom, left in locations]
         log_action("BACKEND", "Face Detection Run", f"Detected {len(faces)} faces.")
         return faces
     except Exception as e:
@@ -27,11 +31,13 @@ def detect_faces(img_input):
 def recognize_faces(img_input):
     try:
         rgb = get_rgb_image(img_input)
-        locations = face_recognition.face_locations(rgb)
+        # Resize to 1/4 size for 16x fewer pixels and 10x-15x faster processing
+        small_rgb = cv2.resize(rgb, (0, 0), fx=0.25, fy=0.25)
+        locations = face_recognition.face_locations(small_rgb)
         if not locations:
             return []
             
-        encodings = face_recognition.face_encodings(rgb, locations)
+        encodings = face_recognition.face_encodings(small_rgb, locations)
         
         known_names = []
         known_encodings = []
@@ -53,6 +59,12 @@ def recognize_faces(img_input):
         
         results = []
         for (top, right, bottom, left), face_encoding in zip(locations, encodings):
+            # Scale coordinates back up by 4x
+            top_scaled = top * 4
+            right_scaled = right * 4
+            bottom_scaled = bottom * 4
+            left_scaled = left * 4
+            
             name = "Unknown"
             if known_encodings:
                 matches = face_recognition.compare_faces(known_encodings, face_encoding, tolerance=0.6)
@@ -65,11 +77,11 @@ def recognize_faces(img_input):
             # Print Hello <name> as requested
             if name != "Unknown":
                 print(f"Hello {name}")
-                log_action("BACKEND", f"Hello {name}", f"Recognized face at box ({left}, {top}, {right}, {bottom})")
+                log_action("BACKEND", f"Hello {name}", f"Recognized face at box ({left_scaled}, {top_scaled}, {right_scaled}, {bottom_scaled})")
             else:
-                log_action("BACKEND", "Unknown Face Detected", f"Box ({left}, {top}, {right}, {bottom})")
+                log_action("BACKEND", "Unknown Face Detected", f"Box ({left_scaled}, {top_scaled}, {right_scaled}, {bottom_scaled})")
             
-            box = (left, top, right - left, bottom - top)
+            box = (left_scaled, top_scaled, right_scaled - left_scaled, bottom_scaled - top_scaled)
             results.append({"box": box, "name": name})
             
         return results
