@@ -231,6 +231,76 @@
         display: inline-block;
       }
 
+      /* Chatbot System Styles */
+      .chat-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 250px;
+        overflow-y: auto;
+        padding: 12px;
+        background: rgba(4, 10, 18, 0.6);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        margin-bottom: 12px;
+        scroll-behavior: smooth;
+      }
+
+      .chat-message {
+        display: flex;
+        flex-direction: column;
+        max-width: 85%;
+        animation: fadeIn 0.25s ease both;
+      }
+
+      .chat-message.user-msg {
+        align-self: flex-end;
+      }
+
+      .chat-message.bot-msg {
+        align-self: flex-start;
+      }
+
+      .chat-bubble {
+        padding: 10px 14px;
+        border-radius: 16px;
+        font-size: 0.92rem;
+        line-height: 1.4;
+      }
+
+      .user-msg .chat-bubble {
+        background: linear-gradient(135deg, rgba(125, 211, 252, 0.22), rgba(125, 211, 252, 0.08));
+        color: #fff;
+        border: 1px solid rgba(125, 211, 252, 0.35);
+        border-radius: 16px 16px 2px 16px;
+        box-shadow: 0 4px 12px rgba(125, 211, 252, 0.05);
+      }
+
+      .bot-msg .chat-bubble {
+        background: linear-gradient(135deg, rgba(77, 227, 183, 0.18), rgba(77, 227, 183, 0.06));
+        color: #fff;
+        border: 1px solid rgba(77, 227, 183, 0.28);
+        border-radius: 16px 16px 16px 2px;
+        box-shadow: 0 4px 12px rgba(77, 227, 183, 0.03);
+      }
+
+      .chat-time {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 4px;
+        padding: 0 4px;
+      }
+
+      .user-msg .chat-time {
+        text-align: right;
+      }
+
+      #chatInput:focus {
+        border-color: var(--accent-2);
+        box-shadow: 0 0 10px rgba(125, 211, 252, 0.25);
+        background: rgba(0, 0, 0, 0.5);
+      }
+
       /* Modal Overlay */
       .modal-overlay {
         position: fixed;
@@ -407,44 +477,109 @@
     </style>
 
     <div class="dashboard-layout">
-      <section class="feed-section" aria-label="live feed section">
-        <h3 class="section-title">Live Feed</h3>
-        <div class="video-shell">
-          <img class="video-feed" src="{{ url_for('video_feed') }}" alt="Live camera feed from WAVEGO">
-          <div class="video-overlay">
-            <span class="video-dot"></span>
-            <span>Live camera feed</span>
+      <div class="left-column" style="display: flex; flex-direction: column; gap: 20px; min-width: 0;">
+        <section class="feed-section" aria-label="live feed section">
+          <h3 class="section-title">Live Feed</h3>
+          <div class="video-shell">
+            <img class="video-feed" src="{{ url_for('video_feed') }}" alt="Live camera feed from WAVEGO">
+            <div class="video-overlay">
+              <span class="video-dot"></span>
+              <span>Live camera feed</span>
+            </div>
           </div>
-        </div>
 
-        <div class="stats" aria-label="network status">
-          <div class="stat">
-            <div class="stat-label">Mode</div>
-            <div class="stat-value" id="modeValue">{{ state.mode }}</div>
+          <div class="stats" aria-label="network status">
+            <div class="stat">
+              <div class="stat-label">Mode</div>
+              <div class="stat-value" id="modeValue">{{ state.mode }}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">IP Address</div>
+              <div class="stat-value" id="ipValue">{{ state.ip }}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Endpoint</div>
+              <div class="stat-value">/api/status</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">CPU Temp</div>
+              <div class="stat-value" id="cpuTempValue">{{ state.cpu_temp }}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">RAM Usage</div>
+              <div class="stat-value" id="ramValue">{{ state.ram_info }}%</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">CPU Usage</div>
+              <div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div>
+            </div>
           </div>
-          <div class="stat">
-            <div class="stat-label">IP Address</div>
-            <div class="stat-value" id="ipValue">{{ state.ip }}</div>
+          <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Network ready</span></div>
+        </section>
+
+        <!-- AI Chatbot System Section -->
+        <section class="feed-section chatbot-section" aria-label="AI Chatbot Control">
+          <h3 class="section-title" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <span>🤖 AI Command Assistant</span>
+            <div class="status-badge" style="margin-top: 0; padding: 4px 10px; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);">
+              <span class="status-dot" id="chatbotStatusDot" style="background: #9fb1ce; width: 8px; height: 8px; box-shadow: none;"></span>
+              <span id="chatbotStatusText" style="color: var(--muted); font-family: monospace;">Model ready</span>
+            </div>
+          </h3>
+          
+          <!-- Chat History -->
+          <div class="chat-container" id="chatContainer">
+            <div class="chat-message bot-msg">
+              <div class="chat-bubble">
+                Hello! I am your AI Command Assistant. You can control the WAVEGO robot using natural language. Try saying things like:
+                <ul style="margin: 6px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.4;">
+                  <li>"please move forward"</li>
+                  <li>"can you turn left"</li>
+                  <li>"turn right immediately"</li>
+                  <li>"stop walking!"</li>
+                </ul>
+              </div>
+              <div class="chat-time">System</div>
+            </div>
           </div>
-          <div class="stat">
-            <div class="stat-label">Endpoint</div>
-            <div class="stat-value">/api/status</div>
+          
+          <!-- Input Form -->
+          <div class="chat-input-wrapper" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="chatInput" placeholder="Type a command for WAVEGO..." style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0, 0, 0, 0.4); color: #fff; font-size: 0.95rem; outline: none; transition: all 0.3s;" />
+            <button id="chatSendBtn" class="modal-btn submit-btn" style="min-width: 80px; height: 42px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.9rem;">
+              <span>Send</span>
+              <span>➔</span>
+            </button>
           </div>
-          <div class="stat">
-            <div class="stat-label">CPU Temp</div>
-            <div class="stat-value" id="cpuTempValue">{{ state.cpu_temp }}</div>
+          
+          <!-- Live status of command execution -->
+          <div class="execution-monitor" style="margin-top: 15px; padding: 14px; background: rgba(16, 28, 49, 0.6); border-radius: 12px; border: 1px solid rgba(125, 211, 252, 0.15); display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 0.82rem; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.08em; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+              <span>⚡ Live Command Monitor</span>
+              <span id="execIndicator" class="video-dot" style="background: #4ade80; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.15); display: none;"></span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 0.92rem; margin-top: 4px;">
+              <span style="color: var(--muted);">Raw Command:</span>
+              <span id="monRawCommand" style="font-family: monospace; color: #fff;">-</span>
+              
+              <span style="color: var(--muted);">Parsed Intent:</span>
+              <span id="monIntent" style="font-family: monospace; color: var(--accent); font-weight: bold;">-</span>
+              
+              <span style="color: var(--muted);">Confidence:</span>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; max-width: 140px; min-width: 100px;">
+                  <div id="monConfidenceBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.4s ease;"></div>
+                </div>
+                <span id="monConfidenceVal" style="font-family: monospace; font-size: 0.85rem; color: var(--accent-2);">-</span>
+              </div>
+              
+              <span style="color: var(--muted);">Status:</span>
+              <span id="monStatus" style="color: var(--muted); font-size: 0.9rem;">No command executed yet</span>
+            </div>
           </div>
-          <div class="stat">
-            <div class="stat-label">RAM Usage</div>
-            <div class="stat-value" id="ramValue">{{ state.ram_info }}%</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">CPU Usage</div>
-            <div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div>
-          </div>
-        </div>
-        <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Network ready</span></div>
-      </section>
+        </section>
+      </div>
 
       <aside class="control-section" aria-label="robot controls section">
         <section class="feed-section">
@@ -1238,6 +1373,137 @@
         console.error(err);
         objectStatus.textContent = `Error: ${err.message}`;
         objectStatus.style.color = "#ef4444";
+      }
+    });
+  }
+
+  // --- Chatbot Assistant Frontend Logic ---
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
+  const chatContainer = document.getElementById('chatContainer');
+  const chatbotStatusDot = document.getElementById('chatbotStatusDot');
+  const chatbotStatusText = document.getElementById('chatbotStatusText');
+  
+  const execIndicator = document.getElementById('execIndicator');
+  const monRawCommand = document.getElementById('monRawCommand');
+  const monIntent = document.getElementById('monIntent');
+  const monConfidenceBar = document.getElementById('monConfidenceBar');
+  const monConfidenceVal = document.getElementById('monConfidenceVal');
+  const monStatus = document.getElementById('monStatus');
+
+  function appendChatMessage(sender, text) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-message ${sender === 'user' ? 'user-msg' : 'bot-msg'}`;
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'chat-bubble';
+    bubbleDiv.textContent = text;
+    
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'chat-time';
+    const now = new Date();
+    timeDiv.textContent = `${sender === 'user' ? 'You' : 'Robot'} • ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+    
+    msgDiv.appendChild(bubbleDiv);
+    msgDiv.appendChild(timeDiv);
+    chatContainer.appendChild(msgDiv);
+    
+    // Auto-scroll to bottom
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  async function handleSendChat() {
+    const commandText = chatInput.value.trim();
+    if (!commandText) return;
+    
+    // 1. Clear input
+    chatInput.value = "";
+    
+    // 2. Append User message
+    appendChatMessage('user', commandText);
+    
+    // 3. Update Status Indicator to Working/Processing
+    chatbotStatusDot.style.background = "#f59e0b"; // amber dot
+    chatbotStatusDot.style.boxShadow = "0 0 0 6px rgba(245, 158, 11, 0.15)";
+    chatbotStatusText.textContent = "Analyzing command...";
+    chatbotStatusText.style.color = "#fbbf24";
+    
+    // 4. Update Live Monitor with command
+    monRawCommand.textContent = `"${commandText}"`;
+    monIntent.textContent = "-";
+    monConfidenceBar.style.width = "0%";
+    monConfidenceVal.textContent = "-";
+    monStatus.textContent = "Processing NLP request on server...";
+    execIndicator.style.display = "inline-block";
+    execIndicator.style.background = "#fbbf24"; // amber flashing
+    
+    try {
+      // 5. POST to server API
+      const response = await fetch('/api/chatbot/command', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ command: commandText })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Server error processing command.");
+      }
+      
+      // 6. Success: Update Live Monitor
+      const scorePercent = Math.round(data.score * 100);
+      monIntent.textContent = data.intent || "UNKNOWN / UNDER THRESHOLD";
+      monConfidenceBar.style.width = `${Math.max(0, Math.min(100, scorePercent))}%`;
+      monConfidenceBar.style.background = data.threshold_passed ? "var(--accent)" : "#ef4444";
+      monConfidenceVal.textContent = `${data.score.toFixed(4)} (${scorePercent}%)`;
+      monStatus.textContent = data.action_taken;
+      
+      // Update running status dot
+      execIndicator.style.background = data.execution_success ? "#4ade80" : "#ef4444";
+      
+      // 7. Append Bot response message bubble
+      let botResponse = "";
+      if (data.threshold_passed) {
+        botResponse = `Command matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
+      } else {
+        botResponse = `I understood your command with too low confidence (${scorePercent}%). No action was taken. Try saying: "move forward", "turn left", "turn right", or "stop".`;
+      }
+      appendChatMessage('bot', botResponse);
+      
+    } catch (err) {
+      console.error(err);
+      // 8. Error handling
+      monIntent.textContent = "ERROR";
+      monConfidenceBar.style.width = "0%";
+      monConfidenceBar.style.background = "#ef4444";
+      monConfidenceVal.textContent = "0.0000";
+      monStatus.textContent = `Error: ${err.message}`;
+      execIndicator.style.background = "#ef4444";
+      
+      appendChatMessage('bot', `Sorry, I ran into an error trying to process your command: ${err.message}`);
+    } finally {
+      // 9. Reset status indicators
+      chatbotStatusDot.style.background = "var(--accent)";
+      chatbotStatusDot.style.boxShadow = "none";
+      chatbotStatusText.textContent = "Model ready";
+      chatbotStatusText.style.color = "var(--muted)";
+      
+      // Hide running indicator after a brief delay
+      setTimeout(() => {
+        execIndicator.style.display = "none";
+      }, 2000);
+    }
+  }
+
+  // Bind click & key events
+  if (chatSendBtn && chatInput) {
+    chatSendBtn.addEventListener('click', handleSendChat);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        handleSendChat();
       }
     });
   }

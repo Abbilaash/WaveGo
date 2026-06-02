@@ -284,6 +284,104 @@ def api_move(action):
 	return jsonify({"success": True, "action": action, "speed": speed})
 
 
+chatbot_model = None
+chatbot_db = None
+chatbot_lock = threading.Lock()
+
+def get_chatbot_model_and_db():
+	global chatbot_model, chatbot_db
+	with chatbot_lock:
+		if chatbot_model is None:
+			from sentence_transformers import SentenceTransformer
+			import pickle
+			
+			db_path = os.path.normpath(os.path.join(THIS_DIR, "CommandUnit", "intent_db.pkl"))
+			if not os.path.exists(db_path):
+				raise FileNotFoundError(f"Intent database not found at {db_path}. Please build it first.")
+				
+			with open(db_path, "rb") as f:
+				chatbot_db = pickle.load(f)
+				
+			chatbot_model = SentenceTransformer("all-MiniLM-L6-v2")
+			
+	return chatbot_model, chatbot_db
+
+
+@app.route('/api/chatbot/command', methods=['POST'])
+def api_chatbot_command():
+	data = request.json
+	if not data or "command" not in data:
+		return jsonify({"success": False, "error": "Missing command string"}), 400
+		
+	command_text = data["command"].strip()
+	if not command_text:
+		return jsonify({"success": False, "error": "Command string cannot be empty"}), 400
+		
+	import numpy as np
+	
+	try:
+		model_obj, db_obj = get_chatbot_model_and_db()
+	except Exception as exc:
+		log_action("BACKEND", "Chatbot Initialization Error", str(exc))
+		return jsonify({"success": False, "error": f"Failed to initialize chatbot model: {str(exc)}"}), 500
+		
+	try:
+		# Run encoding
+		query_vector = model_obj.encode([command_text])[0]
+		
+		best_intent = None
+		best_score = -1.0
+		
+		for intent, vectors in db_obj.items():
+			for v in vectors:
+				score = np.dot(query_vector, v) / (
+					np.linalg.norm(query_vector) * np.linalg.norm(v)
+				)
+				if score > best_score:
+					best_score = float(score)
+					best_intent = intent
+					
+		# Execute the matched intent if it passes the threshold
+		CONFIDENCE_THRESHOLD = 0.4
+		action_msg = ""
+		execution_success = True
+		
+		if best_score >= CONFIDENCE_THRESHOLD:
+			if best_intent == "MOVE_FORWARD":
+				robot.forward(100)
+				action_msg = "Moving forward at default speed 100."
+			elif best_intent == "TURN_LEFT":
+				robot.left(100)
+				action_msg = "Turning left at speed 100."
+			elif best_intent == "TURN_RIGHT":
+				robot.right(100)
+				action_msg = "Turning right at speed 100."
+			elif best_intent == "STOP":
+				stop_robot()
+				action_msg = "Stopped all robot motion."
+			else:
+				execution_success = False
+				action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
+		else:
+			execution_success = False
+			action_msg = "Command not understood (low match confidence)."
+			
+		log_action("BACKEND", "Chatbot Command Executed", f"Command: '{command_text}', Best Intent: {best_intent}, Score: {best_score:.4f}, Action: {action_msg}")
+		
+		return jsonify({
+			"success": True,
+			"command": command_text,
+			"intent": best_intent if best_score >= CONFIDENCE_THRESHOLD else None,
+			"score": best_score,
+			"threshold_passed": bool(best_score >= CONFIDENCE_THRESHOLD),
+			"action_taken": action_msg,
+			"execution_success": execution_success
+		})
+	except Exception as exc:
+		log_action("BACKEND", "Chatbot Command Error", str(exc))
+		return jsonify({"success": False, "error": str(exc)}), 500
+
+
 @app.route("/api/img/<path:filename>")
 def sendimg(filename):
 	return send_from_directory(os.path.join(THIS_DIR, "dist", "img"), filename)
