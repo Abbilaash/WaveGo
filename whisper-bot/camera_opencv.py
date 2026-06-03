@@ -557,17 +557,17 @@ class CVThread(threading.Thread):
         
         COLORS = {
             "red": [
-                ((0, 150, 90), (10, 255, 255)),
-                ((170, 150, 90), (180, 255, 255))
+                ((0, 120, 70), (10, 255, 255)),
+                ((170, 120, 70), (180, 255, 255))
             ],
             "green": [
-                ((35, 100, 70), (85, 255, 255))
+                ((35, 50, 50), (85, 255, 255))
             ],
             "blue": [
-                ((90, 120, 90), (130, 255, 255))
+                ((90, 50, 50), (130, 255, 255))
             ],
             "yellow": [
-                ((20, 120, 100), (35, 255, 255))
+                ((20, 100, 100), (35, 255, 255))
             ]
         }
         
@@ -598,44 +598,25 @@ class CVThread(threading.Thread):
             mask = cv2.erode(mask, kernel, iterations=2)
             mask = cv2.dilate(mask, kernel, iterations=2)
             
-            # Increase param2 to 35 for stricter circular shape validation
-            circles = cv2.HoughCircles(
-                mask,
-                cv2.HOUGH_GRADIENT,
-                dp=1.2,
-                minDist=50,
-                param1=100,
-                param2=35,
-                minRadius=15,
-                maxRadius=200
-            )
+            # Find contours to locate contiguous color blobs
+            cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            import imutils
+            cnts = imutils.grab_contours(cnts)
             
             action = "SEARCH"
-            valid_target = False
-            
-            if circles is not None:
-                circles = np.round(circles[0, :]).astype("int")
-                largest = max(circles, key=lambda c: c[2])
-                x, y, radius = largest
+            if len(cnts) > 0:
+                # Select the contour representing the maximum concentration of the target color
+                largest_contour = max(cnts, key=cv2.contourArea)
                 
-                # Check pixel density within the detected circle area to filter background noise
-                h, w = mask.shape[:2]
-                x1 = max(0, x - radius)
-                y1 = max(0, y - radius)
-                x2 = min(w, x + radius)
-                y2 = min(h, y + radius)
-                
-                circle_roi = mask[y1:y2, x1:x2]
-                if circle_roi.size > 0:
-                    density = np.sum(circle_roi == 255) / circle_roi.size
-                    # Require at least 40% of the bounding square area to contain the target color
-                    if density >= 0.40:
-                        valid_target = True
-                
-                if valid_target:
+                # Minimum area threshold (e.g., 200 pixels) to avoid tracking tiny background noise
+                if cv2.contourArea(largest_contour) > 200:
+                    ((x, y), radius) = cv2.minEnclosingCircle(largest_contour)
+                    x, y, radius = int(x), int(y), int(radius)
+                    
                     center_x = frame_image.shape[1] // 2
                     error = x - center_x
                     
+                    # STOP_RADIUS = 100, CENTER_TOLERANCE = 50
                     if radius > 100:
                         action = "STOP"
                         robot.stopFB()
@@ -653,9 +634,10 @@ class CVThread(threading.Thread):
                             
                     self.follow_circle = (x, y, radius, action)
                 else:
+                    action = "SEARCH"
+                    robot.left() # slow rotation to search for the ball
                     self.follow_circle = None
-            
-            if not valid_target:
+            else:
                 action = "SEARCH"
                 robot.left() # slow rotation to search for the ball
                 self.follow_circle = None
