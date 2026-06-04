@@ -36,7 +36,7 @@ from logger import log_action
 # on Windows from detecting newly accessed files and restarting the server during requests.
 try:
 	import onnxruntime
-	from transformers import WhisperFeatureExtractor, WhisperTokenizer
+	from tokenizers import Tokenizer
 except Exception as e:
 	log_action("BACKEND", "Preload Speech Libraries Error", str(e))
 
@@ -402,7 +402,9 @@ def get_audio_transcriber():
 		model_dir = os.path.join(THIS_DIR, "whisper")
 		has_encoder = os.path.exists(os.path.join(model_dir, "encoder_model.onnx")) or os.path.exists(os.path.join(model_dir, "encoder_model_quantized.onnx"))
 		has_decoder = os.path.exists(os.path.join(model_dir, "decoder_model.onnx")) or os.path.exists(os.path.join(model_dir, "decoder_model_quantized.onnx"))
-		if has_encoder and has_decoder:
+		has_tokenizer = os.path.exists(os.path.join(model_dir, "tokenizer.json"))
+		has_mel = os.path.exists(os.path.join(model_dir, "mel_filters.npz"))
+		if has_encoder and has_decoder and has_tokenizer and has_mel:
 			from whisper.AudioToText import AudioToTextTranscriber
 			_audio_transcriber = AudioToTextTranscriber(model_dir)
 			return _audio_transcriber

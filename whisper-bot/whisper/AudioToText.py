@@ -2,21 +2,32 @@ import os
 import wave
 import numpy as np
 import onnxruntime as ort
-from transformers import WhisperFeatureExtractor, WhisperTokenizer
+from tokenizers import Tokenizer
 
 class AudioToTextTranscriber:
     def __init__(self, model_dir):
         """
         Initializes the Whisper ONNX transcriber.
-        Expects the ONNX models and Hugging Face configuration files to be in the model_dir.
+        Expects the ONNX models, tokenizer.json, and mel_filters.npz to be in the model_dir.
         """
         self.model_dir = model_dir
         
-        # Load local configuration and tokenizer from model_dir
-        self.feature_extractor = WhisperFeatureExtractor.from_pretrained(model_dir)
-        self.tokenizer = WhisperTokenizer.from_pretrained(model_dir)
+        # Load local Tokenizer (using lightweight tokenizers package)
+        tokenizer_path = os.path.join(model_dir, "tokenizer.json")
+        if not os.path.exists(tokenizer_path):
+            raise FileNotFoundError(f"tokenizer.json not found at: {tokenizer_path}")
+        self.tokenizer = Tokenizer.from_file(tokenizer_path)
         
-        # Paths to encoder and decoder ONNX models (standard or quantized names)
+        # Load precomputed Mel filters matrix from OpenAI's mel_filters.npz
+        mel_filters_path = os.path.join(model_dir, "mel_filters.npz")
+        if not os.path.exists(mel_filters_path):
+            raise FileNotFoundError(f"mel_filters.npz not found at: {mel_filters_path}. Please download it from: https://github.com/openai/whisper/raw/main/whisper/assets/mel_filters.npz")
+            
+        with np.load(mel_filters_path) as f:
+            # Whisper base uses 80 Mel bands
+            self.mel_filters = f["mel_80"]
+            
+        # Paths to encoder and decoder ONNX models (supporting both default and quantized names)
         encoder_path = os.path.join(model_dir, "encoder_model.onnx")
         if not os.path.exists(encoder_path):
             encoder_path = os.path.join(model_dir, "encoder_model_quantized.onnx")
@@ -24,11 +35,11 @@ class AudioToTextTranscriber:
         decoder_path = os.path.join(model_dir, "decoder_model.onnx")
         if not os.path.exists(decoder_path):
             decoder_path = os.path.join(model_dir, "decoder_model_quantized.onnx")
-        
+            
         if not os.path.exists(encoder_path):
-            raise FileNotFoundError(f"ONNX Encoder model not found (tried encoder_model.onnx and encoder_model_quantized.onnx) in: {model_dir}")
+            raise FileNotFoundError(f"ONNX Encoder model not found in: {model_dir}")
         if not os.path.exists(decoder_path):
-            raise FileNotFoundError(f"ONNX Decoder model not found (tried decoder_model.onnx and decoder_model_quantized.onnx) in: {model_dir}")
+            raise FileNotFoundError(f"ONNX Decoder model not found in: {model_dir}")
             
         # Initialize ONNX inference sessions (using CPU execution provider)
         self.encoder_session = ort.InferenceSession(encoder_path, providers=["CPUExecutionProvider"])
@@ -47,11 +58,11 @@ class AudioToTextTranscriber:
                 self.decoder_encoder_states_name = name
                 
         # Retrieve Whisper special tokens
-        self.start_token = self.tokenizer.convert_tokens_to_ids("<|startoftranscript|>")
-        self.en_token = self.tokenizer.convert_tokens_to_ids("<|en|>")
-        self.transcribe_token = self.tokenizer.convert_tokens_to_ids("<|transcribe|>")
-        self.notimestamps_token = self.tokenizer.convert_tokens_to_ids("<|notimestamps|>")
-        self.eos_token_id = self.tokenizer.eos_token_id
+        self.start_token = self.tokenizer.token_to_id("<|startoftranscript|>")
+        self.en_token = self.tokenizer.token_to_id("<|en|>")
+        self.transcribe_token = self.tokenizer.token_to_id("<|transcribe|>")
+        self.notimestamps_token = self.tokenizer.token_to_id("<|notimestamps|>")
+        self.eos_token_id = self.tokenizer.token_to_id("<|endoftext|>")
 
     def transcribe(self, wav_path):
         """
@@ -81,17 +92,48 @@ class AudioToTextTranscriber:
                 if n_channels > 1:
                     audio = audio.reshape(-1, n_channels).mean(axis=1)
                     
-            # 2. Extract Log-Mel Spectrogram features
-            # Pads/truncates the audio to a standard 30s window (3000 frames) and extracts 80 channels
-            features = self.feature_extractor(audio, sampling_rate=16000, return_tensors="np")
-            input_features = features.input_features.astype(np.float32)
+            # 2. Replicate Whisper Log-Mel Spectrogram extraction using pure NumPy
+            # Pad or trim audio to exactly 30s (480,000 samples at 16kHz)
+            n_samples = 480000
+            if len(audio) > n_samples:
+                audio = audio[:n_samples]
+            else:
+                audio = np.pad(audio, (0, n_samples - len(audio)))
+                
+            # Pad audio with reflection (200 samples at the beginning and end) for window centering
+            audio_padded = np.pad(audio, 200, mode='reflect')
+            
+            # Compute STFT (Window size 400, Hop 160, 3000 frames)
+            window = 0.5 * (1.0 - np.cos(2.0 * np.pi * np.arange(400) / 400))
+            stft = []
+            for i in range(3000):
+                start = i * 160
+                frame = audio_padded[start : start + 400] * window
+                fft = np.fft.rfft(frame)
+                stft.append(np.abs(fft) ** 2)
+                
+            stft_matrix = np.array(stft).T # Shape: (201, 3000)
+            
+            # Apply Mel filterbank matrix (80, 201)
+            mel_spec = np.dot(self.mel_filters, stft_matrix)
+            
+            # Log Scaling
+            log_mel_spec = np.log10(np.maximum(mel_spec, 1e-10))
+            
+            # Dynamic Range Compression
+            log_mel_spec = np.maximum(log_mel_spec, log_mel_spec.max() - 8.0)
+            
+            # Scale to [-1, 1]
+            log_mel_spec = (log_mel_spec + 4.0) / 4.0
+            
+            # Add batch dimension: Shape becomes (1, 80, 3000)
+            input_features = np.expand_dims(log_mel_spec, axis=0).astype(np.float32)
             
             # 3. Run Encoder Session
             encoder_outputs = self.encoder_session.run(None, {self.encoder_input_name: input_features})
             last_hidden_state = encoder_outputs[0]
             
             # 4. Autoregressive Decoder Loop (Greedy Search)
-            # Sequence format: [<|startoftranscript|>, <|en|>, <|transcribe|>, <|notimestamps|>]
             seq = [self.start_token]
             if self.en_token is not None:
                 seq.append(self.en_token)
@@ -112,7 +154,7 @@ class AudioToTextTranscriber:
                 decoder_outputs = self.decoder_session.run(None, decoder_inputs)
                 logits = decoder_outputs[0]
                 
-                # Predict the next token (greedy, argmax of the last step's logits)
+                # Predict the next token (greedy)
                 next_token_logits = logits[0, -1, :]
                 next_token_id = int(np.argmax(next_token_logits))
                 
@@ -122,7 +164,7 @@ class AudioToTextTranscriber:
                 generated_tokens.append(next_token_id)
                 decoder_input_ids = np.append(decoder_input_ids, [[next_token_id]], axis=1)
                 
-            # 5. Decode generated token IDs to text string
+            # 5. Decode generated token IDs to text string using tokenizers
             transcription = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
             return transcription.strip()
         finally:
