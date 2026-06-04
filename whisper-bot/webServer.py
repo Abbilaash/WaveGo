@@ -32,6 +32,14 @@ import camera_tilt
 import robot
 from logger import log_action
 
+# Preload speech libraries at startup to prevent the Werkzeug developer reloader
+# on Windows from detecting newly accessed files and restarting the server during requests.
+try:
+	import onnxruntime
+	from transformers import WhisperFeatureExtractor, WhisperTokenizer
+except Exception as e:
+	log_action("BACKEND", "Preload Speech Libraries Error", str(e))
+
 
 AP_DEFAULT_IP = "192.168.12.1"
 NETWORK_CHECK_TARGET = ("1.1.1.1", 80)
@@ -381,6 +389,141 @@ def api_chatbot_command():
 		})
 	except Exception as exc:
 		log_action("BACKEND", "Chatbot Command Error", str(exc))
+		return jsonify({"success": False, "error": str(exc)}), 500
+
+
+_audio_transcriber = None
+
+def get_audio_transcriber():
+	global _audio_transcriber
+	if _audio_transcriber is not None:
+		return _audio_transcriber
+	try:
+		model_dir = os.path.join(THIS_DIR, "whisper")
+		has_encoder = os.path.exists(os.path.join(model_dir, "encoder_model.onnx")) or os.path.exists(os.path.join(model_dir, "encoder_model_quantized.onnx"))
+		has_decoder = os.path.exists(os.path.join(model_dir, "decoder_model.onnx")) or os.path.exists(os.path.join(model_dir, "decoder_model_quantized.onnx"))
+		if has_encoder and has_decoder:
+			from whisper.AudioToText import AudioToTextTranscriber
+			_audio_transcriber = AudioToTextTranscriber(model_dir)
+			return _audio_transcriber
+	except Exception as exc:
+		log_action("BACKEND", "Audio Transcriber Init Error", str(exc))
+	return None
+
+
+@app.route('/api/chatbot/audio', methods=['POST'])
+def api_chatbot_audio():
+	if 'audio' not in request.files:
+		return jsonify({"success": False, "error": "No audio file provided"}), 400
+		
+	audio_file = request.files['audio']
+	temp_path = os.path.join(THIS_DIR, f"temp_voice_{int(time.time())}.wav")
+	
+	try:
+		audio_file.save(temp_path)
+	except Exception as exc:
+		log_action("BACKEND", "Audio Upload Save Error", str(exc))
+		return jsonify({"success": False, "error": f"Failed to save uploaded audio file: {str(exc)}"}), 500
+
+	transcriber = get_audio_transcriber()
+	if transcriber is None:
+		if os.path.exists(temp_path):
+			os.remove(temp_path)
+		return jsonify({
+			"success": False,
+			"error": "Local audio transcriber is not initialized. Please ensure the ONNX models (encoder_model.onnx and decoder_model.onnx) and configuration files are downloaded in the 'whisper' folder."
+		}), 400
+
+	try:
+		# Run Whisper ONNX transcription
+		transcribed_text = transcriber.transcribe(temp_path)
+		log_action("BACKEND", "Speech-to-Text Success", f"Transcribed: '{transcribed_text}'")
+	except Exception as exc:
+		log_action("BACKEND", "Speech-to-Text Processing Error", str(exc))
+		return jsonify({"success": False, "error": f"Failed to transcribe audio: {str(exc)}"}), 500
+	finally:
+		if os.path.exists(temp_path):
+			os.remove(temp_path)
+
+	if not transcribed_text:
+		return jsonify({"success": False, "error": "Speech was not recognized or transcription is empty. Please speak clearly."}), 400
+
+	try:
+		predict_fn = get_chatbot_predict()
+	except Exception as exc:
+		log_action("BACKEND", "Chatbot Initialization Error", str(exc))
+		return jsonify({"success": False, "error": f"Failed to initialize chatbot model: {str(exc)}"}), 500
+
+	try:
+		# Run NLP intent matching on the transcribed text
+		best_intent, best_score = predict_fn(transcribed_text)
+		
+		# Execute matched intent
+		CONFIDENCE_THRESHOLD = 0.4
+		action_msg = ""
+		execution_success = True
+		
+		if best_score >= CONFIDENCE_THRESHOLD:
+			if best_intent == "MOVE_FORWARD":
+				robot.forward(100)
+				action_msg = "Moving forward at default speed 100."
+			elif best_intent == "MOVE_BACKWARD":
+				robot.backward(100)
+				action_msg = "Moving backward at speed 100."
+			elif best_intent == "TURN_LEFT":
+				robot.left(100)
+				action_msg = "Turning left at speed 100."
+			elif best_intent == "TURN_RIGHT":
+				robot.right(100)
+				action_msg = "Turning right at speed 100."
+			elif best_intent == "STOP":
+				active_follow_color = None
+				camera_opencv.Camera.modeSelect = 'none'
+				camera_opencv.Camera.followColor = 'none'
+				stop_robot()
+				action_msg = "Stopped all robot motion and openCV modes."
+			elif best_intent == "SIT":
+				robot.steadyMode()
+				action_msg = "Robot sitting down (stabilized steady mode)."
+			elif best_intent == "STAND":
+				robot.steadyMode()
+				action_msg = "Robot standing up (stabilized steady mode)."
+			elif best_intent == "FOLLOW_RED":
+				active_follow_color = "red"
+				camera_opencv.Camera.modeSelect = 'followColor'
+				camera_opencv.Camera.followColor = "red"
+				action_msg = "Started color tracking mode following the 'red' ball."
+			elif best_intent == "FOLLOW_GREEN":
+				active_follow_color = "green"
+				camera_opencv.Camera.modeSelect = 'followColor'
+				camera_opencv.Camera.followColor = "green"
+				action_msg = "Started color tracking mode following the 'green' ball."
+			elif best_intent == "FOLLOW_BLUE":
+				active_follow_color = "blue"
+				camera_opencv.Camera.modeSelect = 'followColor'
+				camera_opencv.Camera.followColor = "blue"
+				action_msg = "Started color tracking mode following the 'blue' ball."
+			else:
+				execution_success = False
+				action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
+		else:
+			execution_success = False
+			action_msg = "Command not understood (low match confidence)."
+			
+		log_action("BACKEND", "Chatbot Audio Command Executed", f"Text: '{transcribed_text}', Best Intent: {best_intent}, Score: {best_score:.4f}, Action: {action_msg}")
+		
+		return jsonify({
+			"success": True,
+			"message": "Audio file received and processed successfully",
+			"command": transcribed_text,
+			"intent": best_intent if best_score >= CONFIDENCE_THRESHOLD else None,
+			"score": best_score,
+			"threshold_passed": bool(best_score >= CONFIDENCE_THRESHOLD),
+			"action_taken": action_msg,
+			"execution_success": execution_success
+		})
+	except Exception as exc:
+		log_action("BACKEND", "Chatbot Audio Processing Error", str(exc))
 		return jsonify({"success": False, "error": str(exc)}), 500
 
 

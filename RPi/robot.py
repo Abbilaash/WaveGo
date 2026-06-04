@@ -1,6 +1,7 @@
 #!/usr/bin/env/python3
 # File name   : robot.py
 # Description : Robot interfaces.
+import os
 import time
 import json
 import serial
@@ -14,6 +15,8 @@ serial_lock = threading.Lock()
 
 def _open_serial():
 	global ser
+	if os.name == 'nt':
+		return False
 	if ser is not None and ser.is_open:
 		return True
 	try:

@@ -6,3 +6,5 @@ MiniLM/all-MiniLM.onnx
 intentdbBuild.py
 testIntentDb.py
 MiniLM/
+whisper/*.json
+whisper/*.onnx

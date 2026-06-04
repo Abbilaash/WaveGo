@@ -9,7 +9,7 @@ import threading
 import imutils
 
 curpath = os.path.realpath(__file__)
-thisPath = "/" + os.path.dirname(curpath)
+thisPath = os.path.dirname(curpath)
 
 faceCascade = cv2.CascadeClassifier(thisPath + '/haarcascade_frontalface_default.xml')
 

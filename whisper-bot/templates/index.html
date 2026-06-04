@@ -21,6 +21,17 @@
         align-items: start;
       }
 
+      /* Mobile responsiveness overrides */
+      @media (max-width: 920px) {
+        .dashboard-layout {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        .control-section {
+          width: 100%;
+        }
+      }
+
       .feed-section,
       .control-section {
         background: rgba(255, 255, 255, 0.06);
@@ -514,18 +525,6 @@
 
           <div class="stats" aria-label="network status">
             <div class="stat">
-              <div class="stat-label">Mode</div>
-              <div class="stat-value" id="modeValue">{{ state.mode }}</div>
-            </div>
-            <div class="stat">
-              <div class="stat-label">IP Address</div>
-              <div class="stat-value" id="ipValue">{{ state.ip }}</div>
-            </div>
-            <div class="stat">
-              <div class="stat-label">Endpoint</div>
-              <div class="stat-value">/api/status</div>
-            </div>
-            <div class="stat">
               <div class="stat-label">CPU Temp</div>
               <div class="stat-value" id="cpuTempValue">{{ state.cpu_temp }}</div>
             </div>
@@ -568,12 +567,33 @@
           </div>
           
           <!-- Input Form -->
-          <div class="chat-input-wrapper" style="display: flex; gap: 10px; align-items: center;">
-            <input type="text" id="chatInput" placeholder="Type a command for WAVEGO..." style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0, 0, 0, 0.4); color: #fff; font-size: 0.95rem; outline: none; transition: all 0.3s;" />
-            <button id="chatSendBtn" class="modal-btn submit-btn" style="min-width: 80px; height: 42px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.9rem;">
-              <span>Send</span>
-              <span>➔</span>
-            </button>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Audio File Preview Chip (hidden by default) -->
+            <div id="audioPreviewContainer" style="display: none; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(125, 211, 252, 0.15); border: 1px solid rgba(125, 211, 252, 0.3); border-radius: 12px; font-size: 0.9rem; animation: fadeIn 0.2s ease;">
+              <span style="font-size: 1.1rem;">🎙️</span>
+              <span style="color: #fff; font-weight: bold; flex: 1;" id="audioFileName">voice_command.wav</span>
+              <span id="audioFileDuration" style="color: var(--muted); font-size: 0.8rem;">(0.00s)</span>
+              <button id="audioClearBtn" style="background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 1.1rem; padding: 0 4px;">×</button>
+            </div>
+            
+            <div class="chat-input-wrapper" style="display: flex; gap: 8px; align-items: center; width: 100%;">
+              <input type="text" id="chatInput" placeholder="Type a command for WAVEGO..." style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0, 0, 0, 0.4); color: #fff; font-size: 0.95rem; outline: none; transition: all 0.3s; min-width: 0;" />
+              
+              <!-- Voice mic button (Long press to record) -->
+              <button id="chatVoiceBtn" class="modal-btn submit-btn" style="min-width: 44px; max-width: 44px; width: 44px; height: 42px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(125, 211, 252, 0.22), rgba(125, 211, 252, 0.08)); border: 1px solid rgba(125, 211, 252, 0.35); box-shadow: 0 4px 12px rgba(125, 211, 252, 0.05); color: #fff; cursor: pointer; transition: all 0.3s; padding: 0;" title="Hold to record voice command">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+              </button>
+              
+              <!-- Send button -->
+              <button id="chatSendBtn" class="modal-btn submit-btn" style="min-width: 76px; height: 42px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; padding: 0 16px;">
+                <span>Send</span>
+              </button>
+            </div>
           </div>
           
           <!-- Live status of command execution -->
@@ -712,6 +732,33 @@
       <button id="modalSave" class="modal-btn save-btn">Save</button>
       <button id="modalNext" class="modal-btn next-btn">Next</button>
       <button id="modalSubmit" class="modal-btn submit-btn">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Microphone Permission Request Modal -->
+<div id="micPermissionModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content" style="max-width: 460px;">
+    <div class="modal-header">
+      <h3>Microphone Access Required</h3>
+      <span class="modal-close" id="micPermissionClose">&times;</span>
+    </div>
+    <div class="modal-body" style="padding: 24px; text-align: center; gap: 16px;">
+      <div style="font-size: 3rem; margin-bottom: 8px;">🎙️</div>
+      <p style="margin: 0; color: #fff; font-size: 1.05rem; font-weight: bold; line-height: 1.4;">
+        Enable Voice Commands
+      </p>
+      <p style="margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.6;">
+        WAVEGO Voice Control needs microphone access. You can then hold down the mic button to speak commands directly to the robot.
+      </p>
+      <div id="micHelperText" style="display: none; font-size: 0.85rem; color: #fca5a5; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 12px; border-radius: 8px; width: 100%; text-align: left; line-height: 1.5;">
+        <strong>HTTP Security Notice:</strong> Browsers require a secure connection (HTTPS) or local setup to access the microphone. 
+        If you are on HTTP, please go to <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code>, add this robot IP address: <strong><span id="robotIpPlaceholder"></span></strong>, enable the flag, and restart Chrome.
+      </div>
+    </div>
+    <div class="modal-footer" style="background: rgba(0,0,0,0.15);">
+      <button id="micPermissionCancel" class="modal-btn undo-btn" style="min-width: 80px;">Cancel</button>
+      <button id="micPermissionAllow" class="modal-btn submit-btn" style="min-width: 120px;">Allow Access</button>
     </div>
   </div>
 </div>
@@ -1411,12 +1458,20 @@
     });
   }
 
+
+
   // --- Chatbot Assistant Frontend Logic ---
   const chatInput = document.getElementById('chatInput');
   const chatSendBtn = document.getElementById('chatSendBtn');
+  const chatVoiceBtn = document.getElementById('chatVoiceBtn');
   const chatContainer = document.getElementById('chatContainer');
   const chatbotStatusDot = document.getElementById('chatbotStatusDot');
   const chatbotStatusText = document.getElementById('chatbotStatusText');
+  
+  const audioPreviewContainer = document.getElementById('audioPreviewContainer');
+  const audioFileName = document.getElementById('audioFileName');
+  const audioFileDuration = document.getElementById('audioFileDuration');
+  const audioClearBtn = document.getElementById('audioClearBtn');
   
   const execIndicator = document.getElementById('execIndicator');
   const monRawCommand = document.getElementById('monRawCommand');
@@ -1424,6 +1479,12 @@
   const monConfidenceBar = document.getElementById('monConfidenceBar');
   const monConfidenceVal = document.getElementById('monConfidenceVal');
   const monStatus = document.getElementById('monStatus');
+  
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let recordedAudioBlob = null;
+  let recordingStartTime = 0;
+  let isRecording = false;
 
   function appendChatMessage(sender, text) {
     const msgDiv = document.createElement('div');
@@ -1448,57 +1509,120 @@
 
   async function handleSendChat() {
     const commandText = chatInput.value.trim();
+    
+    // Check if we have a recorded voice command first
+    if (recordedAudioBlob) {
+      // 1. Append User message showing voice indicator
+      appendChatMessage('user', "🎙️ [Voice Command]");
+      
+      // 2. Update Status Indicators
+      chatbotStatusDot.style.background = "#f59e0b"; // amber dot
+      chatbotStatusDot.style.boxShadow = "0 0 0 6px rgba(245, 158, 11, 0.15)";
+      chatbotStatusText.textContent = "Transcribing & analyzing audio...";
+      chatbotStatusText.style.color = "#fbbf24";
+      
+      monRawCommand.textContent = "🎙️ [Audio Stream File]";
+      monIntent.textContent = "-";
+      monConfidenceBar.style.width = "0%";
+      monConfidenceVal.textContent = "-";
+      monStatus.textContent = "Uploading audio payload to server...";
+      execIndicator.style.display = "inline-block";
+      execIndicator.style.background = "#fbbf24";
+      
+      const formData = new FormData();
+      formData.append('audio', recordedAudioBlob, 'voice_command.wav');
+      
+      // Clear voice preview
+      clearRecordedAudio();
+      
+      try {
+        const response = await fetch('/api/chatbot/audio', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Server failed to transcribe audio.");
+        }
+        
+        // Success: Update Live Monitor
+        const scorePercent = Math.round(data.score * 100);
+        monRawCommand.textContent = `"${data.command}"`;
+        monIntent.textContent = data.intent || "UNKNOWN / UNDER THRESHOLD";
+        monConfidenceBar.style.width = `${Math.max(0, Math.min(100, scorePercent))}%`;
+        monConfidenceBar.style.background = data.threshold_passed ? "var(--accent)" : "#ef4444";
+        monConfidenceVal.textContent = `${data.score.toFixed(4)} (${scorePercent}%)`;
+        monStatus.textContent = data.action_taken;
+        execIndicator.style.background = data.execution_success ? "#4ade80" : "#ef4444";
+        
+        // Append Bot response
+        let botResponse = "";
+        if (data.threshold_passed) {
+          botResponse = `Command: "${data.command}" matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
+        } else {
+          botResponse = `Transcribed command: "${data.command}" but confidence was too low (${scorePercent}%). Try speaking clearly or type: "move forward", "turn left", "turn right", or "stop".`;
+        }
+        appendChatMessage('bot', botResponse);
+        
+      } catch (err) {
+        console.error(err);
+        monIntent.textContent = "ERROR";
+        monConfidenceBar.style.width = "0%";
+        monConfidenceBar.style.background = "#ef4444";
+        monConfidenceVal.textContent = "0.0000";
+        monStatus.textContent = `Error: ${err.message}`;
+        execIndicator.style.background = "#ef4444";
+        appendChatMessage('bot', `Sorry, I failed to process your voice command: ${err.message}`);
+      } finally {
+        chatbotStatusDot.style.background = "var(--accent)";
+        chatbotStatusDot.style.boxShadow = "none";
+        chatbotStatusText.textContent = "Model ready";
+        chatbotStatusText.style.color = "var(--muted)";
+        setTimeout(() => { execIndicator.style.display = "none"; }, 2000);
+      }
+      return;
+    }
+    
+    // Fallback to text command
     if (!commandText) return;
     
-    // 1. Clear input
     chatInput.value = "";
-    
-    // 2. Append User message
     appendChatMessage('user', commandText);
     
-    // 3. Update Status Indicator to Working/Processing
-    chatbotStatusDot.style.background = "#f59e0b"; // amber dot
+    chatbotStatusDot.style.background = "#f59e0b";
     chatbotStatusDot.style.boxShadow = "0 0 0 6px rgba(245, 158, 11, 0.15)";
     chatbotStatusText.textContent = "Analyzing command...";
     chatbotStatusText.style.color = "#fbbf24";
     
-    // 4. Update Live Monitor with command
     monRawCommand.textContent = `"${commandText}"`;
     monIntent.textContent = "-";
     monConfidenceBar.style.width = "0%";
     monConfidenceVal.textContent = "-";
     monStatus.textContent = "Processing NLP request on server...";
     execIndicator.style.display = "inline-block";
-    execIndicator.style.background = "#fbbf24"; // amber flashing
+    execIndicator.style.background = "#fbbf24";
     
     try {
-      // 5. POST to server API
       const response = await fetch('/api/chatbot/command', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ command: commandText })
       });
       
       const data = await response.json();
-      
       if (!response.ok || !data.success) {
         throw new Error(data.error || "Server error processing command.");
       }
       
-      // 6. Success: Update Live Monitor
       const scorePercent = Math.round(data.score * 100);
       monIntent.textContent = data.intent || "UNKNOWN / UNDER THRESHOLD";
       monConfidenceBar.style.width = `${Math.max(0, Math.min(100, scorePercent))}%`;
       monConfidenceBar.style.background = data.threshold_passed ? "var(--accent)" : "#ef4444";
       monConfidenceVal.textContent = `${data.score.toFixed(4)} (${scorePercent}%)`;
       monStatus.textContent = data.action_taken;
-      
-      // Update running status dot
       execIndicator.style.background = data.execution_success ? "#4ade80" : "#ef4444";
       
-      // 7. Append Bot response message bubble
       let botResponse = "";
       if (data.threshold_passed) {
         botResponse = `Command matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
@@ -1509,28 +1633,293 @@
       
     } catch (err) {
       console.error(err);
-      // 8. Error handling
       monIntent.textContent = "ERROR";
       monConfidenceBar.style.width = "0%";
       monConfidenceBar.style.background = "#ef4444";
       monConfidenceVal.textContent = "0.0000";
       monStatus.textContent = `Error: ${err.message}`;
       execIndicator.style.background = "#ef4444";
-      
       appendChatMessage('bot', `Sorry, I ran into an error trying to process your command: ${err.message}`);
     } finally {
-      // 9. Reset status indicators
       chatbotStatusDot.style.background = "var(--accent)";
       chatbotStatusDot.style.boxShadow = "none";
       chatbotStatusText.textContent = "Model ready";
       chatbotStatusText.style.color = "var(--muted)";
-      
-      // Hide running indicator after a brief delay
-      setTimeout(() => {
-        execIndicator.style.display = "none";
-      }, 2000);
+      setTimeout(() => { execIndicator.style.display = "none"; }, 2000);
     }
   }
+
+  // --- Voice Recording Functions ---
+  const micPermissionModal = document.getElementById('micPermissionModal');
+  const micPermissionAllow = document.getElementById('micPermissionAllow');
+  const micPermissionCancel = document.getElementById('micPermissionCancel');
+  const micPermissionClose = document.getElementById('micPermissionClose');
+  const micHelperText = document.getElementById('micHelperText');
+  const robotIpPlaceholder = document.getElementById('robotIpPlaceholder');
+
+  // Request microphone permission, showing UI modal if not already granted
+  async function requestMicrophonePermission(forceShow = false) {
+    // Check if permission was already granted in this browser session or localStorage
+    if (localStorage.getItem('mic_permission_granted') === 'true' && !forceShow) {
+      // Try to silently verify or warm up the permission
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach(track => track.stop());
+        } catch (e) {}
+      }
+      return;
+    }
+
+    // Display the custom UI permission modal
+    micPermissionModal.style.display = 'flex';
+    micHelperText.style.display = 'none';
+    
+    // Automatically detect and present the current host IP to the user for the flags configuration
+    if (robotIpPlaceholder) {
+      robotIpPlaceholder.textContent = `${window.location.protocol}//${window.location.host}`;
+    }
+  }
+
+  // Handle the confirmation button inside our custom permission modal
+  micPermissionAllow.addEventListener('click', async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      // Browser blocks mediaDevices API on insecure origins (HTTP local IPs)
+      micHelperText.style.display = 'block';
+      return;
+    }
+
+    try {
+      // Trigger the browser's native microphone permission prompt popup
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop());
+      
+      // Save permission state to local storage to prevent prompting on every page refresh
+      localStorage.setItem('mic_permission_granted', 'true');
+      micPermissionModal.style.display = 'none';
+      log_action("FRONTEND", "Microphone access authorized by user.");
+    } catch (err) {
+      console.warn("Browser microphone permission denied:", err);
+      micHelperText.style.display = 'block';
+    }
+  });
+
+  // Handle close/cancel events on the permission modal
+  function closeMicModal() {
+    micPermissionModal.style.display = 'none';
+  }
+  micPermissionCancel.addEventListener('click', closeMicModal);
+  micPermissionClose.addEventListener('click', closeMicModal);
+  
+  // Proactively check and ask permission on page load
+  requestMicrophonePermission();
+
+  let audioContext = null;
+  let scriptProcessor = null;
+  let mediaStreamSource = null;
+  let micStream = null;
+  let leftChannel = [];
+  let recordingLength = 0;
+
+  function writeUTFBytes(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  }
+
+  // Pure JS WAV Encoder (PCM 16-bit mono)
+  function encodeWAV(samples, sampleRate) {
+    const buffer = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(buffer);
+
+    /* RIFF identifier */
+    writeUTFBytes(view, 0, 'RIFF');
+    /* file length */
+    view.setUint32(4, 36 + samples.length * 2, true);
+    /* RIFF type */
+    writeUTFBytes(view, 8, 'WAVE');
+    /* format chunk identifier */
+    writeUTFBytes(view, 12, 'fmt ');
+    /* format chunk length */
+    view.setUint32(16, 16, true);
+    /* sample format (raw) */
+    view.setUint16(20, 1, true);
+    /* channel count (mono) */
+    view.setUint16(22, 1, true);
+    /* sample rate */
+    view.setUint32(24, sampleRate, true);
+    /* byte rate (sample rate * block align) */
+    view.setUint32(28, sampleRate * 2, true);
+    /* block align (channel count * bytes per sample) */
+    view.setUint16(32, 2, true);
+    /* bits per sample */
+    view.setUint16(34, 16, true);
+    /* data chunk identifier */
+    writeUTFBytes(view, 36, 'data');
+    /* data chunk length */
+    view.setUint32(40, samples.length * 2, true);
+
+    // Write PCM audio samples (quantize to 16-bit signed integers)
+    let offset = 44;
+    for (let i = 0; i < samples.length; i++, offset += 2) {
+      let s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+
+    return new Blob([view], { type: 'audio/wav' });
+  }
+
+  async function startRecording() {
+    if (isRecording) return;
+    leftChannel = [];
+    recordingLength = 0;
+    recordedAudioBlob = null;
+    
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Initialize AudioContext
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioContext = new AudioContext();
+      const sampleRate = audioContext.sampleRate;
+      
+      mediaStreamSource = audioContext.createMediaStreamSource(micStream);
+      
+      // Create ScriptProcessorNode (bufferSize 4096, 1 input channel, 1 output channel)
+      scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+      
+      scriptProcessor.onaudioprocess = (e) => {
+        if (!isRecording) return;
+        const inputData = e.inputBuffer.getChannelData(0);
+        leftChannel.push(new Float32Array(inputData));
+        recordingLength += inputData.length;
+      };
+      
+      mediaStreamSource.connect(scriptProcessor);
+      scriptProcessor.connect(audioContext.destination);
+      
+      recordingStartTime = Date.now();
+      isRecording = true;
+      
+      // Update mic button style to show active recording state
+      chatVoiceBtn.style.background = "linear-gradient(135deg, #ef4444, #dc2626)";
+      chatVoiceBtn.style.borderColor = "#b91c1c";
+      chatVoiceBtn.style.boxShadow = "0 0 16px rgba(239, 68, 68, 0.6)";
+      
+      chatbotStatusDot.style.background = "#ef4444";
+      chatbotStatusDot.style.boxShadow = "0 0 0 6px rgba(239, 68, 68, 0.2)";
+      chatbotStatusText.textContent = "Recording voice command...";
+      chatbotStatusText.style.color = "#fca5a5";
+      
+    } catch (err) {
+      console.error("Microphone access denied:", err);
+      appendChatMessage('bot', "Could not access microphone. Please grant permission in your browser.");
+    }
+  }
+
+  function stopRecording() {
+    if (!isRecording) return;
+    isRecording = false;
+    
+    // Stop recording processes
+    if (scriptProcessor) {
+      scriptProcessor.disconnect();
+      scriptProcessor.onaudioprocess = null;
+    }
+    if (mediaStreamSource) {
+      mediaStreamSource.disconnect();
+    }
+    if (audioContext && audioContext.state !== 'closed') {
+      const sampleRate = audioContext.sampleRate;
+      audioContext.close().then(() => {
+        // Flatten the multi-chunk buffers into a single float array
+        const flattenedSamples = new Float32Array(recordingLength);
+        let offset = 0;
+        for (let i = 0; i < leftChannel.length; i++) {
+          flattenedSamples.set(leftChannel[i], offset);
+          offset += leftChannel[i].length;
+        }
+        
+        // Encode to pure WAV Blob
+        recordedAudioBlob = encodeWAV(flattenedSamples, sampleRate);
+        const durationSec = ((Date.now() - recordingStartTime) / 1000).toFixed(2);
+        
+        // Show the preview chip
+        audioFileName.textContent = "voice_command.wav";
+        audioFileDuration.textContent = `(${durationSec}s)`;
+        audioPreviewContainer.style.display = 'flex';
+        
+        // Disable text input while audio is queued
+        chatInput.placeholder = "Voice file queued. Click Send or clear [×].";
+        chatInput.disabled = true;
+        chatInput.value = "";
+      });
+    }
+    
+    if (micStream) {
+      micStream.getTracks().forEach(track => track.stop());
+    }
+    
+    // Reset mic button style
+    chatVoiceBtn.style.background = "";
+    chatVoiceBtn.style.borderColor = "";
+    chatVoiceBtn.style.boxShadow = "";
+    
+    chatbotStatusDot.style.background = "var(--accent)";
+    chatbotStatusDot.style.boxShadow = "none";
+    chatbotStatusText.textContent = "Model ready";
+    chatbotStatusText.style.color = "var(--muted)";
+  }
+
+  function clearRecordedAudio() {
+    recordedAudioBlob = null;
+    leftChannel = [];
+    recordingLength = 0;
+    audioPreviewContainer.style.display = 'none';
+    chatInput.placeholder = "Type a command for WAVEGO...";
+    chatInput.disabled = false;
+  }
+
+  // --- Voice Button Long Press Handlers ---
+  // If clicked (single tap/click), request/verify permission
+  chatVoiceBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (localStorage.getItem('mic_permission_granted') !== 'true') {
+      requestMicrophonePermission(true);
+    }
+  });
+
+  // Mouse events
+  chatVoiceBtn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    if (localStorage.getItem('mic_permission_granted') !== 'true') {
+      requestMicrophonePermission(true);
+    } else {
+      startRecording();
+    }
+  });
+  
+  window.addEventListener('mouseup', () => {
+    if (isRecording) stopRecording();
+  });
+  
+  // Touch events for mobile compatibility
+  chatVoiceBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (localStorage.getItem('mic_permission_granted') !== 'true') {
+      requestMicrophonePermission(true);
+    } else {
+      startRecording();
+    }
+  });
+  
+  chatVoiceBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    stopRecording();
+  });
+
+  // Clear audio preview chip
+  audioClearBtn.addEventListener('click', clearRecordedAudio);
 
   // Bind click & key events
   if (chatSendBtn && chatInput) {
