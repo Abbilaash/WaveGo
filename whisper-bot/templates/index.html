@@ -1163,7 +1163,7 @@
   // Load the current image frame onto canvas
   function loadCurrentImage() {
     if (currentObjIndex < 0 || currentObjIndex >= capturedObjImages.length) return;
-    modalStatusText.textContent = "First Frame of Captured Video";
+    modalStatusText.textContent = `Image ${currentObjIndex + 1} of 3`;
     
     currentObjImageElement = new Image();
     currentObjImageElement.onload = function() {
@@ -1273,12 +1273,6 @@
   function openObjectModal() {
     objectModal.style.display = "flex";
     currentObjIndex = 0;
-    
-    // Hide Next and Save buttons since we only need first frame bounding box
-    modalNext.style.display = "none";
-    modalSave.style.display = "none";
-    modalStatusText.textContent = "First Frame of Captured Video";
-    
     loadCurrentImage();
     showModalNotification("Draw a rectangular box on the object.");
   }
@@ -1287,7 +1281,7 @@
     objectModal.style.display = "none";
     currentObjImageElement = null;
     capturedObjImages = [];
-    objBoundingBoxes = [null];
+    objBoundingBoxes = [null, null, null];
     const nameInput = document.getElementById('objectNameInput');
     if (nameInput) nameInput.value = "";
   }
@@ -1308,14 +1302,16 @@
   modalSave.addEventListener('click', () => {
     const box = objBoundingBoxes[currentObjIndex];
     if (box) {
-      showModalNotification("Saved box coordinates!");
+      showModalNotification(`Saved box coordinates for Image ${currentObjIndex + 1}!`);
     } else {
       showModalNotification("No box drawn to save yet!", true);
     }
   });
 
   modalNext.addEventListener('click', () => {
-    showModalNotification("Next image not applicable for single frame learning.", true);
+    currentObjIndex = (currentObjIndex + 1) % 3;
+    loadCurrentImage();
+    showModalNotification(`Navigated to Image ${currentObjIndex + 1}`);
   });
 
   modalSubmit.addEventListener('click', async () => {
@@ -1326,19 +1322,13 @@
       return;
     }
 
-    const box = objBoundingBoxes[0];
-    if (!box) {
-      showModalNotification("Please draw a bounding box around the object first!", true);
-      return;
-    }
-
     modalSubmit.disabled = true;
-    showModalNotification("Submitting bounding box and tracking video...");
+    showModalNotification("Submitting bounding boxes...");
     try {
       const response = await fetch('/api/object/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ box: box, name: objectName })
+        body: JSON.stringify({ images: capturedObjImages, boxes: objBoundingBoxes, name: objectName })
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Submit failed');
@@ -1383,33 +1373,60 @@
     }
   }
 
-  // Object Learn trigger (captures 3 seconds of video frames)
+  // Object Learn trigger (takes 3 pictures one-by-one, each with a 1-second prepare gap)
   if (objectLearnBtn && objectStatus) {
     objectLearnBtn.addEventListener('click', async () => {
       capturedObjImages = [];
-      objBoundingBoxes = [null];
+      objBoundingBoxes = [null, null, null];
       objectLearnBtn.disabled = true;
       objectStatus.style.color = "var(--accent)";
-      objectStatus.textContent = "Recording 3-second video sequence...";
+      objectStatus.textContent = "Starting capture sequence...";
 
-      try {
-        const response = await fetch('/api/object/capture');
-        if (!response.ok) throw new Error('Capture failed');
-        const data = await response.json();
-
-        if (data.success) {
-          capturedObjImages.push(data.image);
-          objectStatus.textContent = "Sequence captured! Opening annotation window...";
-        } else {
-          throw new Error(data.error || 'Unknown error');
+      for (let i = 0; i < 3; i++) {
+        // Wait 1 second clicking/preparing gap BEFORE taking each picture
+        let secondsLeft = 1;
+        while (secondsLeft > 0) {
+          objectStatus.textContent = `Preparing picture ${i + 1} of 3 in ${secondsLeft}s...`;
+          await sleep(1000);
+          secondsLeft--;
         }
-      } catch (err) {
-        objectStatus.textContent = `Capture error: ${err.message}`;
-        objectStatus.style.color = "#ef4444";
-        objectLearnBtn.disabled = false;
-        return;
+
+        objectStatus.textContent = `Taking picture ${i + 1} of 3...`;
+        
+        // Synthesize camera click audio
+        playClickSound();
+        
+        // Shutter visual flash animation on the camera feed
+        const liveFeed = document.querySelector('.video-feed');
+        if (liveFeed) {
+          liveFeed.style.transition = 'none';
+          liveFeed.style.opacity = '0.2';
+          setTimeout(() => {
+            liveFeed.style.transition = 'opacity 0.25s ease-out';
+            liveFeed.style.opacity = '1';
+          }, 60);
+        }
+
+        try {
+          const response = await fetch('/api/object/capture');
+          if (!response.ok) throw new Error('Capture failed');
+          const data = await response.json();
+
+          if (data.success) {
+            capturedObjImages.push(data.image);
+            objectStatus.textContent = `Captured picture ${i + 1} of 3!`;
+          } else {
+            throw new Error(data.error || 'Unknown error');
+          }
+        } catch (err) {
+          objectStatus.textContent = `Capture error: ${err.message}`;
+          objectStatus.style.color = "#ef4444";
+          objectLearnBtn.disabled = false;
+          return;
+        }
       }
 
+      objectStatus.textContent = "Images captured! Opening popup window...";
       await sleep(500);
       objectLearnBtn.disabled = false;
       objectStatus.textContent = "";

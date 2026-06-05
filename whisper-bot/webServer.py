@@ -80,7 +80,6 @@ device_state = {
 }
 camera = None
 camera_error = None
-captured_session_frames = []
 
 
 def get_primary_ip() -> Optional[str]:
@@ -778,223 +777,219 @@ def api_face_save():
 
 @app.route("/api/object/capture", methods=["POST", "GET"])
 def api_object_capture():
-	global captured_session_frames
-	captured_session_frames = []
 	camera_obj = get_camera()
 	if camera_obj is None:
 		return jsonify({"success": False, "error": "Camera unavailable"}), 503
-		
-	start_time = time.time()
-	log_action("BACKEND", "Object Capture Started", "Capturing 3 seconds of video frames...")
-	
-	while time.time() - start_time < 3.0:
-		frame_bytes = camera_obj.get_frame(timeout=1.0)
-		if frame_bytes:
-			captured_session_frames.append(frame_bytes)
-		else:
-			time.sleep(0.01)
-			
-	log_action("BACKEND", "Object Capture Completed", f"Captured {len(captured_session_frames)} frames.")
-	
-	if not captured_session_frames:
-		return jsonify({"success": False, "error": "Could not capture any frames from camera"}), 500
-		
+	frame_bytes = camera_obj.get_frame()
+	if not frame_bytes:
+		return jsonify({"success": False, "error": "Could not capture frame"}), 500
 	import base64
-	encoded_image = base64.b64encode(captured_session_frames[0]).decode("utf-8")
+	encoded_image = base64.b64encode(frame_bytes).decode("utf-8")
 	return jsonify({
 		"success": True,
 		"image": encoded_image
 	})
 
 
-def get_embedding(crop, session, input_name):
-	import cv2
-	import numpy as np
-	# Resize crop to 224x224
-	resized = cv2.resize(crop, (224, 224))
-	# Convert BGR to RGB
-	rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
-	# Convert to float32 and scale to [0, 1]
-	normalized = rgb.astype(np.float32) / 255.0
-	# ImageNet normalization
-	mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
-	std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
-	normalized = (normalized - mean) / std
-	# Transpose HWC to CHW
-	chw = np.transpose(normalized, (2, 0, 1))
-	# Add batch dimension: NCHW
-	nchw = np.expand_dims(chw, axis=0)
-	# Run ONNX inference
-	outputs = session.run(None, {input_name: nchw})
-	embedding = outputs[0][0] # 1D array of shape (1280,)
-	# L2 Normalize
-	norm = np.linalg.norm(embedding)
-	if norm > 1e-10:
-		embedding = embedding / norm
-	return embedding
+mobilenet_model = None
 
-
-def create_tracker():
-	import cv2
-	try:
-		if hasattr(cv2, 'legacy') and hasattr(cv2.legacy, 'TrackerCSRT_create'):
-			return cv2.legacy.TrackerCSRT_create()
-	except Exception:
-		pass
-	try:
-		if hasattr(cv2, 'TrackerCSRT_create'):
-			return cv2.TrackerCSRT_create()
-	except Exception:
-		pass
-	try:
-		if hasattr(cv2, 'legacy') and hasattr(cv2.legacy, 'TrackerKCF_create'):
-			return cv2.legacy.TrackerKCF_create()
-	except Exception:
-		pass
-	try:
-		if hasattr(cv2, 'TrackerKCF_create'):
-			return cv2.TrackerKCF_create()
-	except Exception:
-		pass
-	try:
-		if hasattr(cv2, 'TrackerMIL_create'):
-			return cv2.TrackerMIL_create()
-	except Exception:
-		pass
-	try:
-		if hasattr(cv2, 'legacy') and hasattr(cv2.legacy, 'TrackerMIL_create'):
-			return cv2.legacy.TrackerMIL_create()
-	except Exception:
-		pass
-	raise RuntimeError("No suitable OpenCV tracker found (CSRT/KCF/MIL).")
+def get_mobilenet_model():
+	global mobilenet_model
+	if mobilenet_model is None:
+		from tensorflow.keras.applications import MobileNetV3Small
+		import os
+		os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+		mobilenet_model = MobileNetV3Small(
+			weights="imagenet",
+			include_top=False,
+			pooling="avg"
+		)
+	return mobilenet_model
 
 
 @app.route("/api/object/submit", methods=["POST"])
 def api_object_submit():
-	global captured_session_frames
 	data = request.json
-	if not data or "box" not in data or "name" not in data:
-		return jsonify({"success": False, "error": "Missing box or name"}), 400
+	if not data or "images" not in data or "boxes" not in data:
+		return jsonify({"success": False, "error": "Missing images or boxes"}), 400
 	
-	box = data["box"]
-	object_name = data["name"].strip().replace(" ", "_")
+	images = data["images"]
+	boxes = data["boxes"]
+	object_name = data.get("name", "unnamed_object").strip().replace(" ", "_")
 	
 	# Sanitize the object name to prevent directory traversal or invalid characters
 	object_name = "".join(c for c in object_name if c.isalnum() or c in ("-", "_"))
 	if not object_name:
 		object_name = "unnamed_object"
-		
-	if not captured_session_frames:
-		return jsonify({"success": False, "error": "No captured video frames found in session"}), 400
-		
+	
+	if not isinstance(images, list) or not isinstance(boxes, list) or len(images) != 3 or len(boxes) != 3:
+		return jsonify({"success": False, "error": "Invalid images or boxes length"}), 400
+	
+	import base64
 	import cv2
 	import numpy as np
 	import pickle
 	import time
-	import glob
-	import onnxruntime as ort
 	
-	try:
-		# 1. Decode first frame and initialize tracker
-		first_frame_bytes = captured_session_frames[0]
-		first_frame = cv2.imdecode(np.frombuffer(first_frame_bytes, np.uint8), cv2.IMREAD_COLOR)
-		if first_frame is None:
-			return jsonify({"success": False, "error": "Failed to decode first frame"}), 500
+	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning", object_name)
+	os.makedirs(object_learning_dir, exist_ok=True)
+	
+	# Decode, crop and generate ORB features for each image
+	new_descriptors = []
+	new_shapes = []
+	last_img_loaded = None
+	last_des = None
+	
+	for i, (img_b64, box) in enumerate(zip(images, boxes)):
+		if not img_b64:
+			continue
+		try:
+			if "," in img_b64:
+				img_b64 = img_b64.split(",")[1]
+			img_bytes = base64.b64decode(img_b64)
 			
-		h_img, w_img = first_frame.shape[:2]
-		
-		# Box coordinates drawn by user
-		x = int(box["x"])
-		y = int(box["y"])
-		w = int(box["w"])
-		h = int(box["h"])
-		
-		# Clamp coordinates
-		x = max(0, min(x, w_img - 1))
-		y = max(0, min(y, h_img - 1))
-		w = max(1, min(w, w_img - x))
-		h = max(1, min(h, h_img - y))
-		
-		tracker = create_tracker()
-		tracker.init(first_frame, (x, y, w, h))
-		
-		# Load ONNX model
-		model_path = os.path.join(THIS_DIR, "mobilenetv3_embedding.onnx")
-		if not os.path.exists(model_path):
-			return jsonify({"success": False, "error": "Model file mobilenetv3_embedding.onnx not found in whisper-bot folder"}), 500
-			
-		session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
-		input_name = session.get_inputs()[0].name
-		
-		embeddings = []
-		
-		# Crop first frame and get embedding
-		crop = first_frame[y:y+h, x:x+w]
-		if crop.size > 0:
-			emb = get_embedding(crop, session, input_name)
-			embeddings.append(emb)
-			
-		# Track through remaining frames
-		for idx in range(1, len(captured_session_frames)):
-			frame_bytes = captured_session_frames[idx]
-			frame = cv2.imdecode(np.frombuffer(frame_bytes, np.uint8), cv2.IMREAD_COLOR)
-			if frame is None:
+			# Decode image with OpenCV
+			nparr = np.frombuffer(img_bytes, np.uint8)
+			img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+			if img is None:
+				log_action("BACKEND", "Object Crop Error", f"Failed to decode image {i+1}")
 				continue
-				
-			success, bbox = tracker.update(frame)
-			if success:
-				tx, ty, tw, th = [int(v) for v in bbox]
-				# Clamp tracked bounding box to frame boundaries
-				tx = max(0, min(tx, w_img - 1))
-				ty = max(0, min(ty, h_img - 1))
-				tw = max(1, min(tw, w_img - tx))
-				th = max(1, min(th, h_img - ty))
-				
-				# Every 2 frames (stepping by 2), run model inference
-				if idx % 2 == 0:
-					crop = frame[ty:ty+th, tx:tx+tw]
-					if crop.size > 0:
-						emb = get_embedding(crop, session, input_name)
-						embeddings.append(emb)
-						
-		if not embeddings:
-			return jsonify({"success": False, "error": "Failed to extract any embeddings during tracking"}), 400
 			
-		# Save database embeddings
-		object_db_dir = os.path.join(THIS_DIR, "object_db")
-		os.makedirs(object_db_dir, exist_ok=True)
-		
-		pkl_path = os.path.join(object_db_dir, f"{object_name}.pkl")
-		with open(pkl_path, "wb") as f:
-			pickle.dump({
-				"name": object_name,
-				"embeddings": embeddings
-			}, f)
-			
-		log_action("BACKEND", "Object PKL Saved", f"Saved {len(embeddings)} embeddings for '{object_name}' to {pkl_path}")
-		
-		# Enforce maximum limit of 10 objects in object_db
-		pkl_files = glob.glob(os.path.join(object_db_dir, "*.pkl"))
-		if len(pkl_files) > 10:
-			# Sort files by modification time (oldest first)
-			pkl_files.sort(key=os.path.getmtime)
-			while len(pkl_files) > 10:
-				oldest_file = pkl_files.pop(0)
+			img_path = None
+			# Crop if a bounding box was drawn
+			if box and isinstance(box, dict) and all(k in box for k in ("x", "y", "w", "h")):
+				x = int(box["x"])
+				y = int(box["y"])
+				w = int(box["w"])
+				h = int(box["h"])
+				
+				# Ensure coordinates are within image boundaries
+				img_h, img_w = img.shape[:2]
+				x = max(0, min(x, img_w - 1))
+				y = max(0, min(y, img_h - 1))
+				w = max(1, min(w, img_w - x))
+				h = max(1, min(h, img_h - y))
+				
+				# Crop
+				cropped_img = img[y : y + h, x : x + w]
+				
+				# Save cropped image to ObjectLearning/crop_<timestamp>_<index>.jpg
+				img_filename = f"crop_{int(time.time())}_{i+1}.jpg"
+				img_path = os.path.join(object_learning_dir, img_filename)
+				cv2.imwrite(img_path, cropped_img)
+				log_action("BACKEND", "Object Crop Saved", f"Saved cropped image {i+1}")
+			else:
+				# If no bounding box was drawn, save the full image inside ObjectLearning/
+				img_filename = f"crop_full_{int(time.time())}_{i+1}.jpg"
+				img_path = os.path.join(object_learning_dir, img_filename)
+				cv2.imwrite(img_path, img)
+				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1}")
+				
+			# Generate ORB descriptors for the saved image
+			if img_path and os.path.exists(img_path):
 				try:
-					os.remove(oldest_file)
-					log_action("BACKEND", "Object DB Eviction", f"Evicted oldest object file: {os.path.basename(oldest_file)}")
-				except Exception as e:
-					log_action("BACKEND", "Object DB Eviction Error", f"Failed to delete {oldest_file}: {str(e)}")
-					
-		# Force the camera thread to reload object templates next time it runs object detection
-		if hasattr(camera_opencv.Camera, 'cvt') and camera_opencv.Camera.cvt is not None:
-			camera_opencv.Camera.cvt.object_templates = None
+					img_loaded = cv2.imread(img_path)
+					if img_loaded is not None:
+						orb = cv2.ORB_create(1000)
+						kp, des = orb.detectAndCompute(img_loaded, None)
+						
+						new_descriptors.append(des)
+						new_shapes.append(img_loaded.shape)
+						
+						last_img_loaded = img_loaded
+						last_des = des
+						log_action("BACKEND", "Object ORB Success", f"Generated ORB descriptors for image {i+1}: Keypoints: {len(kp)}")
+					else:
+						log_action("BACKEND", "Object ORB Error", f"Failed to load image {img_path} for ORB processing")
+				except Exception as orb_err:
+					log_action("BACKEND", "Object ORB Error", f"Failed to generate ORB for image {i+1}: {str(orb_err)}")
+		except Exception as e:
+			log_action("BACKEND", "Object Crop/Save Error", f"Failed to crop/save image {i+1}: {str(e)}")
 			
-		return jsonify({"success": True, "message": f"Successfully learned object '{object_name}' with {len(embeddings)} frames tracked."})
+	# If we have successfully generated any descriptors, append them to storage.pkl
+	if new_descriptors:
+		pkl_path = os.path.join(THIS_DIR, "ObjectLearning", "storage.pkl")
 		
-	except Exception as e:
-		log_action("BACKEND", "Object Submit Error", str(e))
-		return jsonify({"success": False, "error": f"Failed to process and learn object: {str(e)}"}), 500
+		# Load existing database
+		existing_objects = []
+		if os.path.exists(pkl_path):
+			try:
+				with open(pkl_path, "rb") as f:
+					data = pickle.load(f)
+					if isinstance(data, list):
+						existing_objects = data
+					elif isinstance(data, dict):
+						existing_objects = [data]
+			except Exception as pkl_load_err:
+				log_action("BACKEND", "PKL Load Error", f"Failed to load storage.pkl: {str(pkl_load_err)}")
+				existing_objects = []
+				
+		# Remove any existing object with the same name to overwrite and update the queue order
+		existing_objects = [obj for obj in existing_objects if obj.get("name", "").lower() != object_name.lower()]
+		
+		# Add new object data
+		new_obj_entry = {
+			"name": object_name,
+			"descriptors": new_descriptors,
+			"shapes": new_shapes
+		}
+		existing_objects.append(new_obj_entry)
+		
+		# Enforce the maximum limit of 10 objects
+		if len(existing_objects) > 10:
+			# Evict the oldest object (the first one)
+			evicted_obj = existing_objects.pop(0)
+			evicted_name = evicted_obj.get("name", "unnamed_object")
+			log_action("BACKEND", "Object Queue Evicted", f"Evicted oldest object '{evicted_name}' from storage.pkl queue")
+			
+			# Also clean up the evicted folder on disk to keep everything perfectly in sync
+			evicted_dir = os.path.join(THIS_DIR, "ObjectLearning", evicted_name)
+			if os.path.exists(evicted_dir):
+				import shutil
+				try:
+					shutil.rmtree(evicted_dir)
+					log_action("BACKEND", "Object Folder Deleted", f"Deleted folder for evicted object '{evicted_name}'")
+				except Exception as clean_err:
+					log_action("BACKEND", "Object Folder Delete Error", f"Failed to delete {evicted_name} directory: {str(clean_err)}")
+					
+			evicted_pkl = os.path.normpath(os.path.join(THIS_DIR, "ObjectLearning", f"{evicted_name}.pkl"))
+			if os.path.exists(evicted_pkl):
+				try:
+					os.remove(evicted_pkl)
+					log_action("BACKEND", "Object PKL Deleted", f"Deleted pkl file for evicted object '{evicted_name}'")
+				except Exception as del_err:
+					log_action("BACKEND", "Object PKL Delete Error", f"Failed to delete {evicted_name}.pkl file: {str(del_err)}")
+					
+		# Save updated database list to storage.pkl
+		try:
+			with open(pkl_path, "wb") as f:
+				pickle.dump(existing_objects if len(existing_objects) > 1 else existing_objects[0], f)
+			log_action("BACKEND", "PKL Save Success", f"Successfully saved object '{object_name}' with {len(new_descriptors)} descriptor arrays to storage.pkl")
+		except Exception as pkl_save_err:
+			log_action("BACKEND", "PKL Save Error", f"Failed to write storage.pkl: {str(pkl_save_err)}")
+			
+		# Also save individual pkl files as requested by the user: {object_name}.pkl
+		if last_img_loaded is not None:
+			individual_pkl_paths = [
+				os.path.normpath(os.path.join(object_learning_dir, f"{object_name}.pkl")),
+				os.path.normpath(os.path.join(THIS_DIR, "ObjectLearning", f"{object_name}.pkl"))
+			]
+			for pkl_p in individual_pkl_paths:
+				try:
+					with open(pkl_p, "wb") as f:
+						pickle.dump(
+							{
+								"name": object_name,
+								"descriptors": last_des,
+								"shape": last_img_loaded.shape
+							},
+							f
+						)
+					log_action("BACKEND", "Individual PKL Save Success", f"Successfully saved individual ORB pkl to {pkl_p}")
+				except Exception as ind_pkl_err:
+					log_action("BACKEND", "Individual PKL Save Error", f"Failed to save {pkl_p}: {str(ind_pkl_err)}")
+					
+	return jsonify({"success": True, "message": "bounding success"})
 
 
 active_follow_color = None

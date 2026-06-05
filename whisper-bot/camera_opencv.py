@@ -137,16 +137,16 @@ class CVThread(threading.Thread):
                 cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
                 for obj in self.detected_objects:
                     try:
-                        x, y, w, h = [int(v) for v in obj["box"]]
+                        dst = obj["box"]
                         name = obj["name"]
-                        similarity = obj["similarity"]
+                        matches = obj["matches"]
                         
-                        # Draw green bounding box around the detected object
-                        cv2.rectangle(imgInput, (x, y), (x + w, y + h), (74, 222, 128), 2)
+                        # Draw green bounding box around the detected object using cv2.polylines
+                        cv2.polylines(imgInput, [np.int32(dst)], True, (74, 222, 128), 3, cv2.LINE_AA)
                         
                         # Put label near the top-left corner of the box
-                        label = f"{name} ({similarity*100:.1f}%)"
-                        cv2.putText(imgInput, label, (x, y - 10), CVThread.font, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
+                        top_left = dst[0][0]
+                        cv2.putText(imgInput, f"{name} ({matches} matches)", (int(top_left[0]), int(top_left[1]) - 10), CVThread.font, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
                     except Exception:
                         pass
             else:
@@ -461,72 +461,37 @@ class CVThread(threading.Thread):
     def load_object_templates(self):
         import glob
         import os
-        import pickle
-        import onnxruntime as ort
+        import cv2
         
         self.object_templates = []
-        print("[OBJECT DETECTION] Scanning object database...")
-        
-        # Load ONNX model
-        model_path = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "mobilenetv3_embedding.onnx"))
-        if not os.path.exists(model_path):
-            print("[OBJECT DETECTION] ERROR: mobilenetv3_embedding.onnx not found at:", model_path)
+        object_learning_root = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "ObjectLearning"))
+        if not os.path.exists(object_learning_root):
             return
             
-        try:
-            self.onnx_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
-            self.onnx_input_name = self.onnx_session.get_inputs()[0].name
-            print("[OBJECT DETECTION] Successfully initialized ONNX model session.")
-        except Exception as e:
-            print("[OBJECT DETECTION] ERROR: Failed to load ONNX session:", e)
-            return
-            
-        object_db_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "object_db"))
-        print(f"[OBJECT DETECTION] Looking for pkl files in: {object_db_dir}")
-        if not os.path.exists(object_db_dir):
-            print("[OBJECT DETECTION] Database directory does not exist yet.")
-            return
-            
-        pkl_files = glob.glob(os.path.join(object_db_dir, "*.pkl"))
-        print(f"[OBJECT DETECTION] Found {len(pkl_files)} database files: {pkl_files}")
-        for pkl_p in pkl_files:
-            try:
-                with open(pkl_p, "rb") as f:
-                    data = pickle.load(f)
-                    if isinstance(data, dict) and "name" in data and "embeddings" in data:
-                        self.object_templates.append(data)
-                        print(f"[OBJECT DETECTION] Loaded template: '{data['name']}' with {len(data['embeddings'])} embeddings.")
-            except Exception as e:
-                print(f"[OBJECT DETECTION] Error loading pkl {pkl_p}: {e}")
-
-
-    def get_crop_embedding(self, crop):
-        import cv2
-        import numpy as np
-        # Resize to 224x224
-        resized = cv2.resize(crop, (224, 224))
-        # Convert BGR to RGB
-        rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
-        # Normalize to [0, 1]
-        normalized = rgb.astype(np.float32) / 255.0
-        # ImageNet mean & std
-        mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
-        std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
-        normalized = (normalized - mean) / std
-        # HWC to CHW
-        chw = np.transpose(normalized, (2, 0, 1))
-        # Add batch dim NCHW
-        nchw = np.expand_dims(chw, axis=0)
+        # Scan folders inside ObjectLearning
+        for entry in os.listdir(object_learning_root):
+            entry_path = os.path.join(object_learning_root, entry)
+            if os.path.isdir(entry_path) and entry != "__pycache__":
+                jpg_files = glob.glob(os.path.join(entry_path, "crop_*.jpg"))
+                for img_p in jpg_files:
+                    try:
+                        img = cv2.imread(img_p)
+                        if img is not None:
+                            orb = cv2.ORB_create(1000)
+                            kp, des = orb.detectAndCompute(img, None)
+                            if des is not None and len(des) > 10:
+                                self.object_templates.append({
+                                    "name": entry,
+                                    "kp": kp,
+                                    "des": des,
+                                    "shape": img.shape
+                                })
+                    except Exception as e:
+                        print(f"Error loading template {img_p}: {e}")
         
-        # Inference
-        outputs = self.onnx_session.run(None, {self.onnx_input_name: nchw})
-        embedding = outputs[0][0]
-        
-        # L2 Normalize
-        norm = np.linalg.norm(embedding)
-        if norm > 1e-10:
-            embedding = embedding / norm
-        return embedding
+        # Also let's check for individual watch.pkl files or watch folders directly in ObjectLearning/
+        # Since the user requested: "the files generated are: storage.pkl, watch folder, watch.pkl."
+        # Scanning directories guarantees we find all folder-stored cropped template frames.
 
 
     def objectDetectCV(self, frame_image):
@@ -534,117 +499,55 @@ class CVThread(threading.Thread):
         import numpy as np
         
         self.detected_objects = []
-        if not self.object_templates or not hasattr(self, 'onnx_session'):
+        if not self.object_templates:
             self.pause()
             return
             
         try:
-            # Generate proposals
-            gray = cv2.cvtColor(frame_image, cv2.COLOR_BGR2GRAY)
-            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+            orb = cv2.ORB_create(1000)
+            kp2, des2 = orb.detectAndCompute(frame_image, None)
             
-            # 1. Edge-based contours
-            edged = cv2.Canny(blurred, 30, 150)
-            cnts_edge = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            import imutils
-            cnts_edge = imutils.grab_contours(cnts_edge)
-            
-            rects = []
-            for c in cnts_edge:
-                x, y, w, h = cv2.boundingRect(c)
-                if w > 15 and h > 15 and w < 630 and h < 470:
-                    rects.append([x, y, w, h])
-            
-            # 2. Threshold-based contours
-            _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-            cnts_thresh = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            cnts_thresh = imutils.grab_contours(cnts_thresh)
-            for c in cnts_thresh:
-                x, y, w, h = cv2.boundingRect(c)
-                if w > 15 and h > 15 and w < 630 and h < 470:
-                    rects.append([x, y, w, h])
-            
-            # Group overlapping proposals
-            rectsList = []
-            for x, y, w, h in rects:
-                rectsList.append([x, y, w, h])
-                rectsList.append([x, y, w, h])
-            
-            grouped_rects, weights = cv2.groupRectangles(rectsList, groupThreshold=1, eps=0.25)
-            candidates = sorted(grouped_rects, key=lambda r: r[2]*r[3], reverse=True)[:12]
-            
-            img_h, img_w = frame_image.shape[:2]
-            best_matches = []
-            
-            for cx, cy, cw, ch in candidates:
-                # Clamp boundaries
-                cx = max(0, min(cx, img_w - 1))
-                cy = max(0, min(cy, img_h - 1))
-                cw = max(1, min(cw, img_w - cx))
-                ch = max(1, min(ch, img_h - cy))
+            if des2 is not None and len(des2) > 10:
+                bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
                 
-                crop = frame_image[cy:cy+ch, cx:cx+cw]
-                if crop.size == 0:
-                    continue
-                
-                # Get crop embedding
-                emb = self.get_crop_embedding(crop)
-                
-                best_sim = -1.0
-                best_name = None
-                
-                # Compare with database templates
+                # Match against each loaded template
                 for template in self.object_templates:
+                    des1 = template["des"]
+                    kp1 = template["kp"]
+                    shape = template["shape"]
                     name = template["name"]
-                    for db_emb in template["embeddings"]:
-                        # Cosine similarity is the dot product (since both are L2 normalized)
-                        sim = float(np.dot(emb, db_emb))
-                        if sim > best_sim:
-                            best_sim = sim
-                            best_name = name
-                
-                # Lower threshold slightly to 0.70 for improved recall in varying conditions
-                if best_sim > 0.70:
-                    best_matches.append({
-                        "box": [cx, cy, cw, ch],
-                        "name": best_name,
-                        "similarity": best_sim
-                    })
-            
-            # Simple Non-Maximum Suppression (NMS) to remove redundant boxes on the same object
-            final_matches = []
-            best_matches.sort(key=lambda x: x["similarity"], reverse=True)
-            for m in best_matches:
-                overlap = False
-                for f in final_matches:
-                    boxA = m["box"]
-                    boxB = f["box"]
-                    xA = max(boxA[0], boxB[0])
-                    yA = max(boxA[1], boxB[1])
-                    xB = min(boxA[0] + boxA[2], boxB[0] + boxB[2])
-                    yB = min(boxA[1] + boxA[3], boxB[1] + boxB[3])
-                    interArea = max(0, xB - xA) * max(0, yB - yA)
-                    boxAArea = boxA[2] * boxA[3]
-                    boxBArea = boxB[2] * boxB[3]
-                    iou = interArea / float(boxAArea + boxBArea - interArea + 1e-10)
-                    if iou > 0.35:
-                        overlap = True
-                        break
-                if not overlap:
-                    final_matches.append(m)
-            
-            # Draw results and trigger alert if there's any match
-            if final_matches:
-                robot.lightCtrl('green', 0)
-                self.detected_objects = final_matches
-                for fm in final_matches:
-                    print(f"[OBJECT DETECTION] Matched '{fm['name']}' with similarity {fm['similarity']:.4f}")
-            else:
-                robot.lightCtrl('blue', 0)
-                self.detected_objects = []
-                
+                    
+                    if des1 is not None and len(des1) > 10:
+                        matches = bf.knnMatch(des1, des2, k=2)
+                        
+                        # Lowe's ratio test
+                        good_matches = []
+                        for m_n in matches:
+                            if len(m_n) == 2:
+                                m, n = m_n
+                                if m.distance < 0.75 * n.distance:
+                                    good_matches.append(m)
+                                    
+                        if len(good_matches) >= 12: # robust homography match threshold
+                            src_pts = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+                            dst_pts = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+                            
+                            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+                            
+                            if M is not None:
+                                h_temp, w_temp = shape[:2]
+                                pts = np.float32([[0, 0], [0, h_temp - 1], [w_temp - 1, h_temp - 1], [w_temp - 1, 0]]).reshape(-1, 1, 2)
+                                dst = cv2.perspectiveTransform(pts, M)
+                                
+                                self.detected_objects.append({
+                                    "name": name,
+                                    "box": dst,
+                                    "matches": len(good_matches)
+                                })
+                                # Trigger visual alert via lights
+                                robot.lightCtrl('green', 0)
         except Exception as err:
-            print("Error in objectDetectCV:", err)
+            pass
             
         self.pause()
 
@@ -810,7 +713,7 @@ class CVThread(threading.Thread):
 
             elif self.CVMode == 'objectDetection':
                 self.CVThreading = 1
-                if not self.object_templates:
+                if self.object_templates is None:
                     self.load_object_templates()
                 self.objectDetectCV(self.imgCV)
                 self.CVThreading = 0
@@ -825,7 +728,6 @@ class Camera(BaseCamera):
     modeSelect = 'none'
     followName = ''
     followColor = 'none'
-    cvt = None
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
     # modeSelect = 'watchDog'
@@ -910,7 +812,6 @@ class Camera(BaseCamera):
         picam2.start()
 
         cvt = CVThread()
-        Camera.cvt = cvt
         cvt.start()
 
         print("DEBUG: Running frames() from whisper-bot/camera_opencv.py - Using frame directly")
@@ -932,8 +833,8 @@ class Camera(BaseCamera):
                     cvt.resume()
                 try:
                     img = cvt.elementDraw(img)
-                except Exception as draw_err:
-                    print("Error drawing elements on frame:", draw_err)
+                except:
+                    pass
 
             # encode as a jpeg image and return it
             try:
