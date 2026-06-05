@@ -7,7 +7,6 @@ import datetime
 import time
 import threading
 import imutils
-import onnxruntime as ort
 
 curpath = os.path.realpath(__file__)
 thisPath = os.path.dirname(curpath)
@@ -135,16 +134,19 @@ class CVThread(threading.Thread):
 
         elif self.CVMode == 'objectDetection':
             if hasattr(self, 'detected_objects') and self.detected_objects:
-                cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Found', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+                cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
                 for obj in self.detected_objects:
                     try:
                         x, y, w, h = obj["box"]
                         name = obj["name"]
-                        confidence = obj["confidence"]
-                        color = (74, 222, 128)
-                        cv2.rectangle(imgInput, (x, y), (x + w, y + h), color, 2)
-                        label = f"{name} {confidence:.0%}"
-                        cv2.putText(imgInput, label, (x, max(y - 8, 12)), CVThread.font, 0.5, color, 1, cv2.LINE_AA)
+                        similarity = obj["similarity"]
+                        
+                        # Draw green bounding box around the detected object
+                        cv2.rectangle(imgInput, (x, y), (x + w, y + h), (74, 222, 128), 2)
+                        
+                        # Put label near the top-left corner of the box
+                        label = f"{name} ({similarity*100:.1f}%)"
+                        cv2.putText(imgInput, label, (x, y - 10), CVThread.font, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
                     except Exception:
                         pass
             else:
@@ -456,153 +458,155 @@ class CVThread(threading.Thread):
         self.pause()
 
 
-    # -------------------------------------------------------
-    # MobileNetV3 ONNX embedding helpers
-    # -------------------------------------------------------
-    _ort_session = None          # shared ONNX session (loaded once)
-    _ort_input_name = None
-    _ORT_LOCK = threading.Lock()
-
-    @classmethod
-    def _get_ort_session(cls):
-        """Lazy-load the MobileNetV3 ONNX session (thread-safe)."""
-        with cls._ORT_LOCK:
-            if cls._ort_session is None:
-                model_path = os.path.join(
-                    os.path.dirname(os.path.realpath(__file__)),
-                    "mobilenetv3_embedding.onnx"
-                )
-                if os.path.exists(model_path):
-                    cls._ort_session = ort.InferenceSession(
-                        model_path,
-                        providers=["CPUExecutionProvider"]
-                    )
-                    cls._ort_input_name = cls._ort_session.get_inputs()[0].name
-            return cls._ort_session
-
-    @classmethod
-    def _get_embedding(cls, crop_bgr):
-        """Return a 1-D L2-normalised embedding vector for a BGR crop, or None."""
-        session = cls._get_ort_session()
-        if session is None:
-            return None
-        try:
-            rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
-            rgb = cv2.resize(rgb, (224, 224))
-            tensor = rgb.astype(np.float32) / 255.0
-            mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
-            std  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
-            tensor = (tensor - mean) / std
-            tensor = np.transpose(tensor, (2, 0, 1))          # HWC -> CHW
-            tensor = np.expand_dims(tensor, axis=0)           # NCHW
-            output = session.run(None, {cls._ort_input_name: tensor})[0]
-            vec = output.flatten().astype(np.float64)
-            norm = np.linalg.norm(vec)
-            if norm > 0:
-                vec = vec / norm
-            return vec
-        except Exception as e:
-            print("_get_embedding error:", e)
-            return None
-
-    # -------------------------------------------------------
-    # Template loading (reads storage.pkl with embeddings)
-    # -------------------------------------------------------
     def load_object_templates(self):
-        """Load pre-computed MobileNetV3 embeddings from ObjectLearning/storage.pkl."""
+        import glob
+        import os
         import pickle
-
+        import onnxruntime as ort
+        
         self.object_templates = []
-        pkl_path = os.path.normpath(
-            os.path.join(os.path.dirname(os.path.realpath(__file__)), "ObjectLearning", "storage.pkl")
-        )
-        if not os.path.exists(pkl_path):
-            print("[ObjectDetect] storage.pkl not found — no templates loaded.")
+        
+        # Load ONNX model
+        model_path = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "mobilenetv3_embedding.onnx"))
+        if not os.path.exists(model_path):
+            print("ERROR: mobilenetv3_embedding.onnx not found at:", model_path)
             return
-
+            
         try:
-            with open(pkl_path, "rb") as f:
-                data = pickle.load(f)
-            if isinstance(data, dict):
-                data = [data]
-            for entry in data:
-                name = entry.get("name", "unknown")
-                embeddings = entry.get("embeddings", [])
-                if embeddings:
-                    # Average all stored embeddings for this object into one reference vector
-                    stacked = np.array(embeddings, dtype=np.float64)
-                    avg_emb = np.mean(stacked, axis=0)
-                    norm = np.linalg.norm(avg_emb)
-                    if norm > 0:
-                        avg_emb = avg_emb / norm
-                    self.object_templates.append({"name": name, "embedding": avg_emb})
-                    print(f"[ObjectDetect] Loaded template for '{name}' ({len(embeddings)} embeddings)")
+            self.onnx_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
+            self.onnx_input_name = self.onnx_session.get_inputs()[0].name
         except Exception as e:
-            print(f"[ObjectDetect] Failed to load storage.pkl: {e}")
-            self.object_templates = []
+            print("ERROR: Failed to load ONNX session:", e)
+            return
+            
+        object_db_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "object_db"))
+        if not os.path.exists(object_db_dir):
+            return
+            
+        pkl_files = glob.glob(os.path.join(object_db_dir, "*.pkl"))
+        for pkl_p in pkl_files:
+            try:
+                with open(pkl_p, "rb") as f:
+                    data = pickle.load(f)
+                    if isinstance(data, dict) and "name" in data and "embeddings" in data:
+                        self.object_templates.append(data)
+                        print(f"Loaded object template: {data['name']} with {len(data['embeddings'])} embeddings.")
+            except Exception as e:
+                print(f"Error loading pkl {pkl_p}: {e}")
 
-    # -------------------------------------------------------
-    # Detection loop (cosine similarity against templates)
-    # -------------------------------------------------------
+
+    def get_crop_embedding(self, crop):
+        import cv2
+        import numpy as np
+        # Resize to 224x224
+        resized = cv2.resize(crop, (224, 224))
+        # Convert BGR to RGB
+        rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+        # Normalize to [0, 1]
+        normalized = rgb.astype(np.float32) / 255.0
+        # ImageNet mean & std
+        mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+        std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+        normalized = (normalized - mean) / std
+        # HWC to CHW
+        chw = np.transpose(normalized, (2, 0, 1))
+        # Add batch dim NCHW
+        nchw = np.expand_dims(chw, axis=0)
+        
+        # Inference
+        outputs = self.onnx_session.run(None, {self.onnx_input_name: nchw})
+        embedding = outputs[0][0]
+        
+        # L2 Normalize
+        norm = np.linalg.norm(embedding)
+        if norm > 1e-10:
+            embedding = embedding / norm
+        return embedding
+
+
     def objectDetectCV(self, frame_image):
-        """Detect learned objects in frame_image using MobileNetV3 ONNX embeddings."""
-        SIMILARITY_THRESHOLD = 0.70  # cosine similarity cut-off
-        CELL_ROWS = 2                # divide frame into a grid for localisation
-        CELL_COLS = 2
-
+        import cv2
+        import numpy as np
+        
         self.detected_objects = []
-
-        if not self.object_templates:
+        if not self.object_templates or not hasattr(self, 'onnx_session'):
             self.pause()
             return
-
+            
         try:
-            frame_h, frame_w = frame_image.shape[:2]
-            cell_h = frame_h // CELL_ROWS
-            cell_w = frame_w // CELL_COLS
-
-            best_by_name = {}  # name -> {box, confidence}
-
-            for row in range(CELL_ROWS):
-                for col in range(CELL_COLS):
-                    y1 = row * cell_h
-                    y2 = y1 + cell_h
-                    x1 = col * cell_w
-                    x2 = x1 + cell_w
-                    cell = frame_image[y1:y2, x1:x2]
-
-                    emb = self._get_embedding(cell)
-                    if emb is None:
-                        continue
-
-                    for template in self.object_templates:
-                        ref_emb = template["embedding"]
-                        similarity = float(np.dot(emb, ref_emb))
-                        name = template["name"]
-
-                        if similarity >= SIMILARITY_THRESHOLD:
-                            existing = best_by_name.get(name)
-                            if existing is None or similarity > existing["confidence"]:
-                                best_by_name[name] = {
-                                    "box": (x1, y1, cell_w, cell_h),
-                                    "confidence": similarity
-                                }
-
-            for name, info in best_by_name.items():
-                self.detected_objects.append({
-                    "name": name,
-                    "box": info["box"],
-                    "confidence": info["confidence"]
-                })
-
-            if self.detected_objects:
+            # Generate proposals
+            gray = cv2.cvtColor(frame_image, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+            edged = cv2.Canny(blurred, 30, 150)
+            
+            cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            import imutils
+            cnts = imutils.grab_contours(cnts)
+            
+            rects = []
+            for c in cnts:
+                x, y, w, h = cv2.boundingRect(c)
+                if w > 30 and h > 30 and w < 600 and h < 440:
+                    rects.append([x, y, w, h])
+            
+            rectsList = []
+            for x, y, w, h in rects:
+                rectsList.append([x, y, w, h])
+                rectsList.append([x, y, w, h])
+            
+            grouped_rects, weights = cv2.groupRectangles(rectsList, groupThreshold=1, eps=0.25)
+            candidates = sorted(grouped_rects, key=lambda r: r[2]*r[3], reverse=True)[:8]
+            
+            img_h, img_w = frame_image.shape[:2]
+            
+            best_matches = []
+            
+            for cx, cy, cw, ch in candidates:
+                # Clamp boundaries
+                cx = max(0, min(cx, img_w - 1))
+                cy = max(0, min(cy, img_h - 1))
+                cw = max(1, min(cw, img_w - cx))
+                ch = max(1, min(ch, img_h - cy))
+                
+                crop = frame_image[cy:cy+ch, cx:cx+cw]
+                if crop.size == 0:
+                    continue
+                
+                # Get crop embedding
+                emb = self.get_crop_embedding(crop)
+                
+                best_sim = -1.0
+                best_name = None
+                
+                # Compare with database templates
+                for template in self.object_templates:
+                    name = template["name"]
+                    for db_emb in template["embeddings"]:
+                        # Cosine similarity is the dot product (since both are L2 normalized)
+                        sim = float(np.dot(emb, db_emb))
+                        if sim > best_sim:
+                            best_sim = sim
+                            best_name = name
+                
+                if best_sim > 0.72:
+                    best_matches.append({
+                        "box": [cx, cy, cw, ch],
+                        "name": best_name,
+                        "similarity": best_sim
+                    })
+            
+            # Draw results and trigger alert if there's any match
+            if best_matches:
                 robot.lightCtrl('green', 0)
+                # Save to self.detected_objects for elementDraw
+                self.detected_objects = best_matches
             else:
                 robot.lightCtrl('blue', 0)
-
+                self.detected_objects = []
+                
         except Exception as err:
-            print("objectDetectCV error:", err)
-
+            print("Error in objectDetectCV:", err)
+            
         self.pause()
 
 
@@ -782,6 +786,7 @@ class Camera(BaseCamera):
     modeSelect = 'none'
     followName = ''
     followColor = 'none'
+    cvt = None
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
     # modeSelect = 'watchDog'
@@ -866,6 +871,7 @@ class Camera(BaseCamera):
         picam2.start()
 
         cvt = CVThread()
+        Camera.cvt = cvt
         cvt.start()
 
         print("DEBUG: Running frames() from whisper-bot/camera_opencv.py - Using frame directly")

@@ -80,6 +80,7 @@ device_state = {
 }
 camera = None
 camera_error = None
+captured_session_frames = []
 
 
 def get_primary_ip() -> Optional[str]:
@@ -777,181 +778,213 @@ def api_face_save():
 
 @app.route("/api/object/capture", methods=["POST", "GET"])
 def api_object_capture():
+	global captured_session_frames
+	captured_session_frames = []
 	camera_obj = get_camera()
 	if camera_obj is None:
 		return jsonify({"success": False, "error": "Camera unavailable"}), 503
-	frame_bytes = camera_obj.get_frame()
-	if not frame_bytes:
-		return jsonify({"success": False, "error": "Could not capture frame"}), 500
+		
+	start_time = time.time()
+	log_action("BACKEND", "Object Capture Started", "Capturing 3 seconds of video frames...")
+	
+	while time.time() - start_time < 3.0:
+		frame_bytes = camera_obj.get_frame(timeout=1.0)
+		if frame_bytes:
+			captured_session_frames.append(frame_bytes)
+		else:
+			time.sleep(0.01)
+			
+	log_action("BACKEND", "Object Capture Completed", f"Captured {len(captured_session_frames)} frames.")
+	
+	if not captured_session_frames:
+		return jsonify({"success": False, "error": "Could not capture any frames from camera"}), 500
+		
 	import base64
-	encoded_image = base64.b64encode(frame_bytes).decode("utf-8")
+	encoded_image = base64.b64encode(captured_session_frames[0]).decode("utf-8")
 	return jsonify({
 		"success": True,
 		"image": encoded_image
 	})
 
 
-# Shared ONNX session for MobileNetV3 embedding (loaded lazily on first submit)
-_mobilenet_ort_session = None
-_mobilenet_input_name = None
-_mobilenet_lock = threading.Lock()
+def get_embedding(crop, session, input_name):
+	import cv2
+	import numpy as np
+	# Resize crop to 224x224
+	resized = cv2.resize(crop, (224, 224))
+	# Convert BGR to RGB
+	rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+	# Convert to float32 and scale to [0, 1]
+	normalized = rgb.astype(np.float32) / 255.0
+	# ImageNet normalization
+	mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+	std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+	normalized = (normalized - mean) / std
+	# Transpose HWC to CHW
+	chw = np.transpose(normalized, (2, 0, 1))
+	# Add batch dimension: NCHW
+	nchw = np.expand_dims(chw, axis=0)
+	# Run ONNX inference
+	outputs = session.run(None, {input_name: nchw})
+	embedding = outputs[0][0] # 1D array of shape (1280,)
+	# L2 Normalize
+	norm = np.linalg.norm(embedding)
+	if norm > 1e-10:
+		embedding = embedding / norm
+	return embedding
 
 
-def get_mobilenet_model():
-	"""Return the onnxruntime InferenceSession for mobilenetv3_embedding.onnx."""
-	global _mobilenet_ort_session, _mobilenet_input_name
-	with _mobilenet_lock:
-		if _mobilenet_ort_session is None:
-			model_path = os.path.join(THIS_DIR, "mobilenetv3_embedding.onnx")
-			_mobilenet_ort_session = onnxruntime.InferenceSession(
-				model_path,
-				providers=["CPUExecutionProvider"]
-			)
-			_mobilenet_input_name = _mobilenet_ort_session.get_inputs()[0].name
-		return _mobilenet_ort_session, _mobilenet_input_name
+def create_tracker():
+	import cv2
+	try:
+		if hasattr(cv2, 'legacy') and hasattr(cv2.legacy, 'TrackerCSRT_create'):
+			return cv2.legacy.TrackerCSRT_create()
+	except Exception:
+		pass
+	try:
+		if hasattr(cv2, 'TrackerCSRT_create'):
+			return cv2.TrackerCSRT_create()
+	except Exception:
+		pass
+	try:
+		if hasattr(cv2, 'legacy') and hasattr(cv2.legacy, 'TrackerKCF_create'):
+			return cv2.legacy.TrackerKCF_create()
+	except Exception:
+		pass
+	try:
+		if hasattr(cv2, 'TrackerKCF_create'):
+			return cv2.TrackerKCF_create()
+	except Exception:
+		pass
+	raise RuntimeError("No suitable OpenCV tracker found (CSRT/KCF).")
 
 
 @app.route("/api/object/submit", methods=["POST"])
 def api_object_submit():
+	global captured_session_frames
 	data = request.json
-	if not data or "images" not in data or "boxes" not in data:
-		return jsonify({"success": False, "error": "Missing images or boxes"}), 400
-
-	images = data["images"]
-	boxes = data["boxes"]
-	object_name = data.get("name", "unnamed_object").strip().replace(" ", "_")
-
-	# Sanitize
+	if not data or "box" not in data or "name" not in data:
+		return jsonify({"success": False, "error": "Missing box or name"}), 400
+	
+	box = data["box"]
+	object_name = data["name"].strip().replace(" ", "_")
+	
+	# Sanitize the object name to prevent directory traversal or invalid characters
 	object_name = "".join(c for c in object_name if c.isalnum() or c in ("-", "_"))
 	if not object_name:
 		object_name = "unnamed_object"
-
-	if not isinstance(images, list) or not isinstance(boxes, list) or len(images) != 3 or len(boxes) != 3:
-		return jsonify({"success": False, "error": "Invalid images or boxes length"}), 400
-
-	import base64
+		
+	if not captured_session_frames:
+		return jsonify({"success": False, "error": "No captured video frames found in session"}), 400
+		
 	import cv2
 	import numpy as np
 	import pickle
-
-	# Ensure output directory exists
-	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning", object_name)
-	os.makedirs(object_learning_dir, exist_ok=True)
-
-	# Load ONNX model once
+	import time
+	import glob
+	import onnxruntime as ort
+	
 	try:
-		ort_session, ort_input_name = get_mobilenet_model()
-	except Exception as model_err:
-		log_action("BACKEND", "MobileNet Load Error", str(model_err))
-		return jsonify({"success": False, "error": f"Failed to load embedding model: {str(model_err)}"}), 500
-
-	def compute_embedding(bgr_img):
-		"""Run MobileNetV3 ONNX on a BGR image and return a normalised 1-D vector."""
-		rgb = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
-		rgb = cv2.resize(rgb, (224, 224))
-		tensor = rgb.astype(np.float32) / 255.0
-		mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
-		std  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
-		tensor = (tensor - mean) / std
-		tensor = np.transpose(tensor, (2, 0, 1))   # HWC -> CHW
-		tensor = np.expand_dims(tensor, axis=0)    # NCHW
-		output = ort_session.run(None, {ort_input_name: tensor})[0]
-		vec = output.flatten().astype(np.float64)
-		norm = np.linalg.norm(vec)
-		if norm > 0:
-			vec = vec / norm
-		return vec
-
-	# Decode, crop, save image, and compute embedding for each of the 3 frames
-	new_embeddings = []
-
-	for i, (img_b64, box) in enumerate(zip(images, boxes)):
-		if not img_b64:
-			continue
-		try:
-			if "," in img_b64:
-				img_b64 = img_b64.split(",")[1]
-			img_bytes = base64.b64decode(img_b64)
-
-			nparr = np.frombuffer(img_bytes, np.uint8)
-			img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-			if img is None:
-				log_action("BACKEND", "Object Crop Error", f"Failed to decode image {i+1}")
+		# 1. Decode first frame and initialize tracker
+		first_frame_bytes = captured_session_frames[0]
+		first_frame = cv2.imdecode(np.frombuffer(first_frame_bytes, np.uint8), cv2.IMREAD_COLOR)
+		if first_frame is None:
+			return jsonify({"success": False, "error": "Failed to decode first frame"}), 500
+			
+		h_img, w_img = first_frame.shape[:2]
+		
+		# Box coordinates drawn by user
+		x = int(box["x"])
+		y = int(box["y"])
+		w = int(box["w"])
+		h = int(box["h"])
+		
+		# Clamp coordinates
+		x = max(0, min(x, w_img - 1))
+		y = max(0, min(y, h_img - 1))
+		w = max(1, min(w, w_img - x))
+		h = max(1, min(h, h_img - y))
+		
+		tracker = create_tracker()
+		tracker.init(first_frame, (x, y, w, h))
+		
+		# Load ONNX model
+		model_path = os.path.join(THIS_DIR, "mobilenetv3_embedding.onnx")
+		if not os.path.exists(model_path):
+			return jsonify({"success": False, "error": "Model file mobilenetv3_embedding.onnx not found in whisper-bot folder"}), 500
+			
+		session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
+		input_name = session.get_inputs()[0].name
+		
+		embeddings = []
+		
+		# Crop first frame and get embedding
+		crop = first_frame[y:y+h, x:x+w]
+		if crop.size > 0:
+			emb = get_embedding(crop, session, input_name)
+			embeddings.append(emb)
+			
+		# Track through remaining frames
+		for idx in range(1, len(captured_session_frames)):
+			frame_bytes = captured_session_frames[idx]
+			frame = cv2.imdecode(np.frombuffer(frame_bytes, np.uint8), cv2.IMREAD_COLOR)
+			if frame is None:
 				continue
-
-			# Crop if a bounding box was drawn, otherwise use the full frame
-			if box and isinstance(box, dict) and all(k in box for k in ("x", "y", "w", "h")):
-				img_h, img_w = img.shape[:2]
-				x = max(0, min(int(box["x"]), img_w - 1))
-				y = max(0, min(int(box["y"]), img_h - 1))
-				w = max(1, min(int(box["w"]), img_w - x))
-				h = max(1, min(int(box["h"]), img_h - y))
-				crop = img[y : y + h, x : x + w]
-				img_filename = f"crop_{int(time.time())}_{i+1}.jpg"
-			else:
-				crop = img
-				img_filename = f"crop_full_{int(time.time())}_{i+1}.jpg"
-
-			# Save the cropped image for reference
-			img_path = os.path.join(object_learning_dir, img_filename)
-			cv2.imwrite(img_path, crop)
-			log_action("BACKEND", "Object Crop Saved", f"Saved crop {i+1} -> {img_filename}")
-
-			# Compute MobileNetV3 embedding
-			try:
-				emb = compute_embedding(crop)
-				new_embeddings.append(emb.tolist())
-				log_action("BACKEND", "Embedding Computed", f"Image {i+1}: vector dim={len(emb)}")
-			except Exception as emb_err:
-				log_action("BACKEND", "Embedding Error", f"Image {i+1}: {str(emb_err)}")
-
-		except Exception as e:
-			log_action("BACKEND", "Object Crop/Save Error", f"Image {i+1}: {str(e)}")
-
-	if not new_embeddings:
-		return jsonify({"success": False, "error": "No embeddings could be computed from the provided images"}), 400
-
-	# Persist embeddings to ObjectLearning/storage.pkl
-	pkl_path = os.path.join(THIS_DIR, "ObjectLearning", "storage.pkl")
-	existing_objects = []
-	if os.path.exists(pkl_path):
-		try:
-			with open(pkl_path, "rb") as f:
-				data = pickle.load(f)
-			existing_objects = data if isinstance(data, list) else [data]
-		except Exception as pkl_load_err:
-			log_action("BACKEND", "PKL Load Error", str(pkl_load_err))
-			existing_objects = []
-
-	# Overwrite any existing entry with the same name
-	existing_objects = [obj for obj in existing_objects if obj.get("name", "").lower() != object_name.lower()]
-
-	# Enforce 10-object cap — evict the oldest
-	if len(existing_objects) >= 10:
-		evicted = existing_objects.pop(0)
-		evicted_name = evicted.get("name", "")
-		log_action("BACKEND", "Object Queue Evicted", f"Evicted '{evicted_name}'")
-		if evicted_name:
-			import shutil
-			evicted_dir = os.path.join(THIS_DIR, "ObjectLearning", evicted_name)
-			if os.path.exists(evicted_dir):
-				try:
-					shutil.rmtree(evicted_dir)
-				except Exception:
-					pass
-
-	existing_objects.append({"name": object_name, "embeddings": new_embeddings})
-
-	try:
-		os.makedirs(os.path.join(THIS_DIR, "ObjectLearning"), exist_ok=True)
+				
+			success, bbox = tracker.update(frame)
+			if success:
+				tx, ty, tw, th = [int(v) for v in bbox]
+				# Clamp tracked bounding box to frame boundaries
+				tx = max(0, min(tx, w_img - 1))
+				ty = max(0, min(ty, h_img - 1))
+				tw = max(1, min(tw, w_img - tx))
+				th = max(1, min(th, h_img - ty))
+				
+				# Every 2 frames (stepping by 2), run model inference
+				if idx % 2 == 0:
+					crop = frame[ty:ty+th, tx:tx+tw]
+					if crop.size > 0:
+						emb = get_embedding(crop, session, input_name)
+						embeddings.append(emb)
+						
+		if not embeddings:
+			return jsonify({"success": False, "error": "Failed to extract any embeddings during tracking"}), 400
+			
+		# Save database embeddings
+		object_db_dir = os.path.join(THIS_DIR, "object_db")
+		os.makedirs(object_db_dir, exist_ok=True)
+		
+		pkl_path = os.path.join(object_db_dir, f"{object_name}.pkl")
 		with open(pkl_path, "wb") as f:
-			pickle.dump(existing_objects, f)
-		log_action("BACKEND", "PKL Save Success", f"Saved '{object_name}' with {len(new_embeddings)} embeddings to storage.pkl")
-	except Exception as pkl_save_err:
-		log_action("BACKEND", "PKL Save Error", str(pkl_save_err))
-		return jsonify({"success": False, "error": f"Failed to save storage.pkl: {str(pkl_save_err)}"}), 500
-
-	return jsonify({"success": True, "message": f"Learned '{object_name}' with {len(new_embeddings)} embeddings."})
+			pickle.dump({
+				"name": object_name,
+				"embeddings": embeddings
+			}, f)
+			
+		log_action("BACKEND", "Object PKL Saved", f"Saved {len(embeddings)} embeddings for '{object_name}' to {pkl_path}")
+		
+		# Enforce maximum limit of 10 objects in object_db
+		pkl_files = glob.glob(os.path.join(object_db_dir, "*.pkl"))
+		if len(pkl_files) > 10:
+			# Sort files by modification time (oldest first)
+			pkl_files.sort(key=os.path.getmtime)
+			while len(pkl_files) > 10:
+				oldest_file = pkl_files.pop(0)
+				try:
+					os.remove(oldest_file)
+					log_action("BACKEND", "Object DB Eviction", f"Evicted oldest object file: {os.path.basename(oldest_file)}")
+				except Exception as e:
+					log_action("BACKEND", "Object DB Eviction Error", f"Failed to delete {oldest_file}: {str(e)}")
+					
+		# Force the camera thread to reload object templates next time it runs object detection
+		if hasattr(camera_opencv.Camera, 'cvt') and camera_opencv.Camera.cvt is not None:
+			camera_opencv.Camera.cvt.object_templates = None
+			
+		return jsonify({"success": True, "message": f"Successfully learned object '{object_name}' with {len(embeddings)} frames tracked."})
+		
+	except Exception as e:
+		log_action("BACKEND", "Object Submit Error", str(e))
+		return jsonify({"success": False, "error": f"Failed to process and learn object: {str(e)}"}), 500
 
 
 active_follow_color = None
