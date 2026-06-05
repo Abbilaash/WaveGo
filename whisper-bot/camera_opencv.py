@@ -575,6 +575,7 @@ class CVThread(threading.Thread):
             self.follow_circle = None
             robot.stopFB()
             robot.stopLR()
+            robot.lookStopUD()
             self.pause()
             return
             
@@ -587,6 +588,7 @@ class CVThread(threading.Thread):
                 
             if not masks:
                 self.follow_circle = None
+                robot.lookStopUD()
                 self.pause()
                 return
                 
@@ -632,18 +634,30 @@ class CVThread(threading.Thread):
                             action = "RIGHT"
                             robot.right()
                             
+                    # Control Y axis (tilt up / down / stop) to keep the target centered vertically
+                    tor = CVThread.tor
+                    if y < 240 - tor:
+                        robot.lookUp()
+                    elif y > 240 + tor:
+                        robot.lookDown()
+                    else:
+                        robot.lookStopUD()
+                            
                     self.follow_circle = (x, y, radius, action)
                 else:
                     action = "SEARCH"
                     robot.left() # slow rotation to search for the ball
+                    robot.lookStopUD()
                     self.follow_circle = None
             else:
                 action = "SEARCH"
                 robot.left() # slow rotation to search for the ball
+                robot.lookStopUD()
                 self.follow_circle = None
         except Exception as e:
             print("Error in followColorCV:", e)
             self.follow_circle = None
+            robot.lookStopUD()
             
         self.pause()
 

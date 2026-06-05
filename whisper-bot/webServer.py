@@ -309,8 +309,8 @@ pending_chatbot_actions = {}
 PENDING_TIMEOUT = 30.0
 
 # Timed movement calibrations (in seconds)
-STEP_DURATION = 0.35      # 1 step = 0.25 seconds
-DEGREE_DURATION = 0.0116    # (1 degree = 0.0105 seconds)
+STEP_DURATION = 0.35      # 1 step = 0.35 seconds
+DEGREE_DURATION = 0.0116    # (1 degree = 0.0116 seconds)
 
 def parse_number(text: str) -> Optional[float]:
 	# Try to find standard digits/floats
