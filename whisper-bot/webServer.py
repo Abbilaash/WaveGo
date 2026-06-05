@@ -310,7 +310,7 @@ PENDING_TIMEOUT = 30.0
 
 # Timed movement calibrations (in seconds)
 STEP_DURATION = 0.25      # 1 step = 0.25 seconds
-DEGREE_DURATION = 0.0105    # (1 degree = 0.0095 seconds)
+DEGREE_DURATION = 0.0116    # (1 degree = 0.0105 seconds)
 
 def parse_number(text: str) -> Optional[float]:
 	# Try to find standard digits/floats
