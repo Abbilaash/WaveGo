@@ -7,6 +7,7 @@ import datetime
 import time
 import threading
 import imutils
+import onnxruntime as ort
 
 curpath = os.path.realpath(__file__)
 thisPath = os.path.dirname(curpath)
@@ -134,19 +135,16 @@ class CVThread(threading.Thread):
 
         elif self.CVMode == 'objectDetection':
             if hasattr(self, 'detected_objects') and self.detected_objects:
-                cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+                cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Found', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
                 for obj in self.detected_objects:
                     try:
-                        dst = obj["box"]
+                        x, y, w, h = obj["box"]
                         name = obj["name"]
-                        matches = obj["matches"]
-                        
-                        # Draw green bounding box around the detected object using cv2.polylines
-                        cv2.polylines(imgInput, [np.int32(dst)], True, (74, 222, 128), 3, cv2.LINE_AA)
-                        
-                        # Put label near the top-left corner of the box
-                        top_left = dst[0][0]
-                        cv2.putText(imgInput, f"{name} ({matches} matches)", (int(top_left[0]), int(top_left[1]) - 10), CVThread.font, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
+                        confidence = obj["confidence"]
+                        color = (74, 222, 128)
+                        cv2.rectangle(imgInput, (x, y), (x + w, y + h), color, 2)
+                        label = f"{name} {confidence:.0%}"
+                        cv2.putText(imgInput, label, (x, max(y - 8, 12)), CVThread.font, 0.5, color, 1, cv2.LINE_AA)
                     except Exception:
                         pass
             else:
@@ -458,97 +456,153 @@ class CVThread(threading.Thread):
         self.pause()
 
 
+    # -------------------------------------------------------
+    # MobileNetV3 ONNX embedding helpers
+    # -------------------------------------------------------
+    _ort_session = None          # shared ONNX session (loaded once)
+    _ort_input_name = None
+    _ORT_LOCK = threading.Lock()
+
+    @classmethod
+    def _get_ort_session(cls):
+        """Lazy-load the MobileNetV3 ONNX session (thread-safe)."""
+        with cls._ORT_LOCK:
+            if cls._ort_session is None:
+                model_path = os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)),
+                    "mobilenetv3_embedding.onnx"
+                )
+                if os.path.exists(model_path):
+                    cls._ort_session = ort.InferenceSession(
+                        model_path,
+                        providers=["CPUExecutionProvider"]
+                    )
+                    cls._ort_input_name = cls._ort_session.get_inputs()[0].name
+            return cls._ort_session
+
+    @classmethod
+    def _get_embedding(cls, crop_bgr):
+        """Return a 1-D L2-normalised embedding vector for a BGR crop, or None."""
+        session = cls._get_ort_session()
+        if session is None:
+            return None
+        try:
+            rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
+            rgb = cv2.resize(rgb, (224, 224))
+            tensor = rgb.astype(np.float32) / 255.0
+            mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+            std  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+            tensor = (tensor - mean) / std
+            tensor = np.transpose(tensor, (2, 0, 1))          # HWC -> CHW
+            tensor = np.expand_dims(tensor, axis=0)           # NCHW
+            output = session.run(None, {cls._ort_input_name: tensor})[0]
+            vec = output.flatten().astype(np.float64)
+            norm = np.linalg.norm(vec)
+            if norm > 0:
+                vec = vec / norm
+            return vec
+        except Exception as e:
+            print("_get_embedding error:", e)
+            return None
+
+    # -------------------------------------------------------
+    # Template loading (reads storage.pkl with embeddings)
+    # -------------------------------------------------------
     def load_object_templates(self):
-        import glob
-        import os
-        import cv2
-        
+        """Load pre-computed MobileNetV3 embeddings from ObjectLearning/storage.pkl."""
+        import pickle
+
         self.object_templates = []
-        object_learning_root = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "ObjectLearning"))
-        if not os.path.exists(object_learning_root):
+        pkl_path = os.path.normpath(
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), "ObjectLearning", "storage.pkl")
+        )
+        if not os.path.exists(pkl_path):
+            print("[ObjectDetect] storage.pkl not found — no templates loaded.")
             return
-            
-        # Scan folders inside ObjectLearning
-        for entry in os.listdir(object_learning_root):
-            entry_path = os.path.join(object_learning_root, entry)
-            if os.path.isdir(entry_path) and entry != "__pycache__":
-                jpg_files = glob.glob(os.path.join(entry_path, "crop_*.jpg"))
-                for img_p in jpg_files:
-                    try:
-                        img = cv2.imread(img_p)
-                        if img is not None:
-                            orb = cv2.ORB_create(1000)
-                            kp, des = orb.detectAndCompute(img, None)
-                            if des is not None and len(des) > 10:
-                                self.object_templates.append({
-                                    "name": entry,
-                                    "kp": kp,
-                                    "des": des,
-                                    "shape": img.shape
-                                })
-                    except Exception as e:
-                        print(f"Error loading template {img_p}: {e}")
-        
-        # Also let's check for individual watch.pkl files or watch folders directly in ObjectLearning/
-        # Since the user requested: "the files generated are: storage.pkl, watch folder, watch.pkl."
-        # Scanning directories guarantees we find all folder-stored cropped template frames.
 
+        try:
+            with open(pkl_path, "rb") as f:
+                data = pickle.load(f)
+            if isinstance(data, dict):
+                data = [data]
+            for entry in data:
+                name = entry.get("name", "unknown")
+                embeddings = entry.get("embeddings", [])
+                if embeddings:
+                    # Average all stored embeddings for this object into one reference vector
+                    stacked = np.array(embeddings, dtype=np.float64)
+                    avg_emb = np.mean(stacked, axis=0)
+                    norm = np.linalg.norm(avg_emb)
+                    if norm > 0:
+                        avg_emb = avg_emb / norm
+                    self.object_templates.append({"name": name, "embedding": avg_emb})
+                    print(f"[ObjectDetect] Loaded template for '{name}' ({len(embeddings)} embeddings)")
+        except Exception as e:
+            print(f"[ObjectDetect] Failed to load storage.pkl: {e}")
+            self.object_templates = []
 
+    # -------------------------------------------------------
+    # Detection loop (cosine similarity against templates)
+    # -------------------------------------------------------
     def objectDetectCV(self, frame_image):
-        import cv2
-        import numpy as np
-        
+        """Detect learned objects in frame_image using MobileNetV3 ONNX embeddings."""
+        SIMILARITY_THRESHOLD = 0.70  # cosine similarity cut-off
+        CELL_ROWS = 2                # divide frame into a grid for localisation
+        CELL_COLS = 2
+
         self.detected_objects = []
+
         if not self.object_templates:
             self.pause()
             return
-            
+
         try:
-            orb = cv2.ORB_create(1000)
-            kp2, des2 = orb.detectAndCompute(frame_image, None)
-            
-            if des2 is not None and len(des2) > 10:
-                bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
-                
-                # Match against each loaded template
-                for template in self.object_templates:
-                    des1 = template["des"]
-                    kp1 = template["kp"]
-                    shape = template["shape"]
-                    name = template["name"]
-                    
-                    if des1 is not None and len(des1) > 10:
-                        matches = bf.knnMatch(des1, des2, k=2)
-                        
-                        # Lowe's ratio test
-                        good_matches = []
-                        for m_n in matches:
-                            if len(m_n) == 2:
-                                m, n = m_n
-                                if m.distance < 0.75 * n.distance:
-                                    good_matches.append(m)
-                                    
-                        if len(good_matches) >= 12: # robust homography match threshold
-                            src_pts = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-                            dst_pts = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-                            
-                            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-                            
-                            if M is not None:
-                                h_temp, w_temp = shape[:2]
-                                pts = np.float32([[0, 0], [0, h_temp - 1], [w_temp - 1, h_temp - 1], [w_temp - 1, 0]]).reshape(-1, 1, 2)
-                                dst = cv2.perspectiveTransform(pts, M)
-                                
-                                self.detected_objects.append({
-                                    "name": name,
-                                    "box": dst,
-                                    "matches": len(good_matches)
-                                })
-                                # Trigger visual alert via lights
-                                robot.lightCtrl('green', 0)
+            frame_h, frame_w = frame_image.shape[:2]
+            cell_h = frame_h // CELL_ROWS
+            cell_w = frame_w // CELL_COLS
+
+            best_by_name = {}  # name -> {box, confidence}
+
+            for row in range(CELL_ROWS):
+                for col in range(CELL_COLS):
+                    y1 = row * cell_h
+                    y2 = y1 + cell_h
+                    x1 = col * cell_w
+                    x2 = x1 + cell_w
+                    cell = frame_image[y1:y2, x1:x2]
+
+                    emb = self._get_embedding(cell)
+                    if emb is None:
+                        continue
+
+                    for template in self.object_templates:
+                        ref_emb = template["embedding"]
+                        similarity = float(np.dot(emb, ref_emb))
+                        name = template["name"]
+
+                        if similarity >= SIMILARITY_THRESHOLD:
+                            existing = best_by_name.get(name)
+                            if existing is None or similarity > existing["confidence"]:
+                                best_by_name[name] = {
+                                    "box": (x1, y1, cell_w, cell_h),
+                                    "confidence": similarity
+                                }
+
+            for name, info in best_by_name.items():
+                self.detected_objects.append({
+                    "name": name,
+                    "box": info["box"],
+                    "confidence": info["confidence"]
+                })
+
+            if self.detected_objects:
+                robot.lightCtrl('green', 0)
+            else:
+                robot.lightCtrl('blue', 0)
+
         except Exception as err:
-            pass
-            
+            print("objectDetectCV error:", err)
+
         self.pause()
 
 
