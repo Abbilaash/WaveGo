@@ -465,34 +465,39 @@ class CVThread(threading.Thread):
         import onnxruntime as ort
         
         self.object_templates = []
+        print("[OBJECT DETECTION] Scanning object database...")
         
         # Load ONNX model
         model_path = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "mobilenetv3_embedding.onnx"))
         if not os.path.exists(model_path):
-            print("ERROR: mobilenetv3_embedding.onnx not found at:", model_path)
+            print("[OBJECT DETECTION] ERROR: mobilenetv3_embedding.onnx not found at:", model_path)
             return
             
         try:
             self.onnx_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
             self.onnx_input_name = self.onnx_session.get_inputs()[0].name
+            print("[OBJECT DETECTION] Successfully initialized ONNX model session.")
         except Exception as e:
-            print("ERROR: Failed to load ONNX session:", e)
+            print("[OBJECT DETECTION] ERROR: Failed to load ONNX session:", e)
             return
             
         object_db_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "object_db"))
+        print(f"[OBJECT DETECTION] Looking for pkl files in: {object_db_dir}")
         if not os.path.exists(object_db_dir):
+            print("[OBJECT DETECTION] Database directory does not exist yet.")
             return
             
         pkl_files = glob.glob(os.path.join(object_db_dir, "*.pkl"))
+        print(f"[OBJECT DETECTION] Found {len(pkl_files)} database files: {pkl_files}")
         for pkl_p in pkl_files:
             try:
                 with open(pkl_p, "rb") as f:
                     data = pickle.load(f)
                     if isinstance(data, dict) and "name" in data and "embeddings" in data:
                         self.object_templates.append(data)
-                        print(f"Loaded object template: {data['name']} with {len(data['embeddings'])} embeddings.")
+                        print(f"[OBJECT DETECTION] Loaded template: '{data['name']}' with {len(data['embeddings'])} embeddings.")
             except Exception as e:
-                print(f"Error loading pkl {pkl_p}: {e}")
+                print(f"[OBJECT DETECTION] Error loading pkl {pkl_p}: {e}")
 
 
     def get_crop_embedding(self, crop):
@@ -805,7 +810,7 @@ class CVThread(threading.Thread):
 
             elif self.CVMode == 'objectDetection':
                 self.CVThreading = 1
-                if self.object_templates is None:
+                if not self.object_templates:
                     self.load_object_templates()
                 self.objectDetectCV(self.imgCV)
                 self.CVThreading = 0
