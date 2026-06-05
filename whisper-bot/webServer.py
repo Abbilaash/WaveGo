@@ -9,6 +9,7 @@ import socket
 import subprocess
 import threading
 import time
+import re
 from typing import Optional, Tuple
 
 from flask import Flask, Response, jsonify, render_template, send_from_directory, request
@@ -304,6 +305,237 @@ def get_chatbot_predict():
 	return chatbot_predict
 
 
+pending_chatbot_actions = {}
+PENDING_TIMEOUT = 30.0
+
+def parse_number(text: str) -> Optional[float]:
+	# Try to find standard digits/floats
+	matches = re.findall(r"[-+]?\d*\.\d+|\d+", text)
+	if matches:
+		return float(matches[0])
+		
+	# Try word equivalents
+	word_to_num = {
+		"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+		"six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10
+	}
+	words = text.lower().split()
+	for w in words:
+		if w in word_to_num:
+			return float(word_to_num[w])
+	return None
+
+
+def process_chatbot_text(command_text: str, client_ip: str) -> dict:
+	global pending_chatbot_actions
+	
+	try:
+		predict_fn = get_chatbot_predict()
+	except Exception as exc:
+		log_action("BACKEND", "Chatbot Initialization Error", str(exc))
+		return {
+			"success": False,
+			"error": f"Failed to initialize chatbot model: {str(exc)}"
+		}
+		
+	# Clean up expired pending states
+	now = time.time()
+	expired_ips = [ip for ip, data in pending_chatbot_actions.items() if now - data.get("timestamp", 0) > PENDING_TIMEOUT]
+	for ip in expired_ips:
+		pending_chatbot_actions.pop(ip, None)
+		
+	pending = pending_chatbot_actions.get(client_ip)
+	
+	# Classify current command text
+	try:
+		best_intent, best_score = predict_fn(command_text)
+	except Exception as exc:
+		log_action("BACKEND", "Chatbot Classification Error", str(exc))
+		return {
+			"success": False,
+			"error": f"Failed to classify intent: {str(exc)}"
+		}
+		
+	CONFIDENCE_THRESHOLD = 0.4
+	
+	# Scenario A: We have a pending action waiting for a numeric parameter
+	if pending is not None:
+		# If the user input is a high-confidence intent that is a different command (e.g. STOP, STAND, FOLLOW_RED etc.),
+		# we abort the pending prompt and execute the new command instead.
+		if best_score >= CONFIDENCE_THRESHOLD and best_intent not in ("MOVE_FORWARD", "MOVE_BACKWARD", "TURN_LEFT", "TURN_RIGHT", pending["intent"]):
+			# Clear pending and let normal flow handle the new command
+			pending_chatbot_actions.pop(client_ip, None)
+			pending = None
+		else:
+			# Try to parse the number parameter from the input
+			num_val = parse_number(command_text)
+			if num_val is not None and num_val > 0:
+				pending_intent = pending["intent"]
+				pending_chatbot_actions.pop(client_ip, None) # Clear pending state
+				
+				action_msg = ""
+				if pending_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+					duration = num_val * 1.0
+					action_msg = f"Moving {pending_intent.split('_')[1].lower()} for {num_val} steps ({duration:.1f}s)."
+					
+					def run_move():
+						try:
+							if pending_intent == "MOVE_FORWARD":
+								robot.forward(100)
+							else:
+								robot.backward(100)
+							time.sleep(duration)
+							robot.stopFB()
+						except Exception as e:
+							log_action("BACKEND", "Timed Move Thread Error", str(e))
+					threading.Thread(target=run_move, daemon=True).start()
+					
+				elif pending_intent in ("TURN_LEFT", "TURN_RIGHT"):
+					duration = num_val * 0.0167
+					action_msg = f"Turning {pending_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
+					
+					def run_turn():
+						try:
+							if pending_intent == "TURN_LEFT":
+								robot.left(100)
+							else:
+								robot.right(100)
+							time.sleep(duration)
+							robot.stopLR()
+						except Exception as e:
+							log_action("BACKEND", "Timed Turn Thread Error", str(e))
+					threading.Thread(target=run_turn, daemon=True).start()
+					
+				log_action("BACKEND", "Chatbot Param Command Executed", f"Intent: {pending_intent}, Param: {num_val}, Action: {action_msg}")
+				return {
+					"success": True,
+					"command": command_text,
+					"intent": pending_intent,
+					"score": best_score,
+					"action_taken": action_msg,
+					"execution_success": True,
+					"prompt_for_param": False,
+					"threshold_passed": True
+				}
+			else:
+				# If we couldn't parse a valid number and the text is not another command, prompt again
+				prompt_msg = ""
+				if pending["intent"] in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+					prompt_msg = "Please specify the number of steps to walk as a number (e.g. 3 or 5)."
+				else:
+					prompt_msg = "Please specify the angle to turn in degrees as a number (e.g. 45 or 90)."
+				return {
+					"success": True,
+					"command": command_text,
+					"intent": pending["intent"],
+					"score": best_score,
+					"action_taken": prompt_msg,
+					"execution_success": False,
+					"prompt_for_param": True,
+					"threshold_passed": True
+				}
+				
+	# Scenario B: No pending action, process standard command
+	action_msg = ""
+	execution_success = True
+	prompt_for_param = False
+	
+	if best_score >= CONFIDENCE_THRESHOLD:
+		if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD", "TURN_LEFT", "TURN_RIGHT"):
+			# Check if user already provided a number in this command (e.g., "turn left 90")
+			num_val = parse_number(command_text)
+			if num_val is not None and num_val > 0:
+				# Execute immediately
+				if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+					duration = num_val * 1.0
+					action_msg = f"Moving {best_intent.split('_')[1].lower()} for {num_val} steps ({duration:.1f}s)."
+					def run_move():
+						try:
+							if best_intent == "MOVE_FORWARD":
+								robot.forward(100)
+							else:
+								robot.backward(100)
+							time.sleep(duration)
+							robot.stopFB()
+						except Exception as e:
+							log_action("BACKEND", "Timed Move Thread Error", str(e))
+					threading.Thread(target=run_move, daemon=True).start()
+				else:
+					duration = num_val * 0.0167
+					action_msg = f"Turning {best_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
+					def run_turn():
+						try:
+							if best_intent == "TURN_LEFT":
+								robot.left(100)
+							else:
+								robot.right(100)
+							time.sleep(duration)
+							robot.stopLR()
+						except Exception as e:
+							log_action("BACKEND", "Timed Turn Thread Error", str(e))
+					threading.Thread(target=run_turn, daemon=True).start()
+			else:
+				# No number provided, set pending state and prompt
+				pending_chatbot_actions[client_ip] = {
+					"intent": best_intent,
+					"timestamp": time.time()
+				}
+				prompt_for_param = True
+				if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+					action_msg = "How many steps would you like to walk?"
+				else:
+					action_msg = "What angle would you like to turn (in degrees)?"
+				execution_success = False
+				
+		elif best_intent == "STOP":
+			global active_follow_color
+			active_follow_color = None
+			camera_opencv.Camera.modeSelect = 'none'
+			camera_opencv.Camera.followColor = 'none'
+			stop_robot()
+			action_msg = "Stopped all robot motion and openCV modes."
+		elif best_intent == "SIT":
+			robot.steadyMode()
+			action_msg = "Robot sitting down (stabilized steady mode)."
+		elif best_intent == "STAND":
+			robot.steadyMode()
+			action_msg = "Robot standing up (stabilized steady mode)."
+		elif best_intent == "FOLLOW_RED":
+			active_follow_color = "red"
+			camera_opencv.Camera.modeSelect = 'followColor'
+			camera_opencv.Camera.followColor = "red"
+			action_msg = "Started color tracking mode following the 'red' ball."
+		elif best_intent == "FOLLOW_GREEN":
+			active_follow_color = "green"
+			camera_opencv.Camera.modeSelect = 'followColor'
+			camera_opencv.Camera.followColor = "green"
+			action_msg = "Started color tracking mode following the 'green' ball."
+		elif best_intent == "FOLLOW_BLUE":
+			active_follow_color = "blue"
+			camera_opencv.Camera.modeSelect = 'followColor'
+			camera_opencv.Camera.followColor = "blue"
+			action_msg = "Started color tracking mode following the 'blue' ball."
+		else:
+			execution_success = False
+			action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
+	else:
+		execution_success = False
+		action_msg = "Command not understood (low match confidence)."
+		
+	log_action("BACKEND", "Chatbot Command Executed", f"Command: '{command_text}', Best Intent: {best_intent}, Score: {best_score:.4f}, Action: {action_msg}")
+	
+	return {
+		"success": True,
+		"command": command_text,
+		"intent": best_intent if best_score >= CONFIDENCE_THRESHOLD else None,
+		"score": best_score,
+		"threshold_passed": bool(best_score >= CONFIDENCE_THRESHOLD),
+		"action_taken": action_msg,
+		"execution_success": execution_success,
+		"prompt_for_param": prompt_for_param
+	}
+
+
 @app.route('/api/chatbot/command', methods=['POST'])
 def api_chatbot_command():
 	data = request.json
@@ -314,82 +546,10 @@ def api_chatbot_command():
 	if not command_text:
 		return jsonify({"success": False, "error": "Command string cannot be empty"}), 400
 		
-	try:
-		predict_fn = get_chatbot_predict()
-	except Exception as exc:
-		log_action("BACKEND", "Chatbot Initialization Error", str(exc))
-		return jsonify({"success": False, "error": f"Failed to initialize chatbot model: {str(exc)}"}), 500
-		
-	try:
-		# Run ONNX inference via local MiniLM package
-		best_intent, best_score = predict_fn(command_text)
-		
-		# Execute the matched intent if it passes the threshold
-		CONFIDENCE_THRESHOLD = 0.4
-		action_msg = ""
-		execution_success = True
-		
-		if best_score >= CONFIDENCE_THRESHOLD:
-			if best_intent == "MOVE_FORWARD":
-				robot.forward(100)
-				action_msg = "Moving forward at default speed 100."
-			elif best_intent == "MOVE_BACKWARD":
-				robot.backward(100)
-				action_msg = "Moving backward at speed 100."
-			elif best_intent == "TURN_LEFT":
-				robot.left(100)
-				action_msg = "Turning left at speed 100."
-			elif best_intent == "TURN_RIGHT":
-				robot.right(100)
-				action_msg = "Turning right at speed 100."
-			elif best_intent == "STOP":
-				active_follow_color = None
-				camera_opencv.Camera.modeSelect = 'none'
-				camera_opencv.Camera.followColor = 'none'
-				stop_robot()
-				action_msg = "Stopped all robot motion and openCV modes."
-			elif best_intent == "SIT":
-				robot.steadyMode()
-				action_msg = "Robot sitting down (stabilized steady mode)."
-			elif best_intent == "STAND":
-				robot.steadyMode()
-				action_msg = "Robot standing up (stabilized steady mode)."
-			elif best_intent == "FOLLOW_RED":
-				active_follow_color = "red"
-				camera_opencv.Camera.modeSelect = 'followColor'
-				camera_opencv.Camera.followColor = "red"
-				action_msg = "Started color tracking mode following the 'red' ball."
-			elif best_intent == "FOLLOW_GREEN":
-				active_follow_color = "green"
-				camera_opencv.Camera.modeSelect = 'followColor'
-				camera_opencv.Camera.followColor = "green"
-				action_msg = "Started color tracking mode following the 'green' ball."
-			elif best_intent == "FOLLOW_BLUE":
-				active_follow_color = "blue"
-				camera_opencv.Camera.modeSelect = 'followColor'
-				camera_opencv.Camera.followColor = "blue"
-				action_msg = "Started color tracking mode following the 'blue' ball."
-			else:
-				execution_success = False
-				action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
-		else:
-			execution_success = False
-			action_msg = "Command not understood (low match confidence)."
-			
-		log_action("BACKEND", "Chatbot Command Executed", f"Command: '{command_text}', Best Intent: {best_intent}, Score: {best_score:.4f}, Action: {action_msg}")
-		
-		return jsonify({
-			"success": True,
-			"command": command_text,
-			"intent": best_intent if best_score >= CONFIDENCE_THRESHOLD else None,
-			"score": best_score,
-			"threshold_passed": bool(best_score >= CONFIDENCE_THRESHOLD),
-			"action_taken": action_msg,
-			"execution_success": execution_success
-		})
-	except Exception as exc:
-		log_action("BACKEND", "Chatbot Command Error", str(exc))
-		return jsonify({"success": False, "error": str(exc)}), 500
+	res = process_chatbot_text(command_text, request.remote_addr)
+	if not res.get("success", True):
+		return jsonify(res), 500
+	return jsonify(res)
 
 
 _audio_transcriber = None
@@ -437,7 +597,6 @@ def api_chatbot_audio():
 		}), 400
 
 	try:
-		# Run Whisper ONNX transcription
 		transcribed_text = transcriber.transcribe(temp_path)
 		log_action("BACKEND", "Speech-to-Text Success", f"Transcribed: '{transcribed_text}'")
 	except Exception as exc:
@@ -450,83 +609,10 @@ def api_chatbot_audio():
 	if not transcribed_text:
 		return jsonify({"success": False, "error": "Speech was not recognized or transcription is empty. Please speak clearly."}), 400
 
-	try:
-		predict_fn = get_chatbot_predict()
-	except Exception as exc:
-		log_action("BACKEND", "Chatbot Initialization Error", str(exc))
-		return jsonify({"success": False, "error": f"Failed to initialize chatbot model: {str(exc)}"}), 500
-
-	try:
-		# Run NLP intent matching on the transcribed text
-		best_intent, best_score = predict_fn(transcribed_text)
-		
-		# Execute matched intent
-		CONFIDENCE_THRESHOLD = 0.4
-		action_msg = ""
-		execution_success = True
-		
-		if best_score >= CONFIDENCE_THRESHOLD:
-			if best_intent == "MOVE_FORWARD":
-				robot.forward(100)
-				action_msg = "Moving forward at default speed 100."
-			elif best_intent == "MOVE_BACKWARD":
-				robot.backward(100)
-				action_msg = "Moving backward at speed 100."
-			elif best_intent == "TURN_LEFT":
-				robot.left(100)
-				action_msg = "Turning left at speed 100."
-			elif best_intent == "TURN_RIGHT":
-				robot.right(100)
-				action_msg = "Turning right at speed 100."
-			elif best_intent == "STOP":
-				active_follow_color = None
-				camera_opencv.Camera.modeSelect = 'none'
-				camera_opencv.Camera.followColor = 'none'
-				stop_robot()
-				action_msg = "Stopped all robot motion and openCV modes."
-			elif best_intent == "SIT":
-				robot.steadyMode()
-				action_msg = "Robot sitting down (stabilized steady mode)."
-			elif best_intent == "STAND":
-				robot.steadyMode()
-				action_msg = "Robot standing up (stabilized steady mode)."
-			elif best_intent == "FOLLOW_RED":
-				active_follow_color = "red"
-				camera_opencv.Camera.modeSelect = 'followColor'
-				camera_opencv.Camera.followColor = "red"
-				action_msg = "Started color tracking mode following the 'red' ball."
-			elif best_intent == "FOLLOW_GREEN":
-				active_follow_color = "green"
-				camera_opencv.Camera.modeSelect = 'followColor'
-				camera_opencv.Camera.followColor = "green"
-				action_msg = "Started color tracking mode following the 'green' ball."
-			elif best_intent == "FOLLOW_BLUE":
-				active_follow_color = "blue"
-				camera_opencv.Camera.modeSelect = 'followColor'
-				camera_opencv.Camera.followColor = "blue"
-				action_msg = "Started color tracking mode following the 'blue' ball."
-			else:
-				execution_success = False
-				action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
-		else:
-			execution_success = False
-			action_msg = "Command not understood (low match confidence)."
-			
-		log_action("BACKEND", "Chatbot Audio Command Executed", f"Text: '{transcribed_text}', Best Intent: {best_intent}, Score: {best_score:.4f}, Action: {action_msg}")
-		
-		return jsonify({
-			"success": True,
-			"message": "Audio file received and processed successfully",
-			"command": transcribed_text,
-			"intent": best_intent if best_score >= CONFIDENCE_THRESHOLD else None,
-			"score": best_score,
-			"threshold_passed": bool(best_score >= CONFIDENCE_THRESHOLD),
-			"action_taken": action_msg,
-			"execution_success": execution_success
-		})
-	except Exception as exc:
-		log_action("BACKEND", "Chatbot Audio Processing Error", str(exc))
-		return jsonify({"success": False, "error": str(exc)}), 500
+	res = process_chatbot_text(transcribed_text, request.remote_addr)
+	if not res.get("success", True):
+		return jsonify(res), 500
+	return jsonify(res)
 
 
 @app.route("/api/img/<path:filename>")

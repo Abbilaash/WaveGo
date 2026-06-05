@@ -676,6 +676,10 @@
             <button id="faceFollow" class="face-btn">Follow</button>
           </div>
           <div id="learnStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
+          <!-- Progress bar for rapid face capture -->
+          <div id="captureProgressContainer" style="display: none; width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; margin-top: 8px; margin-bottom: 8px;">
+            <div id="captureProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.1s linear;"></div>
+          </div>
           <div id="learnPreviews" class="learn-preview-container" style="display:none;"></div>
           <div id="learnSaveForm" class="learn-save-form" style="display:none;">
             <input type="text" id="learnName" class="learn-input" placeholder="Enter person name">
@@ -900,44 +904,48 @@
     learnNameInput.value = "";
     faceLearnBtn.disabled = true;
 
-    let anyFace = false;
+    const progressContainer = document.getElementById('captureProgressContainer');
+    const progressBar = document.getElementById('captureProgressBar');
+    progressContainer.style.display = "block";
+    progressBar.style.width = "0%";
 
-    for (let i = 0; i < 3; i++) {
-      learnStatus.textContent = `Taking picture ${i + 1} of 3...`;
+    let anyFace = false;
+    const totalFrames = 30;
+
+    for (let i = 0; i < totalFrames; i++) {
       try {
         const response = await fetch('/api/face/capture');
         if (!response.ok) throw new Error('Capture failed');
         const data = await response.json();
         
         if (data.success) {
-          const img = document.createElement('img');
-          img.src = `data:image/jpeg;base64,${data.image}`;
-          img.className = `learn-preview-pic ${data.has_face ? 'has-face' : 'no-face'}`;
-          learnPreviews.appendChild(img);
-          
           capturedImages.push(data.image);
           if (data.has_face) {
             anyFace = true;
+          }
+          
+          // Display preview image for sampled frames (1st, 15th, and 30th frames)
+          if (i === 0 || i === 14 || i === 29) {
+            const img = document.createElement('img');
+            img.src = `data:image/jpeg;base64,${data.image}`;
+            img.className = `learn-preview-pic ${data.has_face ? 'has-face' : 'no-face'}`;
+            learnPreviews.appendChild(img);
           }
         } else {
           throw new Error(data.error || 'Unknown error');
         }
       } catch (err) {
-        learnStatus.textContent = `Error at pic ${i + 1}: ${err.message}`;
-        faceLearnBtn.disabled = false;
-        return;
+        console.error("Frame capture error:", err);
       }
       
-      if (i < 2) {
-        let secondsLeft = 3;
-        while (secondsLeft > 0) {
-          learnStatus.textContent = `Waiting ${secondsLeft}s before next picture...`;
-          await sleep(1000);
-          secondsLeft--;
-        }
-      }
+      const percent = Math.round(((i + 1) / totalFrames) * 100);
+      progressBar.style.width = `${percent}%`;
+      learnStatus.textContent = `Capturing: ${percent}%`;
+      
+      await sleep(100);
     }
 
+    progressContainer.style.display = "none";
     faceLearnBtn.disabled = false;
 
     if (anyFace) {
@@ -1558,7 +1566,10 @@
         
         // Append Bot response
         let botResponse = "";
-        if (data.threshold_passed) {
+        if (data.prompt_for_param) {
+          botResponse = data.action_taken;
+          execIndicator.style.background = "#fbbf24";
+        } else if (data.threshold_passed) {
           botResponse = `Command: "${data.command}" matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
         } else {
           botResponse = `Transcribed command: "${data.command}" but confidence was too low (${scorePercent}%). Try speaking clearly or type: "move forward", "turn left", "turn right", or "stop".`;
@@ -1624,7 +1635,10 @@
       execIndicator.style.background = data.execution_success ? "#4ade80" : "#ef4444";
       
       let botResponse = "";
-      if (data.threshold_passed) {
+      if (data.prompt_for_param) {
+        botResponse = data.action_taken;
+        execIndicator.style.background = "#fbbf24";
+      } else if (data.threshold_passed) {
         botResponse = `Command matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
       } else {
         botResponse = `I understood your command with too low confidence (${scorePercent}%). No action was taken. Try saying: "move forward", "turn left", "turn right", or "stop".`;

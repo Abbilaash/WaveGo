@@ -8,3 +8,4 @@ testIntentDb.py
 MiniLM/
 whisper/*.json
 whisper/*.onnx
+whisper/*.npz
