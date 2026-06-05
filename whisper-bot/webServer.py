@@ -866,6 +866,7 @@ def api_object_submit():
 	os.makedirs(object_db_dir, exist_ok=True)
 	
 	new_embeddings = []
+	errors = []
 	
 	for i, (img_b64, box) in enumerate(zip(images, boxes)):
 		if not img_b64:
@@ -879,7 +880,9 @@ def api_object_submit():
 			nparr = np.frombuffer(img_bytes, np.uint8)
 			img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 			if img is None:
-				log_action("BACKEND", "Object Crop Error", f"Failed to decode image {i+1}")
+				err_msg = f"Failed to decode image {i+1}"
+				log_action("BACKEND", "Object Crop Error", err_msg)
+				errors.append(err_msg)
 				continue
 			
 			img_path = None
@@ -920,9 +923,13 @@ def api_object_submit():
 					new_embeddings.append(emb)
 					log_action("BACKEND", "Object Embedding Success", f"Generated embedding for image {i+1}")
 				except Exception as emb_err:
-					log_action("BACKEND", "Object Embedding Error", f"Failed to generate embedding for image {i+1}: {str(emb_err)}")
+					err_msg = f"Failed to generate embedding for image {i+1}: {str(emb_err)}"
+					log_action("BACKEND", "Object Embedding Error", err_msg)
+					errors.append(err_msg)
 		except Exception as e:
-			log_action("BACKEND", "Object Crop/Save Error", f"Failed to crop/save image {i+1}: {str(e)}")
+			err_msg = f"Failed to crop/save image {i+1}: {str(e)}"
+			log_action("BACKEND", "Object Crop/Save Error", err_msg)
+			errors.append(err_msg)
 			
 	# If we have successfully generated any embeddings, save to object_db/<object_name>.pkl
 	if new_embeddings:
@@ -962,6 +969,10 @@ def api_object_submit():
 					log_action("BACKEND", "Object Folder Deleted", f"Deleted folder for evicted object '{oldest_name}'")
 				except Exception as clean_err:
 					log_action("BACKEND", "Object Folder Delete Error", f"Failed to delete {oldest_name} directory: {str(clean_err)}")
+	else:
+		err_summary = ", ".join(errors) if errors else "No images or boxes were provided."
+		log_action("BACKEND", "Object PKL Save Error", f"No embeddings were generated: {err_summary}")
+		return jsonify({"success": False, "error": f"No embeddings were generated. Details: {err_summary}"}), 400
 					
 	return jsonify({"success": True, "message": "bounding success"})
 
