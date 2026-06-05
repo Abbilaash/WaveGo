@@ -46,6 +46,8 @@ class CVThread(threading.Thread):
         self.faces = None
         self.detected_objects = []
         self.object_templates = None
+        self.mobilenet_session = None
+        self.mobilenet_input_name = None
 
         self.mov_x = None
         self.mov_y = None
@@ -137,16 +139,16 @@ class CVThread(threading.Thread):
                 cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
                 for obj in self.detected_objects:
                     try:
-                        dst = obj["box"]
+                        x, y, w, h = obj["box"]
                         name = obj["name"]
-                        matches = obj["matches"]
+                        similarity = obj["similarity"]
                         
-                        # Draw green bounding box around the detected object using cv2.polylines
-                        cv2.polylines(imgInput, [np.int32(dst)], True, (74, 222, 128), 3, cv2.LINE_AA)
+                        # Draw green bounding box around the detected object
+                        cv2.rectangle(imgInput, (x, y), (x + w, y + h), (74, 222, 128), 2)
                         
                         # Put label near the top-left corner of the box
-                        top_left = dst[0][0]
-                        cv2.putText(imgInput, f"{name} ({matches} matches)", (int(top_left[0]), int(top_left[1]) - 10), CVThread.font, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
+                        label = f"{name} ({similarity*100:.1f}%)"
+                        cv2.putText(imgInput, label, (x, y - 10), CVThread.font, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
                     except Exception:
                         pass
             else:
@@ -461,38 +463,75 @@ class CVThread(threading.Thread):
     def load_object_templates(self):
         import glob
         import os
-        import cv2
+        import pickle
         
         self.object_templates = []
-        object_learning_root = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "ObjectLearning"))
-        if not os.path.exists(object_learning_root):
+        object_db_dir = os.path.join(thisPath, "object_db")
+        if not os.path.exists(object_db_dir):
             return
             
-        # Scan folders inside ObjectLearning
-        for entry in os.listdir(object_learning_root):
-            entry_path = os.path.join(object_learning_root, entry)
-            if os.path.isdir(entry_path) and entry != "__pycache__":
-                jpg_files = glob.glob(os.path.join(entry_path, "crop_*.jpg"))
-                for img_p in jpg_files:
-                    try:
-                        img = cv2.imread(img_p)
-                        if img is not None:
-                            orb = cv2.ORB_create(1000)
-                            kp, des = orb.detectAndCompute(img, None)
-                            if des is not None and len(des) > 10:
-                                self.object_templates.append({
-                                    "name": entry,
-                                    "kp": kp,
-                                    "des": des,
-                                    "shape": img.shape
-                                })
-                    except Exception as e:
-                        print(f"Error loading template {img_p}: {e}")
-        
-        # Also let's check for individual watch.pkl files or watch folders directly in ObjectLearning/
-        # Since the user requested: "the files generated are: storage.pkl, watch folder, watch.pkl."
-        # Scanning directories guarantees we find all folder-stored cropped template frames.
+        # Initialize ONNX session if needed
+        if not hasattr(self, 'mobilenet_session') or self.mobilenet_session is None:
+            try:
+                import onnxruntime as ort
+                model_path = os.path.normpath(os.path.join(thisPath, "mobilenetv3_embedding.onnx"))
+                if not os.path.exists(model_path):
+                    print(f"Error: mobilenetv3_embedding.onnx not found at {model_path}")
+                    return
+                self.mobilenet_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
+                self.mobilenet_input_name = self.mobilenet_session.get_inputs()[0].name
+            except Exception as e:
+                print(f"Error initializing ONNX runtime in CVThread: {e}")
+                return
 
+        pkl_files = glob.glob(os.path.join(object_db_dir, "*.pkl"))
+        for pkl_p in pkl_files:
+            try:
+                with open(pkl_p, "rb") as f:
+                    data = pickle.load(f)
+                    if "name" in data and "embeddings" in data:
+                        self.object_templates.append({
+                            "name": data["name"],
+                            "embeddings": data["embeddings"]
+                        })
+            except Exception as e:
+                print(f"Error loading template {pkl_p}: {e}")
+
+    def get_crop_embedding(self, crop):
+        if not hasattr(self, 'mobilenet_session') or self.mobilenet_session is None:
+            return None
+            
+        import cv2
+        import numpy as np
+
+        try:
+            # Resize to 224x224
+            resized = cv2.resize(crop, (224, 224))
+            # Convert BGR to RGB
+            rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+            # Normalize to [0, 1]
+            normalized = rgb.astype(np.float32) / 255.0
+            # ImageNet mean & std
+            mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+            std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+            normalized = (normalized - mean) / std
+            # HWC to CHW
+            chw = np.transpose(normalized, (2, 0, 1))
+            # Add batch dim NCHW
+            nchw = np.expand_dims(chw, axis=0)
+
+            # Inference
+            outputs = self.mobilenet_session.run(None, {self.mobilenet_input_name: nchw})
+            embedding = outputs[0][0]
+
+            # L2 Normalize
+            norm = np.linalg.norm(embedding)
+            if norm > 1e-10:
+                embedding = embedding / norm
+            return embedding
+        except Exception as e:
+            print(f"Error running inference in get_crop_embedding: {e}")
+            return None
 
     def objectDetectCV(self, frame_image):
         import cv2
@@ -503,51 +542,108 @@ class CVThread(threading.Thread):
             self.pause()
             return
             
+        # Ensure ONNX session is loaded
+        if not hasattr(self, 'mobilenet_session') or self.mobilenet_session is None:
+            self.load_object_templates()
+            if not hasattr(self, 'mobilenet_session') or self.mobilenet_session is None:
+                self.pause()
+                return
+
         try:
-            orb = cv2.ORB_create(1000)
-            kp2, des2 = orb.detectAndCompute(frame_image, None)
+            # Proposal generation via Canny and contours
+            gray = cv2.cvtColor(frame_image, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+            edged = cv2.Canny(blurred, 50, 150)
             
-            if des2 is not None and len(des2) > 10:
-                bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
-                
-                # Match against each loaded template
-                for template in self.object_templates:
-                    des1 = template["des"]
-                    kp1 = template["kp"]
-                    shape = template["shape"]
-                    name = template["name"]
+            # Dilate the edges to merge near contours
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+            dilated = cv2.dilate(edged, kernel, iterations=1)
+            
+            cnts = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            import imutils
+            cnts = imutils.grab_contours(cnts)
+            
+            # Sort contours by area in descending order and limit to top 10
+            cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:10]
+            
+            best_detections = []
+            
+            for c in cnts:
+                area = cv2.contourArea(c)
+                if area < 1500 or area > 200000:
+                    continue
                     
-                    if des1 is not None and len(des1) > 10:
-                        matches = bf.knnMatch(des1, des2, k=2)
+                (x, y, w, h) = cv2.boundingRect(c)
+                if w < 40 or h < 40:
+                    continue
+                    
+                # Crop and get embedding
+                crop = frame_image[y : y + h, x : x + w]
+                crop_emb = self.get_crop_embedding(crop)
+                if crop_emb is None:
+                    continue
+                    
+                best_match_name = None
+                best_match_sim = 0.0
+                
+                # Match against all templates
+                for template in self.object_templates:
+                    name = template["name"]
+                    tem_embs = template["embeddings"]
+                    
+                    for tem_emb in tem_embs:
+                        # Cosine similarity is dot product of normalized embeddings
+                        sim = float(np.dot(crop_emb, tem_emb))
+                        if sim > best_match_sim:
+                            best_match_sim = sim
+                            best_match_name = name
+                            
+                # Match threshold is 0.70
+                if best_match_sim >= 0.70:
+                    best_detections.append({
+                        "box": (x, y, w, h),
+                        "name": best_match_name,
+                        "similarity": best_match_sim
+                    })
+            
+            # Post-process detections: NMS based on IoU
+            if best_detections:
+                best_detections.sort(key=lambda x: x["similarity"], reverse=True)
+                keep_detections = []
+                
+                def get_iou(boxA, boxB):
+                    xA = max(boxA[0], boxB[0])
+                    yA = max(boxA[1], boxB[1])
+                    xB = min(boxA[0] + boxA[2], boxB[0] + boxB[2])
+                    yB = min(boxA[1] + boxA[3], boxB[1] + boxB[3])
+                    
+                    interArea = max(0, xB - xA) * max(0, yB - yA)
+                    boxAArea = boxA[2] * boxA[3]
+                    boxBArea = boxB[2] * boxB[3]
+                    
+                    iou = interArea / float(boxAArea + boxBArea - interArea)
+                    return iou
+                    
+                for det in best_detections:
+                    overlap = False
+                    for keep in keep_detections:
+                        if get_iou(det["box"], keep["box"]) > 0.3:
+                            overlap = True
+                            break
+                    if not overlap:
+                        keep_detections.append(det)
                         
-                        # Lowe's ratio test
-                        good_matches = []
-                        for m_n in matches:
-                            if len(m_n) == 2:
-                                m, n = m_n
-                                if m.distance < 0.75 * n.distance:
-                                    good_matches.append(m)
-                                    
-                        if len(good_matches) >= 12: # robust homography match threshold
-                            src_pts = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-                            dst_pts = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-                            
-                            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-                            
-                            if M is not None:
-                                h_temp, w_temp = shape[:2]
-                                pts = np.float32([[0, 0], [0, h_temp - 1], [w_temp - 1, h_temp - 1], [w_temp - 1, 0]]).reshape(-1, 1, 2)
-                                dst = cv2.perspectiveTransform(pts, M)
-                                
-                                self.detected_objects.append({
-                                    "name": name,
-                                    "box": dst,
-                                    "matches": len(good_matches)
-                                })
-                                # Trigger visual alert via lights
-                                robot.lightCtrl('green', 0)
+                self.detected_objects = keep_detections
+                
+                if self.detected_objects:
+                    robot.lightCtrl('green', 0)
+                else:
+                    robot.lightCtrl('blue', 0)
+            else:
+                robot.lightCtrl('blue', 0)
+                
         except Exception as err:
-            pass
+            print(f"Error in objectDetectCV: {err}")
             
         self.pause()
 
