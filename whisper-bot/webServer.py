@@ -856,7 +856,17 @@ def create_tracker():
 			return cv2.TrackerKCF_create()
 	except Exception:
 		pass
-	raise RuntimeError("No suitable OpenCV tracker found (CSRT/KCF).")
+	try:
+		if hasattr(cv2, 'TrackerMIL_create'):
+			return cv2.TrackerMIL_create()
+	except Exception:
+		pass
+	try:
+		if hasattr(cv2, 'legacy') and hasattr(cv2.legacy, 'TrackerMIL_create'):
+			return cv2.legacy.TrackerMIL_create()
+	except Exception:
+		pass
+	raise RuntimeError("No suitable OpenCV tracker found (CSRT/KCF/MIL).")
 
 
 @app.route("/api/object/submit", methods=["POST"])

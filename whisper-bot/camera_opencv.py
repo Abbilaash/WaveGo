@@ -137,7 +137,7 @@ class CVThread(threading.Thread):
                 cv2.putText(imgInput, f'{len(self.detected_objects)} Object(s) Detected', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
                 for obj in self.detected_objects:
                     try:
-                        x, y, w, h = obj["box"]
+                        x, y, w, h = [int(v) for v in obj["box"]]
                         name = obj["name"]
                         similarity = obj["similarity"]
                         
@@ -537,28 +537,38 @@ class CVThread(threading.Thread):
             # Generate proposals
             gray = cv2.cvtColor(frame_image, cv2.COLOR_BGR2GRAY)
             blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-            edged = cv2.Canny(blurred, 30, 150)
             
-            cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            # 1. Edge-based contours
+            edged = cv2.Canny(blurred, 30, 150)
+            cnts_edge = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             import imutils
-            cnts = imutils.grab_contours(cnts)
+            cnts_edge = imutils.grab_contours(cnts_edge)
             
             rects = []
-            for c in cnts:
+            for c in cnts_edge:
                 x, y, w, h = cv2.boundingRect(c)
-                if w > 30 and h > 30 and w < 600 and h < 440:
+                if w > 15 and h > 15 and w < 630 and h < 470:
                     rects.append([x, y, w, h])
             
+            # 2. Threshold-based contours
+            _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            cnts_thresh = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cnts_thresh = imutils.grab_contours(cnts_thresh)
+            for c in cnts_thresh:
+                x, y, w, h = cv2.boundingRect(c)
+                if w > 15 and h > 15 and w < 630 and h < 470:
+                    rects.append([x, y, w, h])
+            
+            # Group overlapping proposals
             rectsList = []
             for x, y, w, h in rects:
                 rectsList.append([x, y, w, h])
                 rectsList.append([x, y, w, h])
             
             grouped_rects, weights = cv2.groupRectangles(rectsList, groupThreshold=1, eps=0.25)
-            candidates = sorted(grouped_rects, key=lambda r: r[2]*r[3], reverse=True)[:8]
+            candidates = sorted(grouped_rects, key=lambda r: r[2]*r[3], reverse=True)[:12]
             
             img_h, img_w = frame_image.shape[:2]
-            
             best_matches = []
             
             for cx, cy, cw, ch in candidates:
@@ -588,18 +598,42 @@ class CVThread(threading.Thread):
                             best_sim = sim
                             best_name = name
                 
-                if best_sim > 0.72:
+                # Lower threshold slightly to 0.70 for improved recall in varying conditions
+                if best_sim > 0.70:
                     best_matches.append({
                         "box": [cx, cy, cw, ch],
                         "name": best_name,
                         "similarity": best_sim
                     })
             
+            # Simple Non-Maximum Suppression (NMS) to remove redundant boxes on the same object
+            final_matches = []
+            best_matches.sort(key=lambda x: x["similarity"], reverse=True)
+            for m in best_matches:
+                overlap = False
+                for f in final_matches:
+                    boxA = m["box"]
+                    boxB = f["box"]
+                    xA = max(boxA[0], boxB[0])
+                    yA = max(boxA[1], boxB[1])
+                    xB = min(boxA[0] + boxA[2], boxB[0] + boxB[2])
+                    yB = min(boxA[1] + boxA[3], boxB[1] + boxB[3])
+                    interArea = max(0, xB - xA) * max(0, yB - yA)
+                    boxAArea = boxA[2] * boxA[3]
+                    boxBArea = boxB[2] * boxB[3]
+                    iou = interArea / float(boxAArea + boxBArea - interArea + 1e-10)
+                    if iou > 0.35:
+                        overlap = True
+                        break
+                if not overlap:
+                    final_matches.append(m)
+            
             # Draw results and trigger alert if there's any match
-            if best_matches:
+            if final_matches:
                 robot.lightCtrl('green', 0)
-                # Save to self.detected_objects for elementDraw
-                self.detected_objects = best_matches
+                self.detected_objects = final_matches
+                for fm in final_matches:
+                    print(f"[OBJECT DETECTION] Matched '{fm['name']}' with similarity {fm['similarity']:.4f}")
             else:
                 robot.lightCtrl('blue', 0)
                 self.detected_objects = []
@@ -893,8 +927,8 @@ class Camera(BaseCamera):
                     cvt.resume()
                 try:
                     img = cvt.elementDraw(img)
-                except:
-                    pass
+                except Exception as draw_err:
+                    print("Error drawing elements on frame:", draw_err)
 
             # encode as a jpeg image and return it
             try:
