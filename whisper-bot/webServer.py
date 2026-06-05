@@ -791,20 +791,24 @@ def api_object_capture():
 	})
 
 
-mobilenet_model = None
+# Shared ONNX session for MobileNetV3 embedding (loaded lazily on first submit)
+_mobilenet_ort_session = None
+_mobilenet_input_name = None
+_mobilenet_lock = threading.Lock()
+
 
 def get_mobilenet_model():
-	global mobilenet_model
-	if mobilenet_model is None:
-		from tensorflow.keras.applications import MobileNetV3Small
-		import os
-		os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-		mobilenet_model = MobileNetV3Small(
-			weights="imagenet",
-			include_top=False,
-			pooling="avg"
-		)
-	return mobilenet_model
+	"""Return the onnxruntime InferenceSession for mobilenetv3_embedding.onnx."""
+	global _mobilenet_ort_session, _mobilenet_input_name
+	with _mobilenet_lock:
+		if _mobilenet_ort_session is None:
+			model_path = os.path.join(THIS_DIR, "mobilenetv3_embedding.onnx")
+			_mobilenet_ort_session = onnxruntime.InferenceSession(
+				model_path,
+				providers=["CPUExecutionProvider"]
+			)
+			_mobilenet_input_name = _mobilenet_ort_session.get_inputs()[0].name
+		return _mobilenet_ort_session, _mobilenet_input_name
 
 
 @app.route("/api/object/submit", methods=["POST"])
@@ -812,34 +816,55 @@ def api_object_submit():
 	data = request.json
 	if not data or "images" not in data or "boxes" not in data:
 		return jsonify({"success": False, "error": "Missing images or boxes"}), 400
-	
+
 	images = data["images"]
 	boxes = data["boxes"]
 	object_name = data.get("name", "unnamed_object").strip().replace(" ", "_")
-	
-	# Sanitize the object name to prevent directory traversal or invalid characters
+
+	# Sanitize
 	object_name = "".join(c for c in object_name if c.isalnum() or c in ("-", "_"))
 	if not object_name:
 		object_name = "unnamed_object"
-	
+
 	if not isinstance(images, list) or not isinstance(boxes, list) or len(images) != 3 or len(boxes) != 3:
 		return jsonify({"success": False, "error": "Invalid images or boxes length"}), 400
-	
+
 	import base64
 	import cv2
 	import numpy as np
 	import pickle
-	import time
-	
+
+	# Ensure output directory exists
 	object_learning_dir = os.path.join(THIS_DIR, "ObjectLearning", object_name)
 	os.makedirs(object_learning_dir, exist_ok=True)
-	
-	# Decode, crop and generate ORB features for each image
-	new_descriptors = []
-	new_shapes = []
-	last_img_loaded = None
-	last_des = None
-	
+
+	# Load ONNX model once
+	try:
+		ort_session, ort_input_name = get_mobilenet_model()
+	except Exception as model_err:
+		log_action("BACKEND", "MobileNet Load Error", str(model_err))
+		return jsonify({"success": False, "error": f"Failed to load embedding model: {str(model_err)}"}), 500
+
+	def compute_embedding(bgr_img):
+		"""Run MobileNetV3 ONNX on a BGR image and return a normalised 1-D vector."""
+		rgb = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+		rgb = cv2.resize(rgb, (224, 224))
+		tensor = rgb.astype(np.float32) / 255.0
+		mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+		std  = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+		tensor = (tensor - mean) / std
+		tensor = np.transpose(tensor, (2, 0, 1))   # HWC -> CHW
+		tensor = np.expand_dims(tensor, axis=0)    # NCHW
+		output = ort_session.run(None, {ort_input_name: tensor})[0]
+		vec = output.flatten().astype(np.float64)
+		norm = np.linalg.norm(vec)
+		if norm > 0:
+			vec = vec / norm
+		return vec
+
+	# Decode, crop, save image, and compute embedding for each of the 3 frames
+	new_embeddings = []
+
 	for i, (img_b64, box) in enumerate(zip(images, boxes)):
 		if not img_b64:
 			continue
@@ -847,149 +872,86 @@ def api_object_submit():
 			if "," in img_b64:
 				img_b64 = img_b64.split(",")[1]
 			img_bytes = base64.b64decode(img_b64)
-			
-			# Decode image with OpenCV
+
 			nparr = np.frombuffer(img_bytes, np.uint8)
 			img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 			if img is None:
 				log_action("BACKEND", "Object Crop Error", f"Failed to decode image {i+1}")
 				continue
-			
-			img_path = None
-			# Crop if a bounding box was drawn
+
+			# Crop if a bounding box was drawn, otherwise use the full frame
 			if box and isinstance(box, dict) and all(k in box for k in ("x", "y", "w", "h")):
-				x = int(box["x"])
-				y = int(box["y"])
-				w = int(box["w"])
-				h = int(box["h"])
-				
-				# Ensure coordinates are within image boundaries
 				img_h, img_w = img.shape[:2]
-				x = max(0, min(x, img_w - 1))
-				y = max(0, min(y, img_h - 1))
-				w = max(1, min(w, img_w - x))
-				h = max(1, min(h, img_h - y))
-				
-				# Crop
-				cropped_img = img[y : y + h, x : x + w]
-				
-				# Save cropped image to ObjectLearning/crop_<timestamp>_<index>.jpg
+				x = max(0, min(int(box["x"]), img_w - 1))
+				y = max(0, min(int(box["y"]), img_h - 1))
+				w = max(1, min(int(box["w"]), img_w - x))
+				h = max(1, min(int(box["h"]), img_h - y))
+				crop = img[y : y + h, x : x + w]
 				img_filename = f"crop_{int(time.time())}_{i+1}.jpg"
-				img_path = os.path.join(object_learning_dir, img_filename)
-				cv2.imwrite(img_path, cropped_img)
-				log_action("BACKEND", "Object Crop Saved", f"Saved cropped image {i+1}")
 			else:
-				# If no bounding box was drawn, save the full image inside ObjectLearning/
+				crop = img
 				img_filename = f"crop_full_{int(time.time())}_{i+1}.jpg"
-				img_path = os.path.join(object_learning_dir, img_filename)
-				cv2.imwrite(img_path, img)
-				log_action("BACKEND", "Object Full Saved", f"No box drawn. Saved full image {i+1}")
-				
-			# Generate ORB descriptors for the saved image
-			if img_path and os.path.exists(img_path):
-				try:
-					img_loaded = cv2.imread(img_path)
-					if img_loaded is not None:
-						orb = cv2.ORB_create(1000)
-						kp, des = orb.detectAndCompute(img_loaded, None)
-						
-						new_descriptors.append(des)
-						new_shapes.append(img_loaded.shape)
-						
-						last_img_loaded = img_loaded
-						last_des = des
-						log_action("BACKEND", "Object ORB Success", f"Generated ORB descriptors for image {i+1}: Keypoints: {len(kp)}")
-					else:
-						log_action("BACKEND", "Object ORB Error", f"Failed to load image {img_path} for ORB processing")
-				except Exception as orb_err:
-					log_action("BACKEND", "Object ORB Error", f"Failed to generate ORB for image {i+1}: {str(orb_err)}")
-		except Exception as e:
-			log_action("BACKEND", "Object Crop/Save Error", f"Failed to crop/save image {i+1}: {str(e)}")
-			
-	# If we have successfully generated any descriptors, append them to storage.pkl
-	if new_descriptors:
-		pkl_path = os.path.join(THIS_DIR, "ObjectLearning", "storage.pkl")
-		
-		# Load existing database
-		existing_objects = []
-		if os.path.exists(pkl_path):
+
+			# Save the cropped image for reference
+			img_path = os.path.join(object_learning_dir, img_filename)
+			cv2.imwrite(img_path, crop)
+			log_action("BACKEND", "Object Crop Saved", f"Saved crop {i+1} -> {img_filename}")
+
+			# Compute MobileNetV3 embedding
 			try:
-				with open(pkl_path, "rb") as f:
-					data = pickle.load(f)
-					if isinstance(data, list):
-						existing_objects = data
-					elif isinstance(data, dict):
-						existing_objects = [data]
-			except Exception as pkl_load_err:
-				log_action("BACKEND", "PKL Load Error", f"Failed to load storage.pkl: {str(pkl_load_err)}")
-				existing_objects = []
-				
-		# Remove any existing object with the same name to overwrite and update the queue order
-		existing_objects = [obj for obj in existing_objects if obj.get("name", "").lower() != object_name.lower()]
-		
-		# Add new object data
-		new_obj_entry = {
-			"name": object_name,
-			"descriptors": new_descriptors,
-			"shapes": new_shapes
-		}
-		existing_objects.append(new_obj_entry)
-		
-		# Enforce the maximum limit of 10 objects
-		if len(existing_objects) > 10:
-			# Evict the oldest object (the first one)
-			evicted_obj = existing_objects.pop(0)
-			evicted_name = evicted_obj.get("name", "unnamed_object")
-			log_action("BACKEND", "Object Queue Evicted", f"Evicted oldest object '{evicted_name}' from storage.pkl queue")
-			
-			# Also clean up the evicted folder on disk to keep everything perfectly in sync
+				emb = compute_embedding(crop)
+				new_embeddings.append(emb.tolist())
+				log_action("BACKEND", "Embedding Computed", f"Image {i+1}: vector dim={len(emb)}")
+			except Exception as emb_err:
+				log_action("BACKEND", "Embedding Error", f"Image {i+1}: {str(emb_err)}")
+
+		except Exception as e:
+			log_action("BACKEND", "Object Crop/Save Error", f"Image {i+1}: {str(e)}")
+
+	if not new_embeddings:
+		return jsonify({"success": False, "error": "No embeddings could be computed from the provided images"}), 400
+
+	# Persist embeddings to ObjectLearning/storage.pkl
+	pkl_path = os.path.join(THIS_DIR, "ObjectLearning", "storage.pkl")
+	existing_objects = []
+	if os.path.exists(pkl_path):
+		try:
+			with open(pkl_path, "rb") as f:
+				data = pickle.load(f)
+			existing_objects = data if isinstance(data, list) else [data]
+		except Exception as pkl_load_err:
+			log_action("BACKEND", "PKL Load Error", str(pkl_load_err))
+			existing_objects = []
+
+	# Overwrite any existing entry with the same name
+	existing_objects = [obj for obj in existing_objects if obj.get("name", "").lower() != object_name.lower()]
+
+	# Enforce 10-object cap — evict the oldest
+	if len(existing_objects) >= 10:
+		evicted = existing_objects.pop(0)
+		evicted_name = evicted.get("name", "")
+		log_action("BACKEND", "Object Queue Evicted", f"Evicted '{evicted_name}'")
+		if evicted_name:
+			import shutil
 			evicted_dir = os.path.join(THIS_DIR, "ObjectLearning", evicted_name)
 			if os.path.exists(evicted_dir):
-				import shutil
 				try:
 					shutil.rmtree(evicted_dir)
-					log_action("BACKEND", "Object Folder Deleted", f"Deleted folder for evicted object '{evicted_name}'")
-				except Exception as clean_err:
-					log_action("BACKEND", "Object Folder Delete Error", f"Failed to delete {evicted_name} directory: {str(clean_err)}")
-					
-			evicted_pkl = os.path.normpath(os.path.join(THIS_DIR, "ObjectLearning", f"{evicted_name}.pkl"))
-			if os.path.exists(evicted_pkl):
-				try:
-					os.remove(evicted_pkl)
-					log_action("BACKEND", "Object PKL Deleted", f"Deleted pkl file for evicted object '{evicted_name}'")
-				except Exception as del_err:
-					log_action("BACKEND", "Object PKL Delete Error", f"Failed to delete {evicted_name}.pkl file: {str(del_err)}")
-					
-		# Save updated database list to storage.pkl
-		try:
-			with open(pkl_path, "wb") as f:
-				pickle.dump(existing_objects if len(existing_objects) > 1 else existing_objects[0], f)
-			log_action("BACKEND", "PKL Save Success", f"Successfully saved object '{object_name}' with {len(new_descriptors)} descriptor arrays to storage.pkl")
-		except Exception as pkl_save_err:
-			log_action("BACKEND", "PKL Save Error", f"Failed to write storage.pkl: {str(pkl_save_err)}")
-			
-		# Also save individual pkl files as requested by the user: {object_name}.pkl
-		if last_img_loaded is not None:
-			individual_pkl_paths = [
-				os.path.normpath(os.path.join(object_learning_dir, f"{object_name}.pkl")),
-				os.path.normpath(os.path.join(THIS_DIR, "ObjectLearning", f"{object_name}.pkl"))
-			]
-			for pkl_p in individual_pkl_paths:
-				try:
-					with open(pkl_p, "wb") as f:
-						pickle.dump(
-							{
-								"name": object_name,
-								"descriptors": last_des,
-								"shape": last_img_loaded.shape
-							},
-							f
-						)
-					log_action("BACKEND", "Individual PKL Save Success", f"Successfully saved individual ORB pkl to {pkl_p}")
-				except Exception as ind_pkl_err:
-					log_action("BACKEND", "Individual PKL Save Error", f"Failed to save {pkl_p}: {str(ind_pkl_err)}")
-					
-	return jsonify({"success": True, "message": "bounding success"})
+				except Exception:
+					pass
+
+	existing_objects.append({"name": object_name, "embeddings": new_embeddings})
+
+	try:
+		os.makedirs(os.path.join(THIS_DIR, "ObjectLearning"), exist_ok=True)
+		with open(pkl_path, "wb") as f:
+			pickle.dump(existing_objects, f)
+		log_action("BACKEND", "PKL Save Success", f"Saved '{object_name}' with {len(new_embeddings)} embeddings to storage.pkl")
+	except Exception as pkl_save_err:
+		log_action("BACKEND", "PKL Save Error", str(pkl_save_err))
+		return jsonify({"success": False, "error": f"Failed to save storage.pkl: {str(pkl_save_err)}"}), 500
+
+	return jsonify({"success": True, "message": f"Learned '{object_name}' with {len(new_embeddings)} embeddings."})
 
 
 active_follow_color = None
