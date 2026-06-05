@@ -308,6 +308,10 @@ def get_chatbot_predict():
 pending_chatbot_actions = {}
 PENDING_TIMEOUT = 30.0
 
+# Timed movement calibrations (in seconds)
+STEP_DURATION = 0.25      # 1 step = 0.25 seconds
+DEGREE_DURATION = 0.0083   # 90 degrees = 0.75 seconds (1 degree = 0.0083 seconds)
+
 def parse_number(text: str) -> Optional[float]:
 	# Try to find standard digits/floats
 	matches = re.findall(r"[-+]?\d*\.\d+|\d+", text)
@@ -346,7 +350,96 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
 		
 	pending = pending_chatbot_actions.get(client_ip)
 	
-	# Classify current command text
+	CONFIDENCE_THRESHOLD = 0.4
+	
+	# Scenario A: We have a pending action waiting for a numeric parameter
+	if pending is not None:
+		# FIRST priority: Check if the user's input contains a valid number parameter.
+		# If a number is present, we process it directly and NEVER classify it (avoiding "2" matching STOP).
+		num_val = parse_number(command_text)
+		if num_val is not None and num_val > 0:
+			pending_intent = pending["intent"]
+			pending_chatbot_actions.pop(client_ip, None) # Clear pending state
+			
+			action_msg = ""
+			if pending_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+				duration = num_val * STEP_DURATION
+				action_msg = f"Moving {pending_intent.split('_')[1].lower()} for {num_val} steps ({duration:.2f}s)."
+				
+				def run_move():
+					try:
+						if pending_intent == "MOVE_FORWARD":
+							robot.forward(100)
+						else:
+							robot.backward(100)
+						time.sleep(duration)
+						robot.stopFB()
+					except Exception as e:
+						log_action("BACKEND", "Timed Move Thread Error", str(e))
+				threading.Thread(target=run_move, daemon=True).start()
+				
+			elif pending_intent in ("TURN_LEFT", "TURN_RIGHT"):
+				duration = num_val * DEGREE_DURATION
+				action_msg = f"Turning {pending_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
+				
+				def run_turn():
+					try:
+						if pending_intent == "TURN_LEFT":
+							robot.left(100)
+						else:
+							robot.right(100)
+						time.sleep(duration)
+						robot.stopLR()
+					except Exception as e:
+						log_action("BACKEND", "Timed Turn Thread Error", str(e))
+				threading.Thread(target=run_turn, daemon=True).start()
+				
+			log_action("BACKEND", "Chatbot Param Command Executed", f"Intent: {pending_intent}, Param: {num_val}, Action: {action_msg}")
+			return {
+				"success": True,
+				"command": command_text,
+				"intent": pending_intent,
+				"score": 1.0,
+				"action_taken": action_msg,
+				"execution_success": True,
+				"prompt_for_param": False,
+				"threshold_passed": True
+			}
+		
+		# SECOND priority: If no number is found, run classification to see if the user
+		# entered an entirely different command (e.g. STOP or FOLLOW_BLUE) to abort the prompt.
+		try:
+			best_intent, best_score = predict_fn(command_text)
+		except Exception as exc:
+			log_action("BACKEND", "Chatbot Classification Error", str(exc))
+			return {
+				"success": False,
+				"error": f"Failed to classify intent: {str(exc)}"
+			}
+			
+		if best_score >= CONFIDENCE_THRESHOLD and best_intent not in ("MOVE_FORWARD", "MOVE_BACKWARD", "TURN_LEFT", "TURN_RIGHT", pending["intent"]):
+			# User explicitly wants to do another command; clear pending state and fall through to Scenario B
+			pending_chatbot_actions.pop(client_ip, None)
+			pending = None
+		else:
+			# Prompt again for a valid number since no number or alternative command was recognized
+			prompt_msg = ""
+			if pending["intent"] in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+				prompt_msg = "Please specify the number of steps to walk as a number (e.g. 3 or 5)."
+			else:
+				prompt_msg = "Please specify the angle to turn in degrees as a number (e.g. 45 or 90)."
+			return {
+				"success": True,
+				"command": command_text,
+				"intent": pending["intent"],
+				"score": best_score,
+				"action_taken": prompt_msg,
+				"execution_success": False,
+				"prompt_for_param": True,
+				"threshold_passed": True
+			}
+
+	# Scenario B: No pending action, process standard command
 	try:
 		best_intent, best_score = predict_fn(command_text)
 	except Exception as exc:
@@ -355,87 +448,7 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
 			"success": False,
 			"error": f"Failed to classify intent: {str(exc)}"
 		}
-		
-	CONFIDENCE_THRESHOLD = 0.4
-	
-	# Scenario A: We have a pending action waiting for a numeric parameter
-	if pending is not None:
-		# If the user input is a high-confidence intent that is a different command (e.g. STOP, STAND, FOLLOW_RED etc.),
-		# we abort the pending prompt and execute the new command instead.
-		if best_score >= CONFIDENCE_THRESHOLD and best_intent not in ("MOVE_FORWARD", "MOVE_BACKWARD", "TURN_LEFT", "TURN_RIGHT", pending["intent"]):
-			# Clear pending and let normal flow handle the new command
-			pending_chatbot_actions.pop(client_ip, None)
-			pending = None
-		else:
-			# Try to parse the number parameter from the input
-			num_val = parse_number(command_text)
-			if num_val is not None and num_val > 0:
-				pending_intent = pending["intent"]
-				pending_chatbot_actions.pop(client_ip, None) # Clear pending state
-				
-				action_msg = ""
-				if pending_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
-					duration = num_val * 1.0
-					action_msg = f"Moving {pending_intent.split('_')[1].lower()} for {num_val} steps ({duration:.1f}s)."
-					
-					def run_move():
-						try:
-							if pending_intent == "MOVE_FORWARD":
-								robot.forward(100)
-							else:
-								robot.backward(100)
-							time.sleep(duration)
-							robot.stopFB()
-						except Exception as e:
-							log_action("BACKEND", "Timed Move Thread Error", str(e))
-					threading.Thread(target=run_move, daemon=True).start()
-					
-				elif pending_intent in ("TURN_LEFT", "TURN_RIGHT"):
-					duration = num_val * 0.0167
-					action_msg = f"Turning {pending_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
-					
-					def run_turn():
-						try:
-							if pending_intent == "TURN_LEFT":
-								robot.left(100)
-							else:
-								robot.right(100)
-							time.sleep(duration)
-							robot.stopLR()
-						except Exception as e:
-							log_action("BACKEND", "Timed Turn Thread Error", str(e))
-					threading.Thread(target=run_turn, daemon=True).start()
-					
-				log_action("BACKEND", "Chatbot Param Command Executed", f"Intent: {pending_intent}, Param: {num_val}, Action: {action_msg}")
-				return {
-					"success": True,
-					"command": command_text,
-					"intent": pending_intent,
-					"score": best_score,
-					"action_taken": action_msg,
-					"execution_success": True,
-					"prompt_for_param": False,
-					"threshold_passed": True
-				}
-			else:
-				# If we couldn't parse a valid number and the text is not another command, prompt again
-				prompt_msg = ""
-				if pending["intent"] in ("MOVE_FORWARD", "MOVE_BACKWARD"):
-					prompt_msg = "Please specify the number of steps to walk as a number (e.g. 3 or 5)."
-				else:
-					prompt_msg = "Please specify the angle to turn in degrees as a number (e.g. 45 or 90)."
-				return {
-					"success": True,
-					"command": command_text,
-					"intent": pending["intent"],
-					"score": best_score,
-					"action_taken": prompt_msg,
-					"execution_success": False,
-					"prompt_for_param": True,
-					"threshold_passed": True
-				}
-				
-	# Scenario B: No pending action, process standard command
+
 	action_msg = ""
 	execution_success = True
 	prompt_for_param = False
@@ -447,8 +460,8 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
 			if num_val is not None and num_val > 0:
 				# Execute immediately
 				if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
-					duration = num_val * 1.0
-					action_msg = f"Moving {best_intent.split('_')[1].lower()} for {num_val} steps ({duration:.1f}s)."
+					duration = num_val * STEP_DURATION
+					action_msg = f"Moving {best_intent.split('_')[1].lower()} for {num_val} steps ({duration:.2f}s)."
 					def run_move():
 						try:
 							if best_intent == "MOVE_FORWARD":
@@ -461,7 +474,7 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
 							log_action("BACKEND", "Timed Move Thread Error", str(e))
 					threading.Thread(target=run_move, daemon=True).start()
 				else:
-					duration = num_val * 0.0167
+					duration = num_val * DEGREE_DURATION
 					action_msg = f"Turning {best_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
 					def run_turn():
 						try:
