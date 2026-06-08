@@ -9,3 +9,4 @@ MiniLM/
 whisper/*.json
 whisper/*.onnx
 whisper/*.npz
+whisper/vosk-model-small-en-us-0.15
