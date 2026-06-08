@@ -27,6 +27,7 @@
           grid-template-columns: 1fr;
           gap: 16px;
         }
+
         .control-section {
           width: 100%;
         }
@@ -142,6 +143,7 @@
         justify-content: center;
         margin-top: 15px;
       }
+
       .learn-preview-pic {
         width: 80px;
         height: 80px;
@@ -151,12 +153,15 @@
         background: rgba(0, 0, 0, 0.3);
         transition: border-color 0.3s;
       }
+
       .learn-preview-pic.has-face {
         border-color: #4ade80;
       }
+
       .learn-preview-pic.no-face {
         border-color: #ef4444;
       }
+
       .learn-save-form {
         display: flex;
         flex-direction: column;
@@ -164,6 +169,7 @@
         margin-top: 15px;
         align-items: center;
       }
+
       .learn-input {
         padding: 6px 10px;
         border-radius: 6px;
@@ -174,6 +180,7 @@
         width: 180px;
         text-align: center;
       }
+
       .learn-save-btn {
         min-width: 88px;
         min-height: 28px;
@@ -187,6 +194,7 @@
         cursor: pointer;
         box-shadow: 0 1.5px 0 #15803d;
       }
+
       .learn-save-btn:active {
         transform: translateY(1px);
         box-shadow: none;
@@ -249,18 +257,21 @@
         color: #fff !important;
         box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
       }
+
       .color-btn.active-blue {
         background: linear-gradient(#60a5fa, #3b82f6) !important;
         border-color: #2563eb !important;
         color: #fff !important;
         box-shadow: 0 0 12px rgba(59, 130, 246, 0.4) !important;
       }
+
       .color-btn.active-red {
         background: linear-gradient(#f87171, #ef4444) !important;
         border-color: #dc2626 !important;
         color: #fff !important;
         box-shadow: 0 0 12px rgba(239, 68, 68, 0.4) !important;
       }
+
       .color-btn:disabled {
         opacity: 0.35;
         cursor: not-allowed;
@@ -371,6 +382,7 @@
         justify-content: space-between;
         align-items: center;
       }
+
       .modal-header h3 {
         margin: 0;
         font-size: 1.3rem;
@@ -378,6 +390,7 @@
         text-transform: uppercase;
         color: var(--accent);
       }
+
       .modal-close {
         font-size: 28px;
         font-weight: bold;
@@ -385,6 +398,7 @@
         color: var(--muted);
         transition: color 0.2s;
       }
+
       .modal-close:hover {
         color: #ef4444;
       }
@@ -397,12 +411,14 @@
         align-items: center;
         gap: 12px;
       }
+
       .modal-status-text {
         font-size: 1.1rem;
         font-weight: 600;
         color: var(--accent-2);
         letter-spacing: 0.05em;
       }
+
       .canvas-container {
         position: relative;
         width: 100%;
@@ -413,17 +429,20 @@
         border: 1.5px solid var(--border);
         background: #02070d;
       }
+
       #objectCanvas {
         display: block;
         width: 100%;
         height: 100%;
         cursor: crosshair;
       }
+
       .modal-instructions {
         font-size: 0.9rem;
         color: var(--muted);
         text-align: center;
       }
+
       .modal-notification {
         font-size: 0.95rem;
         padding: 6px 12px;
@@ -446,6 +465,7 @@
         gap: 12px;
         background: rgba(0, 0, 0, 0.2);
       }
+
       .modal-btn {
         min-width: 90px;
         padding: 8px 16px;
@@ -457,6 +477,7 @@
         user-select: none;
         transition: transform 0.1s, box-shadow 0.1s;
       }
+
       .modal-btn:active {
         transform: translateY(1.5px);
       }
@@ -466,6 +487,7 @@
         background: linear-gradient(#fbfbfb, #e8e8e8);
         color: #333;
       }
+
       .undo-btn:hover {
         background: linear-gradient(#ffffff, #f0f0f0);
       }
@@ -476,6 +498,7 @@
         color: var(--accent-2);
         box-shadow: 0 1.5px 0 rgba(125, 211, 252, 0.2);
       }
+
       .save-btn:hover {
         background: linear-gradient(rgba(125, 211, 252, 0.3), rgba(125, 211, 252, 0.1));
       }
@@ -486,6 +509,7 @@
         color: var(--accent);
         box-shadow: 0 1.5px 0 rgba(77, 227, 183, 0.2);
       }
+
       .next-btn:hover {
         background: linear-gradient(rgba(77, 227, 183, 0.3), rgba(77, 227, 183, 0.1));
       }
@@ -496,18 +520,32 @@
         color: #fff;
         box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
       }
+
       .submit-btn:hover {
         background: linear-gradient(#059669, #047857);
       }
 
       /* Animations */
       @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
       }
+
       @keyframes scaleUp {
-        from { transform: scale(0.9); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
+        from {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
       }
     </style>
 
@@ -537,25 +575,31 @@
               <div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div>
             </div>
           </div>
-          <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Network ready</span></div>
+          <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Network ready</span>
+          </div>
         </section>
 
         <!-- AI Chatbot System Section -->
         <section class="feed-section chatbot-section" aria-label="AI Chatbot Control">
-          <h3 class="section-title" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <h3 class="section-title"
+            style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
             <span>🤖 AI Command Assistant</span>
-            <div class="status-badge" style="margin-top: 0; padding: 4px 10px; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);">
-              <span class="status-dot" id="chatbotStatusDot" style="background: #9fb1ce; width: 8px; height: 8px; box-shadow: none;"></span>
+            <div class="status-badge"
+              style="margin-top: 0; padding: 4px 10px; font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);">
+              <span class="status-dot" id="chatbotStatusDot"
+                style="background: #9fb1ce; width: 8px; height: 8px; box-shadow: none;"></span>
               <span id="chatbotStatusText" style="color: var(--muted); font-family: monospace;">Model ready</span>
             </div>
           </h3>
-          
+
           <!-- Chat History -->
           <div class="chat-container" id="chatContainer">
             <div class="chat-message bot-msg">
               <div class="chat-bubble">
-                Hello! I am your AI Command Assistant. You can control the WAVEGO robot using natural language. Try saying things like:
-                <ul style="margin: 6px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.4;">
+                Hello! I am your AI Command Assistant. You can control the WAVEGO robot using natural language. Try
+                saying things like:
+                <ul
+                  style="margin: 6px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.4;">
                   <li>"please move forward"</li>
                   <li>"can you turn left"</li>
                   <li>"turn right immediately"</li>
@@ -565,59 +609,73 @@
               <div class="chat-time">System</div>
             </div>
           </div>
-          
+
           <!-- Input Form -->
           <div style="display: flex; flex-direction: column; gap: 8px;">
             <!-- Audio File Preview Chip (hidden by default) -->
-            <div id="audioPreviewContainer" style="display: none; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(125, 211, 252, 0.15); border: 1px solid rgba(125, 211, 252, 0.3); border-radius: 12px; font-size: 0.9rem; animation: fadeIn 0.2s ease;">
+            <div id="audioPreviewContainer"
+              style="display: none; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(125, 211, 252, 0.15); border: 1px solid rgba(125, 211, 252, 0.3); border-radius: 12px; font-size: 0.9rem; animation: fadeIn 0.2s ease;">
               <span style="font-size: 1.1rem;">🎙️</span>
               <span style="color: #fff; font-weight: bold; flex: 1;" id="audioFileName">voice_command.wav</span>
               <span id="audioFileDuration" style="color: var(--muted); font-size: 0.8rem;">(0.00s)</span>
-              <button id="audioClearBtn" style="background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 1.1rem; padding: 0 4px;">×</button>
+              <button id="audioClearBtn"
+                style="background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 1.1rem; padding: 0 4px;">×</button>
             </div>
-            
+
             <div class="chat-input-wrapper" style="display: flex; gap: 8px; align-items: center; width: 100%;">
-              <input type="text" id="chatInput" placeholder="Type a command for WAVEGO..." style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0, 0, 0, 0.4); color: #fff; font-size: 0.95rem; outline: none; transition: all 0.3s; min-width: 0;" />
-              
+              <input type="text" id="chatInput" placeholder="Type a command for WAVEGO..."
+                style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0, 0, 0, 0.4); color: #fff; font-size: 0.95rem; outline: none; transition: all 0.3s; min-width: 0;" />
+
               <!-- Voice mic button (Long press to record) -->
-              <button id="chatVoiceBtn" class="modal-btn submit-btn" style="min-width: 44px; max-width: 44px; width: 44px; height: 42px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(125, 211, 252, 0.22), rgba(125, 211, 252, 0.08)); border: 1px solid rgba(125, 211, 252, 0.35); box-shadow: 0 4px 12px rgba(125, 211, 252, 0.05); color: #fff; cursor: pointer; transition: all 0.3s; padding: 0;" title="Hold to record voice command">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                  <line x1="12" y1="19" x2="12" y2="23"/>
-                  <line x1="8" y1="23" x2="16" y2="23"/>
+              <button id="chatVoiceBtn" class="modal-btn submit-btn"
+                style="min-width: 44px; max-width: 44px; width: 44px; height: 42px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(125, 211, 252, 0.22), rgba(125, 211, 252, 0.08)); border: 1px solid rgba(125, 211, 252, 0.35); box-shadow: 0 4px 12px rgba(125, 211, 252, 0.05); color: #fff; cursor: pointer; transition: all 0.3s; padding: 0;"
+                title="Hold to record voice command">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
                 </svg>
               </button>
-              
+
               <!-- Send button -->
-              <button id="chatSendBtn" class="modal-btn submit-btn" style="min-width: 76px; height: 42px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; padding: 0 16px;">
+              <button id="chatSendBtn" class="modal-btn submit-btn"
+                style="min-width: 76px; height: 42px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; padding: 0 16px;">
                 <span>Send</span>
               </button>
             </div>
           </div>
-          
+
           <!-- Live status of command execution -->
-          <div class="execution-monitor" style="margin-top: 15px; padding: 14px; background: rgba(16, 28, 49, 0.6); border-radius: 12px; border: 1px solid rgba(125, 211, 252, 0.15); display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 0.82rem; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.08em; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+          <div class="execution-monitor"
+            style="margin-top: 15px; padding: 14px; background: rgba(16, 28, 49, 0.6); border-radius: 12px; border: 1px solid rgba(125, 211, 252, 0.15); display: flex; flex-direction: column; gap: 8px;">
+            <div
+              style="font-size: 0.82rem; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.08em; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
               <span>⚡ Live Command Monitor</span>
-              <span id="execIndicator" class="video-dot" style="background: #4ade80; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.15); display: none;"></span>
+              <span id="execIndicator" class="video-dot"
+                style="background: #4ade80; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.15); display: none;"></span>
             </div>
-            
-            <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 0.92rem; margin-top: 4px;">
+
+            <div
+              style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 0.92rem; margin-top: 4px;">
               <span style="color: var(--muted);">Raw Command:</span>
               <span id="monRawCommand" style="font-family: monospace; color: #fff;">-</span>
-              
+
               <span style="color: var(--muted);">Parsed Intent:</span>
               <span id="monIntent" style="font-family: monospace; color: var(--accent); font-weight: bold;">-</span>
-              
+
               <span style="color: var(--muted);">Confidence:</span>
               <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; max-width: 140px; min-width: 100px;">
-                  <div id="monConfidenceBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.4s ease;"></div>
+                <div
+                  style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; max-width: 140px; min-width: 100px;">
+                  <div id="monConfidenceBar"
+                    style="width: 0%; height: 100%; background: var(--accent); transition: width 0.4s ease;"></div>
                 </div>
-                <span id="monConfidenceVal" style="font-family: monospace; font-size: 0.85rem; color: var(--accent-2);">-</span>
+                <span id="monConfidenceVal"
+                  style="font-family: monospace; font-size: 0.85rem; color: var(--accent-2);">-</span>
               </div>
-              
+
               <span style="color: var(--muted);">Status:</span>
               <span id="monStatus" style="color: var(--muted); font-size: 0.9rem;">No command executed yet</span>
             </div>
@@ -675,10 +733,14 @@
             <button id="faceDetect" class="face-btn">Detect</button>
             <button id="faceFollow" class="face-btn">Follow</button>
           </div>
-          <div id="learnStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
+          <div id="learnStatus" class="status-line"
+            style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
           <!-- Progress bar for rapid face capture -->
-          <div id="captureProgressContainer" style="display: none; width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; margin-top: 8px; margin-bottom: 8px;">
-            <div id="captureProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.1s linear;"></div>
+          <div id="captureProgressContainer"
+            style="display: none; width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; margin-top: 8px; margin-bottom: 8px;">
+            <div id="captureProgressBar"
+              style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.1s linear;">
+            </div>
           </div>
           <div id="learnPreviews" class="learn-preview-container" style="display:none;"></div>
           <div id="learnSaveForm" class="learn-save-form" style="display:none;">
@@ -697,17 +759,23 @@
             <button id="objectLearn" class="face-btn">Learn</button>
             <button id="objectDetect" class="face-btn">Detect</button>
           </div>
-          <div id="objectStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
+          <div id="objectStatus" class="status-line"
+            style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
         </section>
 
         <section class="feed-section" id="followColorSection">
           <h3 class="section-title">Follow Color</h3>
           <div class="face-grid" style="display: flex; gap: 10px; justify-content: center;">
-            <button id="followColorGreen" class="face-btn color-btn" data-color="green" style="min-width: 80px; transition: all 0.3s ease;">Green</button>
-            <button id="followColorBlue" class="face-btn color-btn" data-color="blue" style="min-width: 80px; transition: all 0.3s ease;">Blue</button>
-            <button id="followColorRed" class="face-btn color-btn" data-color="red" style="min-width: 80px; transition: all 0.3s ease;">Red</button>
+            <button id="followColorGreen" class="face-btn color-btn" data-color="green"
+              style="min-width: 80px; transition: all 0.3s ease;">Green</button>
+            <button id="followColorBlue" class="face-btn color-btn" data-color="blue"
+              style="min-width: 80px; transition: all 0.3s ease;">Blue</button>
+            <button id="followColorRed" class="face-btn color-btn" data-color="red"
+              style="min-width: 80px; transition: all 0.3s ease;">Red</button>
           </div>
-          <div id="followColorStatus" class="status-line" style="text-align: center; margin-top: 8px; font-weight: bold; color: var(--accent-2);">No color followed yet</div>
+          <div id="followColorStatus" class="status-line"
+            style="text-align: center; margin-top: 8px; font-weight: bold; color: var(--accent-2);">No color followed
+            yet</div>
         </section>
     </div>
   </article>
@@ -729,7 +797,8 @@
       <div class="modal-instructions">
         Click and drag on the image above to draw a rectangular box around the object.
       </div>
-      <input type="text" id="objectNameInput" class="learn-input" placeholder="Enter object name" style="margin-top: 12px; width: 100%; max-width: 580px;">
+      <input type="text" id="objectNameInput" class="learn-input" placeholder="Enter object name"
+        style="margin-top: 12px; width: 100%; max-width: 580px;">
     </div>
     <div class="modal-footer">
       <button id="modalUndo" class="modal-btn undo-btn">Undo</button>
@@ -753,11 +822,15 @@
         Enable Voice Commands
       </p>
       <p style="margin: 0; color: var(--muted); font-size: 0.92rem; line-height: 1.6;">
-        WAVEGO Voice Control needs microphone access. You can then hold down the mic button to speak commands directly to the robot.
+        WAVEGO Voice Control needs microphone access. You can then hold down the mic button to speak commands directly
+        to the robot.
       </p>
-      <div id="micHelperText" style="display: none; font-size: 0.85rem; color: #fca5a5; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 12px; border-radius: 8px; width: 100%; text-align: left; line-height: 1.5;">
-        <strong>HTTP Security Notice:</strong> Browsers require a secure connection (HTTPS) or local setup to access the microphone. 
-        If you are on HTTP, please go to <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code>, add this robot IP address: <strong><span id="robotIpPlaceholder"></span></strong>, enable the flag, and restart Chrome.
+      <div id="micHelperText"
+        style="display: none; font-size: 0.85rem; color: #fca5a5; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 12px; border-radius: 8px; width: 100%; text-align: left; line-height: 1.5;">
+        <strong>HTTP Security Notice:</strong> Browsers require a secure connection (HTTPS) or local setup to access the
+        microphone.
+        If you are on HTTP, please go to <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code>, add this
+        robot IP address: <strong><span id="robotIpPlaceholder"></span></strong>, enable the flag, and restart Chrome.
       </div>
     </div>
     <div class="modal-footer" style="background: rgba(0,0,0,0.15);">
@@ -917,13 +990,13 @@
         const response = await fetch('/api/face/capture');
         if (!response.ok) throw new Error('Capture failed');
         const data = await response.json();
-        
+
         if (data.success) {
           capturedImages.push(data.image);
           if (data.has_face) {
             anyFace = true;
           }
-          
+
           // Display preview image for sampled frames (1st, 15th, and 30th frames)
           if (i === 0 || i === 14 || i === 29) {
             const img = document.createElement('img');
@@ -937,11 +1010,11 @@
       } catch (err) {
         console.error("Frame capture error:", err);
       }
-      
+
       const percent = Math.round(((i + 1) / totalFrames) * 100);
       progressBar.style.width = `${percent}%`;
       learnStatus.textContent = `Capturing: ${percent}%`;
-      
+
       await sleep(100);
     }
 
@@ -974,7 +1047,7 @@
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Save failed');
-      
+
       learnStatus.textContent = `Successfully saved face for ${name}!`;
       setTimeout(() => {
         learnPreviews.style.display = "none";
@@ -994,7 +1067,7 @@
       const response = await fetch(`/api/face/detect/${action}`, { method: 'POST' });
       if (!response.ok) throw new Error('Detect toggle failed');
       const data = await response.json();
-      
+
       if (data.success) {
         isDetecting = !isDetecting;
         if (isDetecting) {
@@ -1028,7 +1101,7 @@
         const response = await fetch('/api/face/follow/stop', { method: 'POST' });
         if (!response.ok) throw new Error('Stop follow failed');
         const data = await response.json();
-        
+
         if (data.success) {
           isFollowing = false;
           faceFollowBtn.textContent = "Follow";
@@ -1070,17 +1143,17 @@
       });
       if (!response.ok) throw new Error('Start follow failed');
       const data = await response.json();
-      
+
       if (data.success) {
         isFollowing = true;
         followSaveForm.style.display = "none";
-        
+
         // Update Follow button to Stop Following red button
         faceFollowBtn.textContent = "Stop Following";
         faceFollowBtn.style.border = "1px solid #ef4444";
         faceFollowBtn.style.background = "linear-gradient(#fca5a5, #f87171)";
         faceFollowBtn.style.color = "#fff";
-        
+
         // Show following message
         learnStatus.textContent = `Following ${name}...`;
         learnStatus.style.color = "#4ade80";
@@ -1164,9 +1237,9 @@
   function loadCurrentImage() {
     if (currentObjIndex < 0 || currentObjIndex >= capturedObjImages.length) return;
     modalStatusText.textContent = `Image ${currentObjIndex + 1} of 3`;
-    
+
     currentObjImageElement = new Image();
-    currentObjImageElement.onload = function() {
+    currentObjImageElement.onload = function () {
       drawCurrentBox();
     };
     currentObjImageElement.src = "data:image/jpeg;base64," + capturedObjImages[currentObjIndex];
@@ -1332,7 +1405,7 @@
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Submit failed');
-      
+
       closeObjectModal();
     } catch (err) {
       showModalNotification(`Submission error: ${err.message}`, true);
@@ -1351,19 +1424,19 @@
       for (let i = 0; i < bufferSize; i++) {
         data[i] = Math.random() * 2 - 1;
       }
-      
+
       const noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
-      
+
       const filter = audioCtx.createBiquadFilter();
       filter.type = 'bandpass';
       filter.frequency.value = 1200;
       filter.Q.value = 3;
-      
+
       const gainNode = audioCtx.createGain();
       gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-      
+
       noise.connect(filter);
       filter.connect(gainNode);
       gainNode.connect(audioCtx.destination);
@@ -1392,10 +1465,10 @@
         }
 
         objectStatus.textContent = `Taking picture ${i + 1} of 3...`;
-        
+
         // Synthesize camera click audio
         playClickSound();
-        
+
         // Shutter visual flash animation on the camera feed
         const liveFeed = document.querySelector('.video-feed');
         if (liveFeed) {
@@ -1440,7 +1513,7 @@
         const response = await fetch(`/api/object/detect/${action}`, { method: 'POST' });
         if (!response.ok) throw new Error('Object detect toggle failed');
         const data = await response.json();
-        
+
         if (data.success) {
           isDetectingObjects = !isDetectingObjects;
           if (isDetectingObjects) {
@@ -1475,19 +1548,19 @@
   const chatContainer = document.getElementById('chatContainer');
   const chatbotStatusDot = document.getElementById('chatbotStatusDot');
   const chatbotStatusText = document.getElementById('chatbotStatusText');
-  
+
   const audioPreviewContainer = document.getElementById('audioPreviewContainer');
   const audioFileName = document.getElementById('audioFileName');
   const audioFileDuration = document.getElementById('audioFileDuration');
   const audioClearBtn = document.getElementById('audioClearBtn');
-  
+
   const execIndicator = document.getElementById('execIndicator');
   const monRawCommand = document.getElementById('monRawCommand');
   const monIntent = document.getElementById('monIntent');
   const monConfidenceBar = document.getElementById('monConfidenceBar');
   const monConfidenceVal = document.getElementById('monConfidenceVal');
   const monStatus = document.getElementById('monStatus');
-  
+
   let mediaRecorder = null;
   let audioChunks = [];
   let recordedAudioBlob = null;
@@ -1497,38 +1570,38 @@
   function appendChatMessage(sender, text) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `chat-message ${sender === 'user' ? 'user-msg' : 'bot-msg'}`;
-    
+
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'chat-bubble';
     bubbleDiv.textContent = text;
-    
+
     const timeDiv = document.createElement('div');
     timeDiv.className = 'chat-time';
     const now = new Date();
     timeDiv.textContent = `${sender === 'user' ? 'You' : 'Robot'} • ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
-    
+
     msgDiv.appendChild(bubbleDiv);
     msgDiv.appendChild(timeDiv);
     chatContainer.appendChild(msgDiv);
-    
+
     // Auto-scroll to bottom
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
   async function handleSendChat() {
     const commandText = chatInput.value.trim();
-    
+
     // Check if we have a recorded voice command first
     if (recordedAudioBlob) {
       // 1. Append User message showing voice indicator
       appendChatMessage('user', "🎙️ [Voice Command]");
-      
+
       // 2. Update Status Indicators
       chatbotStatusDot.style.background = "#f59e0b"; // amber dot
       chatbotStatusDot.style.boxShadow = "0 0 0 6px rgba(245, 158, 11, 0.15)";
       chatbotStatusText.textContent = "Transcribing & analyzing audio...";
       chatbotStatusText.style.color = "#fbbf24";
-      
+
       monRawCommand.textContent = "🎙️ [Audio Stream File]";
       monIntent.textContent = "-";
       monConfidenceBar.style.width = "0%";
@@ -1536,24 +1609,24 @@
       monStatus.textContent = "Uploading audio payload to server...";
       execIndicator.style.display = "inline-block";
       execIndicator.style.background = "#fbbf24";
-      
+
       const formData = new FormData();
       formData.append('audio', recordedAudioBlob, 'voice_command.wav');
-      
+
       // Clear voice preview
       clearRecordedAudio();
-      
+
       try {
         const response = await fetch('/api/chatbot/audio', {
           method: 'POST',
           body: formData
         });
-        
+
         const data = await response.json();
         if (!response.ok || !data.success) {
           throw new Error(data.error || "Server failed to transcribe audio.");
         }
-        
+
         // Success: Update Live Monitor
         const scorePercent = Math.round(data.score * 100);
         monRawCommand.textContent = `"${data.command}"`;
@@ -1563,7 +1636,7 @@
         monConfidenceVal.textContent = `${data.score.toFixed(4)} (${scorePercent}%)`;
         monStatus.textContent = data.action_taken;
         execIndicator.style.background = data.execution_success ? "#4ade80" : "#ef4444";
-        
+
         // Append Bot response
         let botResponse = "";
         if (data.prompt_for_param) {
@@ -1575,7 +1648,7 @@
           botResponse = `Transcribed command: "${data.command}" but confidence was too low (${scorePercent}%). Try speaking clearly or type: "move forward", "turn left", "turn right", or "stop".`;
         }
         appendChatMessage('bot', botResponse);
-        
+
       } catch (err) {
         console.error(err);
         monIntent.textContent = "ERROR";
@@ -1594,18 +1667,18 @@
       }
       return;
     }
-    
+
     // Fallback to text command
     if (!commandText) return;
-    
+
     chatInput.value = "";
     appendChatMessage('user', commandText);
-    
+
     chatbotStatusDot.style.background = "#f59e0b";
     chatbotStatusDot.style.boxShadow = "0 0 0 6px rgba(245, 158, 11, 0.15)";
     chatbotStatusText.textContent = "Analyzing command...";
     chatbotStatusText.style.color = "#fbbf24";
-    
+
     monRawCommand.textContent = `"${commandText}"`;
     monIntent.textContent = "-";
     monConfidenceBar.style.width = "0%";
@@ -1613,19 +1686,19 @@
     monStatus.textContent = "Processing NLP request on server...";
     execIndicator.style.display = "inline-block";
     execIndicator.style.background = "#fbbf24";
-    
+
     try {
       const response = await fetch('/api/chatbot/command', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ command: commandText })
       });
-      
+
       const data = await response.json();
       if (!response.ok || !data.success) {
         throw new Error(data.error || "Server error processing command.");
       }
-      
+
       const scorePercent = Math.round(data.score * 100);
       monIntent.textContent = data.intent || "UNKNOWN / UNDER THRESHOLD";
       monConfidenceBar.style.width = `${Math.max(0, Math.min(100, scorePercent))}%`;
@@ -1633,7 +1706,7 @@
       monConfidenceVal.textContent = `${data.score.toFixed(4)} (${scorePercent}%)`;
       monStatus.textContent = data.action_taken;
       execIndicator.style.background = data.execution_success ? "#4ade80" : "#ef4444";
-      
+
       let botResponse = "";
       if (data.prompt_for_param) {
         botResponse = data.action_taken;
@@ -1644,7 +1717,7 @@
         botResponse = `I understood your command with too low confidence (${scorePercent}%). No action was taken. Try saying: "move forward", "turn left", "turn right", or "stop".`;
       }
       appendChatMessage('bot', botResponse);
-      
+
     } catch (err) {
       console.error(err);
       monIntent.textContent = "ERROR";
@@ -1680,7 +1753,7 @@
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           stream.getTracks().forEach(track => track.stop());
-        } catch (e) {}
+        } catch (e) { }
       }
       return;
     }
@@ -1688,7 +1761,7 @@
     // Display the custom UI permission modal
     micPermissionModal.style.display = 'flex';
     micHelperText.style.display = 'none';
-    
+
     // Automatically detect and present the current host IP to the user for the flags configuration
     if (robotIpPlaceholder) {
       robotIpPlaceholder.textContent = `${window.location.protocol}//${window.location.host}`;
@@ -1707,7 +1780,7 @@
       // Trigger the browser's native microphone permission prompt popup
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach(track => track.stop());
-      
+
       // Save permission state to local storage to prevent prompting on every page refresh
       localStorage.setItem('mic_permission_granted', 'true');
       micPermissionModal.style.display = 'none';
@@ -1724,7 +1797,7 @@
   }
   micPermissionCancel.addEventListener('click', closeMicModal);
   micPermissionClose.addEventListener('click', closeMicModal);
-  
+
   // Proactively check and ask permission on page load
   requestMicrophonePermission();
 
@@ -1788,43 +1861,43 @@
     leftChannel = [];
     recordingLength = 0;
     recordedAudioBlob = null;
-    
+
     try {
       micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       // Initialize AudioContext
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       audioContext = new AudioContext();
       const sampleRate = audioContext.sampleRate;
-      
+
       mediaStreamSource = audioContext.createMediaStreamSource(micStream);
-      
+
       // Create ScriptProcessorNode (bufferSize 4096, 1 input channel, 1 output channel)
       scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
-      
+
       scriptProcessor.onaudioprocess = (e) => {
         if (!isRecording) return;
         const inputData = e.inputBuffer.getChannelData(0);
         leftChannel.push(new Float32Array(inputData));
         recordingLength += inputData.length;
       };
-      
+
       mediaStreamSource.connect(scriptProcessor);
       scriptProcessor.connect(audioContext.destination);
-      
+
       recordingStartTime = Date.now();
       isRecording = true;
-      
+
       // Update mic button style to show active recording state
       chatVoiceBtn.style.background = "linear-gradient(135deg, #ef4444, #dc2626)";
       chatVoiceBtn.style.borderColor = "#b91c1c";
       chatVoiceBtn.style.boxShadow = "0 0 16px rgba(239, 68, 68, 0.6)";
-      
+
       chatbotStatusDot.style.background = "#ef4444";
       chatbotStatusDot.style.boxShadow = "0 0 0 6px rgba(239, 68, 68, 0.2)";
       chatbotStatusText.textContent = "Recording voice command...";
       chatbotStatusText.style.color = "#fca5a5";
-      
+
     } catch (err) {
       console.error("Microphone access denied:", err);
       appendChatMessage('bot', "Could not access microphone. Please grant permission in your browser.");
@@ -1834,7 +1907,7 @@
   function stopRecording() {
     if (!isRecording) return;
     isRecording = false;
-    
+
     // Stop recording processes
     if (scriptProcessor) {
       scriptProcessor.disconnect();
@@ -1853,32 +1926,32 @@
           flattenedSamples.set(leftChannel[i], offset);
           offset += leftChannel[i].length;
         }
-        
+
         // Encode to pure WAV Blob
         recordedAudioBlob = encodeWAV(flattenedSamples, sampleRate);
         const durationSec = ((Date.now() - recordingStartTime) / 1000).toFixed(2);
-        
+
         // Show the preview chip
         audioFileName.textContent = "voice_command.wav";
         audioFileDuration.textContent = `(${durationSec}s)`;
         audioPreviewContainer.style.display = 'flex';
-        
+
         // Disable text input while audio is queued
         chatInput.placeholder = "Voice file queued. Click Send or clear [×].";
         chatInput.disabled = true;
         chatInput.value = "";
       });
     }
-    
+
     if (micStream) {
       micStream.getTracks().forEach(track => track.stop());
     }
-    
+
     // Reset mic button style
     chatVoiceBtn.style.background = "";
     chatVoiceBtn.style.borderColor = "";
     chatVoiceBtn.style.boxShadow = "";
-    
+
     chatbotStatusDot.style.background = "var(--accent)";
     chatbotStatusDot.style.boxShadow = "none";
     chatbotStatusText.textContent = "Model ready";
@@ -1912,11 +1985,11 @@
       startRecording();
     }
   });
-  
+
   window.addEventListener('mouseup', () => {
     if (isRecording) stopRecording();
   });
-  
+
   // Touch events for mobile compatibility
   chatVoiceBtn.addEventListener('touchstart', (e) => {
     e.preventDefault();
@@ -1926,7 +1999,7 @@
       startRecording();
     }
   });
-  
+
   chatVoiceBtn.addEventListener('touchend', (e) => {
     e.preventDefault();
     stopRecording();
@@ -1953,31 +2026,31 @@
   async function handleColorClick(e) {
     const btn = e.currentTarget;
     const color = btn.getAttribute('data-color');
-    
+
     // Toggle state logic
     const isDeactivating = (currentActiveColor === color);
     const colorToRequest = isDeactivating ? 'none' : color;
-    
+
     // Block buttons during request
     colorButtons.forEach(b => b.disabled = true);
     followColorStatus.textContent = isDeactivating ? `Stopping color follow...` : `Activating ${color} follow...`;
-    
+
     try {
       const response = await fetch(`/api/color/follow/${colorToRequest}`, {
         method: 'POST'
       });
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || "Failed to toggle color follow.");
       }
-      
+
       if (data.active_color === null || data.status === 'deactivated') {
         // Deactivated state
         currentActiveColor = null;
         followColorStatus.textContent = "No color followed yet";
         followColorStatus.style.color = "var(--accent-2)";
-        
+
         // Remove all active CSS classes and unlock all buttons
         colorButtons.forEach(b => {
           b.className = "face-btn color-btn";
@@ -1988,7 +2061,7 @@
         currentActiveColor = data.active_color;
         followColorStatus.textContent = `Following ${currentActiveColor} color!`;
         followColorStatus.style.color = "#4ade80"; // green text
-        
+
         // Style active button and keep others blocked
         colorButtons.forEach(b => {
           const btnColor = b.getAttribute('data-color');
@@ -2005,7 +2078,7 @@
       console.error(err);
       followColorStatus.textContent = `Error: ${err.message}`;
       followColorStatus.style.color = "#ef4444"; // red text
-      
+
       // Reset state to unlocked if it fails
       currentActiveColor = null;
       colorButtons.forEach(b => {

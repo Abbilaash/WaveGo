@@ -613,8 +613,8 @@ def api_chatbot_audio():
 		log_action("BACKEND", "Speech-to-Text Processing Error", str(exc))
 		return jsonify({"success": False, "error": f"Failed to transcribe audio: {str(exc)}"}), 500
 	finally:
-		'''if os.path.exists(temp_path):
-			os.remove(temp_path)'''
+		if os.path.exists(temp_path):
+			os.remove(temp_path)
 
 	if not transcribed_text:
 		return jsonify({"success": False, "error": "Speech was not recognized or transcription is empty. Please speak clearly."}), 400
