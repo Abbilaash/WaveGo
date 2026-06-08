@@ -586,6 +586,7 @@ def get_audio_transcriber():
 @app.route('/api/chatbot/audio', methods=['POST'])
 def api_chatbot_audio():
 	if 'audio' not in request.files:
+		print("No audio provided")
 		return jsonify({"success": False, "error": "No audio file provided"}), 400
 		
 	audio_file = request.files['audio']
