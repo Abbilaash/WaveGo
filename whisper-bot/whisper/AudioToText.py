@@ -1,7 +1,8 @@
 import os
 import wave
 import json
-import audioop
+import struct
+import numpy as np
 from vosk import Model, KaldiRecognizer
 
 VOSK_SAMPLE_RATE = 16000
@@ -15,53 +16,97 @@ class AudioToTextTranscriber:
         vosk_model_path = os.path.join(model_dir, "vosk-model-small-en-us-0.15")
         
         if not os.path.exists(vosk_model_path):
-            raise FileNotFoundError(f"Vosk model not found at: {vosk_model_path}. Please download and extract it there.")
+            raise FileNotFoundError(
+                f"Vosk model not found at: {vosk_model_path}. "
+                "Please download and extract it there."
+            )
             
         self.model = Model(vosk_model_path)
 
+    @staticmethod
+    def _read_wav_as_float(wf):
+        """Read all frames from a wave.Wave_read and return as float32 numpy array."""
+        n_frames = wf.getnframes()
+        sampwidth = wf.getsampwidth()
+        n_channels = wf.getnchannels()
+        raw = wf.readframes(n_frames)
+
+        if sampwidth == 1:
+            samples = np.frombuffer(raw, dtype=np.uint8).astype(np.float32) / 128.0 - 1.0
+        elif sampwidth == 2:
+            samples = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+        elif sampwidth == 4:
+            samples = np.frombuffer(raw, dtype=np.int32).astype(np.float32) / 2147483648.0
+        else:
+            raise ValueError(f"Unsupported sample width: {sampwidth}")
+
+        # Convert stereo (or multi-channel) to mono by averaging channels
+        if n_channels > 1:
+            samples = samples.reshape(-1, n_channels).mean(axis=1)
+
+        return samples
+
+    @staticmethod
+    def _resample(samples, orig_rate, target_rate):
+        """Resample a float32 numpy array from orig_rate to target_rate."""
+        if orig_rate == target_rate:
+            return samples
+        duration = len(samples) / orig_rate
+        target_len = int(round(duration * target_rate))
+        resampled = np.interp(
+            np.linspace(0, len(samples) - 1, target_len),
+            np.arange(len(samples)),
+            samples
+        )
+        return resampled.astype(np.float32)
+
+    @staticmethod
+    def _float_to_pcm16(samples):
+        """Convert float32 [-1, 1] samples to int16 PCM bytes."""
+        clipped = np.clip(samples, -1.0, 1.0)
+        pcm = (clipped * 32767).astype(np.int16)
+        return pcm.tobytes()
+
     def transcribe(self, wav_path):
         """
-        Transcribes a WAV file. Automatically resamples to 16kHz if needed.
-        The browser typically records at 44100 or 48000 Hz. Vosk only works at 16000 Hz.
+        Transcribes a WAV file. Automatically converts to mono 16kHz PCM
+        regardless of what the browser sent.
         """
-        full_text = []
         with wave.open(wav_path, 'rb') as wf:
+            orig_rate = wf.getframerate()
             n_channels = wf.getnchannels()
             sampwidth = wf.getsampwidth()
-            framerate = wf.getframerate()
-            
-            print(f"[AudioToText] WAV info: channels={n_channels}, sampwidth={sampwidth}, rate={framerate}")
+            print(
+                f"[AudioToText] WAV info: channels={n_channels}, "
+                f"sampwidth={sampwidth}, rate={orig_rate}"
+            )
+            samples = self._read_wav_as_float(wf)
 
-            rec = KaldiRecognizer(self.model, VOSK_SAMPLE_RATE)
-            rec.SetWords(True)
+        # Resample to 16kHz
+        samples = self._resample(samples, orig_rate, VOSK_SAMPLE_RATE)
 
-            resample_state = None
+        # Convert back to int16 PCM bytes for Vosk
+        pcm_bytes = self._float_to_pcm16(samples)
 
-            while True:
-                data = wf.readframes(4000)
-                if len(data) == 0:
-                    break
+        # Run Vosk recognizer on the full PCM buffer
+        rec = KaldiRecognizer(self.model, VOSK_SAMPLE_RATE)
+        rec.SetWords(True)
 
-                # Convert stereo to mono by averaging channels
-                if n_channels > 1:
-                    data = audioop.tomono(data, sampwidth, 0.5, 0.5)
+        full_text = []
+        chunk_size = 8000 * 2  # 8000 int16 samples = 0.5s chunks at 16kHz
 
-                # Resample to 16000 Hz if the browser sent a different rate
-                if framerate != VOSK_SAMPLE_RATE:
-                    data, resample_state = audioop.ratecv(
-                        data, sampwidth, 1, framerate, VOSK_SAMPLE_RATE, resample_state
-                    )
+        for i in range(0, len(pcm_bytes), chunk_size):
+            chunk = pcm_bytes[i : i + chunk_size]
+            if rec.AcceptWaveform(chunk):
+                res = json.loads(rec.Result())
+                text_part = res.get("text", "")
+                if text_part:
+                    full_text.append(text_part)
 
-                if rec.AcceptWaveform(data):
-                    res = json.loads(rec.Result())
-                    text_part = res.get("text", "")
-                    if text_part:
-                        full_text.append(text_part)
-
-            res = json.loads(rec.FinalResult())
-            text_part = res.get("text", "")
-            if text_part:
-                full_text.append(text_part)
+        res = json.loads(rec.FinalResult())
+        text_part = res.get("text", "")
+        if text_part:
+            full_text.append(text_part)
 
         result = " ".join(full_text).strip()
         print(f"[AudioToText] Transcribed: '{result}'")
