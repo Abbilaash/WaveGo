@@ -586,7 +586,6 @@ def get_audio_transcriber():
 @app.route('/api/chatbot/audio', methods=['POST'])
 def api_chatbot_audio():
 	if 'audio' not in request.files:
-		print("No audio provided")
 		return jsonify({"success": False, "error": "No audio file provided"}), 400
 		
 	audio_file = request.files['audio']
@@ -599,9 +598,11 @@ def api_chatbot_audio():
 		return jsonify({"success": False, "error": f"Failed to save uploaded audio file: {str(exc)}"}), 500
 
 	transcriber = get_audio_transcriber()
+	print(transcriber)
 	if transcriber is None:
 		if os.path.exists(temp_path):
 			os.remove(temp_path)
+		print("This is the issue")
 		return jsonify({
 			"success": False,
 			"error": "Local audio transcriber is not initialized. Please ensure the Vosk model (vosk-model-small-en-us-0.15) is downloaded and extracted in the 'whisper' folder."
