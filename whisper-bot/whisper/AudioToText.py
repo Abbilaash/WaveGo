@@ -20,31 +20,27 @@ class AudioToTextTranscriber:
         """
         Transcribes a WAV file.
         """
-        try:
-            with wave.open(wav_path, 'rb') as wf:
-                framerate = wf.getframerate()
-                
-                # Vosk expects 16-bit mono.
-                rec = KaldiRecognizer(self.model, framerate)
-                rec.SetWords(True)
-                
-                while True:
-                    data = wf.readframes(4000)
-                    if len(data) == 0:
-                        break
-                    rec.AcceptWaveform(data)
-                
-                result = json.loads(rec.FinalResult())
-                text = result.get("text", "")
-                print(text)
-                
-                return text.strip()
-        except Exception as e:
-            print(f"Error in transcription: {e}")
-            return ""
-        finally:
-            if os.path.exists(wav_path):
-                try:
-                    os.remove(wav_path)
-                except Exception as e:
-                    print(f"Failed to remove wav file {wav_path}: {e}")
+        full_text = []
+        with wave.open(wav_path, 'rb') as wf:
+            framerate = wf.getframerate()
+            
+            # Vosk expects 16-bit mono.
+            rec = KaldiRecognizer(self.model, framerate)
+            rec.SetWords(True)
+            
+            while True:
+                data = wf.readframes(4000)
+                if len(data) == 0:
+                    break
+                if rec.AcceptWaveform(data):
+                    res = json.loads(rec.Result())
+                    text_part = res.get("text", "")
+                    if text_part:
+                        full_text.append(text_part)
+            
+            res = json.loads(rec.FinalResult())
+            text_part = res.get("text", "")
+            if text_part:
+                full_text.append(text_part)
+            
+        return " ".join(full_text).strip()
