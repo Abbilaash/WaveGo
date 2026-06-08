@@ -76,14 +76,19 @@ class AudioToTextTranscriber:
             orig_rate = wf.getframerate()
             n_channels = wf.getnchannels()
             sampwidth = wf.getsampwidth()
+            n_frames = wf.getnframes()
             print(
                 f"[AudioToText] WAV info: channels={n_channels}, "
-                f"sampwidth={sampwidth}, rate={orig_rate}"
+                f"sampwidth={sampwidth}, rate={orig_rate}, frames={n_frames}, "
+                f"duration={n_frames/orig_rate:.2f}s"
             )
             samples = self._read_wav_as_float(wf)
 
+        print(f"[AudioToText] Samples read: {len(samples)}, min={samples.min():.4f}, max={samples.max():.4f}, rms={float(np.sqrt(np.mean(samples**2))):.4f}")
+
         # Resample to 16kHz
         samples = self._resample(samples, orig_rate, VOSK_SAMPLE_RATE)
+        print(f"[AudioToText] After resample: {len(samples)} samples at {VOSK_SAMPLE_RATE}Hz")
 
         # Convert back to int16 PCM bytes for Vosk
         pcm_bytes = self._float_to_pcm16(samples)
@@ -94,20 +99,26 @@ class AudioToTextTranscriber:
 
         full_text = []
         chunk_size = 8000 * 2  # 8000 int16 samples = 0.5s chunks at 16kHz
+        n_chunks = 0
+        n_accepted = 0
 
         for i in range(0, len(pcm_bytes), chunk_size):
             chunk = pcm_bytes[i : i + chunk_size]
+            n_chunks += 1
             if rec.AcceptWaveform(chunk):
+                n_accepted += 1
                 res = json.loads(rec.Result())
                 text_part = res.get("text", "")
+                print(f"[AudioToText] Mid-result: '{text_part}'")
                 if text_part:
                     full_text.append(text_part)
 
-        res = json.loads(rec.FinalResult())
-        text_part = res.get("text", "")
+        final_json = json.loads(rec.FinalResult())
+        text_part = final_json.get("text", "")
+        print(f"[AudioToText] Chunks={n_chunks}, accepted={n_accepted}, FinalResult='{text_part}'")
         if text_part:
             full_text.append(text_part)
 
         result = " ".join(full_text).strip()
-        print(f"[AudioToText] Transcribed: '{result}'")
+        print(f"[AudioToText] Final transcription: '{result}'")
         return result
