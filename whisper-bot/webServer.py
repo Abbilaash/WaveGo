@@ -573,11 +573,8 @@ def get_audio_transcriber():
 		return _audio_transcriber
 	try:
 		model_dir = os.path.join(THIS_DIR, "whisper")
-		has_encoder = os.path.exists(os.path.join(model_dir, "encoder_model.onnx")) or os.path.exists(os.path.join(model_dir, "encoder_model_quantized.onnx"))
-		has_decoder = os.path.exists(os.path.join(model_dir, "decoder_model.onnx")) or os.path.exists(os.path.join(model_dir, "decoder_model_quantized.onnx"))
-		has_tokenizer = os.path.exists(os.path.join(model_dir, "tokenizer.json"))
-		has_mel = os.path.exists(os.path.join(model_dir, "mel_filters.npz"))
-		if has_encoder and has_decoder and has_tokenizer and has_mel:
+		vosk_model_path = os.path.join(model_dir, "vosk-model-small-en-us-0.15")
+		if os.path.exists(vosk_model_path):
 			from whisper.AudioToText import AudioToTextTranscriber
 			_audio_transcriber = AudioToTextTranscriber(model_dir)
 			return _audio_transcriber
@@ -606,7 +603,7 @@ def api_chatbot_audio():
 			os.remove(temp_path)
 		return jsonify({
 			"success": False,
-			"error": "Local audio transcriber is not initialized. Please ensure the ONNX models (encoder_model.onnx and decoder_model.onnx) and configuration files are downloaded in the 'whisper' folder."
+			"error": "Local audio transcriber is not initialized. Please ensure the Vosk model (vosk-model-small-en-us-0.15) is downloaded and extracted in the 'whisper' folder."
 		}), 400
 
 	try:
