@@ -577,6 +577,7 @@ def get_audio_transcriber():
 		if os.path.exists(vosk_model_path):
 			from whisper.AudioToText import AudioToTextTranscriber
 			_audio_transcriber = AudioToTextTranscriber(model_dir)
+			print(_audio_transcriber)
 			return _audio_transcriber
 	except Exception as exc:
 		log_action("BACKEND", "Audio Transcriber Init Error", str(exc))
@@ -617,7 +618,6 @@ def api_chatbot_audio():
 			os.remove(temp_path)
 
 	if not transcribed_text:
-		print("This is the issue!")
 		return jsonify({"success": False, "error": "Speech was not recognized or transcription is empty. Please speak clearly."}), 400
 
 	res = process_chatbot_text(transcribed_text, request.remote_addr)
