@@ -1033,8 +1033,8 @@ def main() -> None:
 		host=FLASK_HOST,
 		port=FLASK_PORT,
 		threaded=True,
-		debug=True,
-		use_reloader=True,
+		debug=False,
+		use_reloader=False,
 	)
 
 

@@ -46,8 +46,14 @@ def recognize_faces(img_input):
                     else:
                         db_faces = []
                     for face_info in db_faces:
-                        known_names.append(face_info.get("name", "Unknown"))
-                        known_encodings.append(face_info.get("encoding"))
+                        name = face_info.get("name", "Unknown")
+                        if "encodings" in face_info:
+                            for enc in face_info["encodings"]:
+                                known_names.append(name)
+                                known_encodings.append(enc)
+                        elif "encoding" in face_info:
+                            known_names.append(name)
+                            known_encodings.append(face_info.get("encoding"))
             except Exception as e:
                 log_action("BACKEND", "Load PKL inside recognize_faces Failed", str(e))
         
@@ -64,7 +70,6 @@ def recognize_faces(img_input):
             
             # Print Hello <name> as requested
             if name != "Unknown":
-                print(f"Hello {name}")
                 log_action("BACKEND", f"Hello {name}", f"Recognized face at box ({left}, {top}, {right}, {bottom})")
             else:
                 log_action("BACKEND", "Unknown Face Detected", f"Box ({left}, {top}, {right}, {bottom})")
@@ -117,8 +122,6 @@ def save_face_data(name, images_bytes):
                     pass
         return False
         
-    avg_embedding = np.mean(embeddings, axis=0)
-    
     faces = []
     if os.path.exists(PKL_PATH):
         try:
@@ -152,9 +155,9 @@ def save_face_data(name, images_bytes):
                 except Exception as e:
                     log_action("BACKEND", "Image Deletion Error", f"Failed to delete {os.path.basename(img_file)}: {str(e)}")
                     
-    faces.append({"name": name, "encoding": avg_embedding})
+    faces.append({"name": name, "encodings": embeddings})
     
     with open(PKL_PATH, "wb") as f:
         pickle.dump(faces if len(faces) > 1 else faces[0], f)
-    log_action("BACKEND", "Save Face Data Success", f"Saved face for {name} with averaged embedding.")
+    log_action("BACKEND", "Save Face Data Success", f"Saved face for {name} with {len(embeddings)} embeddings.")
     return True
