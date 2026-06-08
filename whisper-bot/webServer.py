@@ -500,6 +500,30 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
 					action_msg = "What angle would you like to turn (in degrees)?"
 				execution_success = False
 				
+		elif best_intent == "DETECT_FACE":
+			camera_opencv.Camera.modeSelect = 'faceDetection'
+			camera_obj = get_camera()
+			detected_name = None
+			if camera_obj is not None:
+				# Capture frame and attempt face recognition immediately
+				frame_bytes = camera_obj.get_frame()
+				if frame_bytes:
+					import face_detection
+					faces = face_detection.recognize_faces(frame_bytes)
+					if faces:
+						known_faces = [f for f in faces if f.get("name", "Unknown") != "Unknown"]
+						if known_faces:
+							detected_name = known_faces[0]["name"]
+						else:
+							detected_name = faces[0]["name"]
+			
+			if detected_name and detected_name != "Unknown":
+				action_msg = f"Hello {detected_name}!"
+			elif detected_name == "Unknown":
+				action_msg = "Face detection started. I see someone, but I don't recognize them."
+			else:
+				action_msg = "Face detection started. I don't see any faces in front of me."
+
 		elif best_intent == "STOP":
 			global active_follow_color
 			active_follow_color = None
