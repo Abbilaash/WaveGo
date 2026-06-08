@@ -17,10 +17,8 @@ class AudioToTextTranscriber:
         self.model = Model(vosk_model_path)
 
     def transcribe(self, wav_path):
-        """
-        Transcribes a WAV file.
-        """
         full_text = []
+        print(f"Wave path: {wav_path}")
         with wave.open(wav_path, 'rb') as wf:
             framerate = wf.getframerate()
             

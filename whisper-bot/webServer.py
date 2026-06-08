@@ -577,7 +577,6 @@ def get_audio_transcriber():
 		if os.path.exists(vosk_model_path):
 			from whisper.AudioToText import AudioToTextTranscriber
 			_audio_transcriber = AudioToTextTranscriber(model_dir)
-			print(_audio_transcriber)
 			return _audio_transcriber
 	except Exception as exc:
 		log_action("BACKEND", "Audio Transcriber Init Error", str(exc))
