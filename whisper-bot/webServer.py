@@ -598,11 +598,9 @@ def api_chatbot_audio():
 		return jsonify({"success": False, "error": f"Failed to save uploaded audio file: {str(exc)}"}), 500
 
 	transcriber = get_audio_transcriber()
-	print(transcriber)
 	if transcriber is None:
 		if os.path.exists(temp_path):
 			os.remove(temp_path)
-		print("This is the issue")
 		return jsonify({
 			"success": False,
 			"error": "Local audio transcriber is not initialized. Please ensure the Vosk model (vosk-model-small-en-us-0.15) is downloaded and extracted in the 'whisper' folder."
@@ -619,6 +617,7 @@ def api_chatbot_audio():
 			os.remove(temp_path)
 
 	if not transcribed_text:
+		print("This is the issue!")
 		return jsonify({"success": False, "error": "Speech was not recognized or transcription is empty. Please speak clearly."}), 400
 
 	res = process_chatbot_text(transcribed_text, request.remote_addr)
