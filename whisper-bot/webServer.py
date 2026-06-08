@@ -590,11 +590,9 @@ def api_chatbot_audio():
 		
 	audio_file = request.files['audio']
 	temp_path = os.path.join(THIS_DIR, f"temp_voice_{int(time.time())}.wav")
-	temp_path1 = os.path.join(THIS_DIR, f"temp_voice_{int(time.time())}.wav")
 	
 	try:
 		audio_file.save(temp_path)
-		audio_file.save(temp_path1)
 	except Exception as exc:
 		log_action("BACKEND", "Audio Upload Save Error", str(exc))
 		return jsonify({"success": False, "error": f"Failed to save uploaded audio file: {str(exc)}"}), 500
@@ -615,8 +613,8 @@ def api_chatbot_audio():
 		log_action("BACKEND", "Speech-to-Text Processing Error", str(exc))
 		return jsonify({"success": False, "error": f"Failed to transcribe audio: {str(exc)}"}), 500
 	finally:
-		if os.path.exists(temp_path):
-			os.remove(temp_path)
+		'''if os.path.exists(temp_path):
+			os.remove(temp_path)'''
 
 	if not transcribed_text:
 		return jsonify({"success": False, "error": "Speech was not recognized or transcription is empty. Please speak clearly."}), 400
