@@ -1,7 +1,5 @@
 import cv2
-import numpy as np
 import io
-import cv2
 import requests
 
 
@@ -31,13 +29,5 @@ def detect(frame_rgb):
                 return None
     except Exception as e:
         print('detect() error:', e)
-        return None
-        resp = requests.post(DETECT_SERVER, files=files, timeout=30)
-        if resp.status_code != 200:
-            print(f"Detection server error: {resp.status_code} {resp.text}")
-            return None
-        return resp.json()
-    except Exception as e:
-        print(f"Error calling detection server: {e}")
         return None
     
