@@ -754,12 +754,11 @@
         </section>
 
         <section class="feed-section">
-          <h3 class="section-title">Object Detection</h3>
+          <h3 class="section-title">Object Search and Find</h3>
           <div class="face-grid">
-            <button id="objectLearn" class="face-btn">Learn</button>
-            <button id="objectDetect" class="face-btn">Detect</button>
+            <button id="ballSearch" class="face-btn">Ball</button>
           </div>
-          <div id="objectStatus" class="status-line"
+          <div id="ballSearchStatus" class="status-line"
             style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
         </section>
 
@@ -781,33 +780,7 @@
   </article>
 </section>
 
-<!-- Object Learning Modal -->
-<div id="objectModal" class="modal-overlay" style="display: none;">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Object Learning</h3>
-      <span class="modal-close" id="modalClose">&times;</span>
-    </div>
-    <div class="modal-body">
-      <div id="modalStatusText" class="modal-status-text">Image 1 of 3</div>
-      <div id="modalNotification" class="modal-notification" style="opacity: 0; margin-bottom: 8px;">Notification</div>
-      <div class="canvas-container">
-        <canvas id="objectCanvas" width="640" height="480"></canvas>
-      </div>
-      <div class="modal-instructions">
-        Click and drag on the image above to draw a rectangular box around the object.
-      </div>
-      <input type="text" id="objectNameInput" class="learn-input" placeholder="Enter object name"
-        style="margin-top: 12px; width: 100%; max-width: 580px;">
-    </div>
-    <div class="modal-footer">
-      <button id="modalUndo" class="modal-btn undo-btn">Undo</button>
-      <button id="modalSave" class="modal-btn save-btn">Save</button>
-      <button id="modalNext" class="modal-btn next-btn">Next</button>
-      <button id="modalSubmit" class="modal-btn submit-btn">Submit</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- Microphone Permission Request Modal -->
 <div id="micPermissionModal" class="modal-overlay" style="display: none;">
@@ -1165,376 +1138,58 @@
     }
   });
 
-  // Object Detection controls & Labeling Modal Implementation
-  const objectLearnBtn = document.getElementById('objectLearn');
-  const objectDetectBtn = document.getElementById('objectDetect');
-  const objectStatus = document.getElementById('objectStatus');
+  // Object Search and Find: Ball Search
+  const ballSearchBtn = document.getElementById('ballSearch');
+  const ballSearchStatus = document.getElementById('ballSearchStatus');
 
-  // Modal elements
-  const objectModal = document.getElementById('objectModal');
-  const modalClose = document.getElementById('modalClose');
-  const modalStatusText = document.getElementById('modalStatusText');
-  const modalNotification = document.getElementById('modalNotification');
-  const canvas = document.getElementById('objectCanvas');
-  const ctx = canvas.getContext('2d');
+  if (ballSearchBtn && ballSearchStatus) {
+    let isSearching = false;
 
-  const modalUndo = document.getElementById('modalUndo');
-  const modalSave = document.getElementById('modalSave');
-  const modalNext = document.getElementById('modalNext');
-  const modalSubmit = document.getElementById('modalSubmit');
-
-  // Object Learning state variables
-  let capturedObjImages = [];
-  let objBoundingBoxes = [null, null, null];
-  let currentObjIndex = 0;
-  let isDrawingObj = false;
-  let startObjX = 0;
-  let startObjY = 0;
-  let currentObjImageElement = null;
-  let notificationTimeout = null;
-
-  // Helper: display notifications inside modal
-  function showModalNotification(text, isError = false) {
-    if (notificationTimeout) clearTimeout(notificationTimeout);
-    modalNotification.textContent = text;
-    modalNotification.style.opacity = "1";
-    if (isError) {
-      modalNotification.style.background = "rgba(239, 68, 68, 0.15)";
-      modalNotification.style.color = "#fca5a5";
-      modalNotification.style.borderColor = "rgba(239, 68, 68, 0.3)";
-    } else {
-      modalNotification.style.background = "rgba(125, 211, 252, 0.15)";
-      modalNotification.style.color = "var(--accent-2)";
-      modalNotification.style.borderColor = "rgba(125, 211, 252, 0.3)";
-    }
-    notificationTimeout = setTimeout(() => {
-      modalNotification.style.opacity = "0";
-    }, 3000);
-  }
-
-  // Draw current image + rectangle box on canvas
-  function drawCurrentBox(tempBox = null) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (currentObjImageElement) {
-      ctx.drawImage(currentObjImageElement, 0, 0, canvas.width, canvas.height);
-    }
-    const box = tempBox || objBoundingBoxes[currentObjIndex];
-    if (box) {
-      ctx.strokeStyle = tempBox ? "#7dd3fc" : "#4ade80"; // blue when drawing, green when saved
-      ctx.lineWidth = 3;
-      ctx.strokeRect(box.x, box.y, box.w, box.h);
-
-      ctx.fillStyle = tempBox ? "rgba(125, 211, 252, 0.15)" : "rgba(74, 222, 128, 0.15)";
-      ctx.fillRect(box.x, box.y, box.w, box.h);
-
-      ctx.fillStyle = tempBox ? "#7dd3fc" : "#4ade80";
-      ctx.font = "bold 16px monospace";
-      ctx.fillText(tempBox ? "Drawing..." : "Object Box", box.x + 5, box.y + 20);
-    }
-  }
-
-  // Load the current image frame onto canvas
-  function loadCurrentImage() {
-    if (currentObjIndex < 0 || currentObjIndex >= capturedObjImages.length) return;
-    modalStatusText.textContent = `Image ${currentObjIndex + 1} of 3`;
-
-    currentObjImageElement = new Image();
-    currentObjImageElement.onload = function () {
-      drawCurrentBox();
-    };
-    currentObjImageElement.src = "data:image/jpeg;base64," + capturedObjImages[currentObjIndex];
-  }
-
-  // Canvas interaction logic (Mouse / Touch support)
-  function getCoords(e) {
-    const rect = canvas.getBoundingClientRect();
-    let clientX, clientY;
-    if (e.touches && e.touches.length > 0) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else if (e.changedTouches && e.changedTouches.length > 0) {
-      clientX = e.changedTouches[0].clientX;
-      clientY = e.changedTouches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    return {
-      x: Math.round((clientX - rect.left) * (canvas.width / rect.width)),
-      y: Math.round((clientY - rect.top) * (canvas.height / rect.height))
-    };
-  }
-
-  canvas.addEventListener('mousedown', (e) => {
-    if (!currentObjImageElement) return;
-    const coords = getCoords(e);
-    startObjX = coords.x;
-    startObjY = coords.y;
-    isDrawingObj = true;
-  });
-
-  canvas.addEventListener('mousemove', (e) => {
-    if (!isDrawingObj) return;
-    const coords = getCoords(e);
-    const w = coords.x - startObjX;
-    const h = coords.y - startObjY;
-    drawCurrentBox({ x: startObjX, y: startObjY, w: w, h: h });
-  });
-
-  canvas.addEventListener('mouseup', (e) => {
-    if (!isDrawingObj) return;
-    isDrawingObj = false;
-    const coords = getCoords(e);
-    let w = coords.x - startObjX;
-    let h = coords.y - startObjY;
-
-    if (Math.abs(w) < 5 || Math.abs(h) < 5) {
-      drawCurrentBox();
-      return;
-    }
-
-    const x = Math.min(startObjX, coords.x);
-    const y = Math.min(startObjY, coords.y);
-    w = Math.abs(w);
-    h = Math.abs(h);
-
-    objBoundingBoxes[currentObjIndex] = { x, y, w, h };
-    drawCurrentBox();
-  });
-
-  // Touch Support
-  canvas.addEventListener('touchstart', (e) => {
-    if (!currentObjImageElement) return;
-    e.preventDefault();
-    const coords = getCoords(e);
-    startObjX = coords.x;
-    startObjY = coords.y;
-    isDrawingObj = true;
-  }, { passive: false });
-
-  canvas.addEventListener('touchmove', (e) => {
-    if (!isDrawingObj) return;
-    e.preventDefault();
-    const coords = getCoords(e);
-    const w = coords.x - startObjX;
-    const h = coords.y - startObjY;
-    drawCurrentBox({ x: startObjX, y: startObjY, w: w, h: h });
-  }, { passive: false });
-
-  canvas.addEventListener('touchend', (e) => {
-    if (!isDrawingObj) return;
-    isDrawingObj = false;
-    const coords = getCoords(e);
-    let w = coords.x - startObjX;
-    let h = coords.y - startObjY;
-
-    if (Math.abs(w) < 5 || Math.abs(h) < 5) {
-      drawCurrentBox();
-      return;
-    }
-
-    const x = Math.min(startObjX, coords.x);
-    const y = Math.min(startObjY, coords.y);
-    w = Math.abs(w);
-    h = Math.abs(h);
-
-    objBoundingBoxes[currentObjIndex] = { x, y, w, h };
-    drawCurrentBox();
-  });
-
-  // Modal Action Listeners
-  function openObjectModal() {
-    objectModal.style.display = "flex";
-    currentObjIndex = 0;
-    loadCurrentImage();
-    showModalNotification("Draw a rectangular box on the object.");
-  }
-
-  function closeObjectModal() {
-    objectModal.style.display = "none";
-    currentObjImageElement = null;
-    capturedObjImages = [];
-    objBoundingBoxes = [null, null, null];
-    const nameInput = document.getElementById('objectNameInput');
-    if (nameInput) nameInput.value = "";
-  }
-
-  modalClose.addEventListener('click', closeObjectModal);
-  objectModal.addEventListener('click', (e) => {
-    if (e.target === objectModal) {
-      closeObjectModal();
-    }
-  });
-
-  modalUndo.addEventListener('click', () => {
-    objBoundingBoxes[currentObjIndex] = null;
-    drawCurrentBox();
-    showModalNotification("Removed rectangle drawing.");
-  });
-
-  modalSave.addEventListener('click', () => {
-    const box = objBoundingBoxes[currentObjIndex];
-    if (box) {
-      showModalNotification(`Saved box coordinates for Image ${currentObjIndex + 1}!`);
-    } else {
-      showModalNotification("No box drawn to save yet!", true);
-    }
-  });
-
-  modalNext.addEventListener('click', () => {
-    currentObjIndex = (currentObjIndex + 1) % 3;
-    loadCurrentImage();
-    showModalNotification(`Navigated to Image ${currentObjIndex + 1}`);
-  });
-
-  modalSubmit.addEventListener('click', async () => {
-    const nameInput = document.getElementById('objectNameInput');
-    const objectName = nameInput ? nameInput.value.trim() : "";
-    if (!objectName) {
-      showModalNotification("Please enter an object name first!", true);
-      return;
-    }
-
-    modalSubmit.disabled = true;
-    showModalNotification("Submitting bounding boxes...");
-    try {
-      const response = await fetch('/api/object/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ images: capturedObjImages, boxes: objBoundingBoxes, name: objectName })
-      });
-      const data = await response.json();
-      if (!response.ok || !data.success) throw new Error(data.error || 'Submit failed');
-
-      closeObjectModal();
-    } catch (err) {
-      showModalNotification(`Submission error: ${err.message}`, true);
-    } finally {
-      modalSubmit.disabled = false;
-    }
-  });
-
-  // Web Audio mechanical camera shutter click synthesizer
-  function playClickSound() {
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const bufferSize = audioCtx.sampleRate * 0.12; // ~120ms
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
+    ballSearchBtn.addEventListener('click', async () => {
+      if (isSearching) {
+        isSearching = false;
+        ballSearchBtn.textContent = 'Ball';
+        ballSearchBtn.style.background = '';
+        ballSearchBtn.style.borderColor = '';
+        ballSearchStatus.textContent = 'Ball search stopped';
+        ballSearchStatus.style.color = '#ef4444';
+        return;
       }
 
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
+      isSearching = true;
+      ballSearchBtn.disabled = true;
+      ballSearchBtn.textContent = 'Stop Search';
+      ballSearchBtn.style.background = 'linear-gradient(#fca5a5, #f87171)';
+      ballSearchBtn.style.borderColor = '#ef4444';
+      ballSearchStatus.style.color = 'var(--accent)';
+      ballSearchStatus.textContent = 'Searching for ball...';
 
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 1200;
-      filter.Q.value = 3;
-
-      const gainNode = audioCtx.createGain();
-      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-
-      noise.connect(filter);
-      filter.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      noise.start();
-    } catch (e) {
-      console.warn("Audio Context not supported or blocked: ", e);
-    }
-  }
-
-  // Object Learn trigger (takes 3 pictures one-by-one, each with a 1-second prepare gap)
-  if (objectLearnBtn && objectStatus) {
-    objectLearnBtn.addEventListener('click', async () => {
-      capturedObjImages = [];
-      objBoundingBoxes = [null, null, null];
-      objectLearnBtn.disabled = true;
-      objectStatus.style.color = "var(--accent)";
-      objectStatus.textContent = "Starting capture sequence...";
-
-      for (let i = 0; i < 3; i++) {
-        // Wait 1 second clicking/preparing gap BEFORE taking each picture
-        let secondsLeft = 1;
-        while (secondsLeft > 0) {
-          objectStatus.textContent = `Preparing picture ${i + 1} of 3 in ${secondsLeft}s...`;
-          await sleep(1000);
-          secondsLeft--;
-        }
-
-        objectStatus.textContent = `Taking picture ${i + 1} of 3...`;
-
-        // Synthesize camera click audio
-        playClickSound();
-
-        // Shutter visual flash animation on the camera feed
-        const liveFeed = document.querySelector('.video-feed');
-        if (liveFeed) {
-          liveFeed.style.transition = 'none';
-          liveFeed.style.opacity = '0.2';
-          setTimeout(() => {
-            liveFeed.style.transition = 'opacity 0.25s ease-out';
-            liveFeed.style.opacity = '1';
-          }, 60);
-        }
-
-        try {
-          const response = await fetch('/api/object/capture');
-          if (!response.ok) throw new Error('Capture failed');
-          const data = await response.json();
-
-          if (data.success) {
-            capturedObjImages.push(data.image);
-            objectStatus.textContent = `Captured picture ${i + 1} of 3!`;
-          } else {
-            throw new Error(data.error || 'Unknown error');
-          }
-        } catch (err) {
-          objectStatus.textContent = `Capture error: ${err.message}`;
-          objectStatus.style.color = "#ef4444";
-          objectLearnBtn.disabled = false;
-          return;
-        }
-      }
-
-      objectStatus.textContent = "Images captured! Opening popup window...";
-      await sleep(500);
-      objectLearnBtn.disabled = false;
-      objectStatus.textContent = "";
-      openObjectModal();
-    });
-
-    let isDetectingObjects = false;
-    objectDetectBtn.addEventListener('click', async () => {
-      const action = isDetectingObjects ? 'stop' : 'start';
       try {
-        const response = await fetch(`/api/object/detect/${action}`, { method: 'POST' });
-        if (!response.ok) throw new Error('Object detect toggle failed');
+        const response = await fetch('/api/search/ball', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'start' })
+        });
         const data = await response.json();
 
         if (data.success) {
-          isDetectingObjects = !isDetectingObjects;
-          if (isDetectingObjects) {
-            objectDetectBtn.textContent = "Stop Detect";
-            objectDetectBtn.style.border = "1px solid #ef4444";
-            objectDetectBtn.style.background = "linear-gradient(#fca5a5, #f87171)";
-            objectDetectBtn.style.color = "#fff";
-            objectStatus.textContent = "Object Detection active";
-            objectStatus.style.color = "#4ade80";
-          } else {
-            objectDetectBtn.textContent = "Detect";
-            objectDetectBtn.style.border = "1px solid #666";
-            objectDetectBtn.style.background = "linear-gradient(#fbfbfb, #e8e8e8)";
-            objectDetectBtn.style.color = "";
-            objectStatus.textContent = "";
-          }
+          ballSearchStatus.textContent = data.message || 'Ball search initiated';
+          ballSearchStatus.style.color = '#4ade80';
+        } else {
+          throw new Error(data.error || 'Search failed');
         }
       } catch (err) {
-        console.error(err);
-        objectStatus.textContent = `Error: ${err.message}`;
-        objectStatus.style.color = "#ef4444";
+        ballSearchStatus.textContent = `Error: ${err.message}`;
+        ballSearchStatus.style.color = '#ef4444';
+        isSearching = false;
+        ballSearchBtn.disabled = false;
+        ballSearchBtn.textContent = 'Ball';
+        ballSearchBtn.style.background = '';
+        ballSearchBtn.style.borderColor = '';
+      }
+
+      if (isSearching) {
+        ballSearchBtn.disabled = false;
       }
     });
   }

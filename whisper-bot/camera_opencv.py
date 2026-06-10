@@ -154,6 +154,25 @@ class CVThread(threading.Thread):
             else:
                 cv2.putText(imgInput, 'Object Detecting', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
 
+        elif self.CVMode == 'ballSearch':
+            search_info = getattr(Camera, 'ball_search_info', None)
+            if search_info and isinstance(search_info, dict):
+                box = search_info.get('box')
+                label = search_info.get('label')
+                confidence = search_info.get('confidence')
+                if box and label is not None:
+                    x = int(box.get('x', 0))
+                    y = int(box.get('y', 0))
+                    w = int(box.get('w', 0))
+                    h = int(box.get('h', 0))
+                    color = (74, 222, 128)
+                    cv2.rectangle(imgInput, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(imgInput, f"{label} {confidence:.2f}", (x, max(y - 10, 20)), CVThread.font, 0.5, color, 1, cv2.LINE_AA)
+                else:
+                    cv2.putText(imgInput, 'Ball search active, no detection yet', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+            else:
+                cv2.putText(imgInput, 'Ball search active', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
+
         elif self.CVMode == 'findColor':
             if self.findColorDetection:
                 cv2.putText(imgInput,'Target Detected',(40,60), CVThread.font, 0.5,(255,255,255),1,cv2.LINE_AA)
@@ -814,6 +833,11 @@ class CVThread(threading.Thread):
                 self.objectDetectCV(self.imgCV)
                 self.CVThreading = 0
 
+            elif self.CVMode == 'ballSearch':
+                self.CVThreading = 1
+                self.pause()
+                self.CVThreading = 0
+
             elif self.CVMode == 'followColor':
                 self.CVThreading = 1
                 self.followColorCV(self.imgCV)
@@ -824,6 +848,8 @@ class Camera(BaseCamera):
     modeSelect = 'none'
     followName = ''
     followColor = 'none'
+    ball_search_info = None
+    latest_bgr_frame = None
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
     # modeSelect = 'watchDog'
@@ -917,6 +943,7 @@ class Camera(BaseCamera):
                 raise RuntimeError('Camera started but could not read frames. Check the Pi camera and Picamera2 configuration.')
 
             img = frame
+            Camera.latest_bgr_frame = img.copy() if isinstance(img, np.ndarray) else None
 
             if Camera.modeSelect == 'none':
                 cvt.pause()
