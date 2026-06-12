@@ -11,3 +11,4 @@ whisper/*.onnx
 whisper/*.npz
 whisper/vosk-model-small-en-us-0.15
 yoloServer/
+FollowObject/*.onnx

@@ -706,32 +706,40 @@ def api_search_ball():
 	action = data.get('action', '').lower()
 	try:
 		import camera_opencv
-		from FollowObject.detect import detect as detect_frame
+		from FollowObject.detect import detect
 
 		if action == 'start':
+			camera_opencv.Camera.modeSelect = 'ballSearch'
+			
+			# Get the latest frame from camera (same way other APIs do it)
 			camera_obj = get_camera()
 			if camera_obj is None:
 				return jsonify({"success": False, "error": "Camera unavailable"}), 503
-
-			frame = getattr(camera_opencv.Camera, 'latest_bgr_frame', None)
+			
+			frame_bytes = camera_obj.get_frame()
+			if not frame_bytes:
+				return jsonify({"success": False, "error": "Could not capture frame"}), 500
+			
+			# Convert frame bytes to numpy array
+			nparr = np.frombuffer(frame_bytes, np.uint8)
+			frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+			
 			if frame is None:
-				return jsonify({"success": False, "error": "No camera frame available"}), 503
-
-			# Convert the latest live frame to RGB for the detection pipeline.
-			rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-			detection = detect_frame(rgb_frame)
-			camera_opencv.Camera.ball_search_info = detection or {}
-			camera_opencv.Camera.modeSelect = 'ballSearch'
-
-			message = 'Ball search initialized'
-			if detection and detection.get('label'):
-				message = f"Ball search initialized: {detection.get('label')}"
-			log_action("BACKEND", "Ball Search Started", str(detection))
-			return jsonify({"success": True, "message": message, "result": detection})
+				return jsonify({"success": False, "error": "Could not decode frame"}), 500
+			
+			# Run detection using the detect() function
+			model_path = os.path.join(THIS_DIR, 'FollowObject', 'best.onnx')
+			detection_result = detect(frame, model_path)
+			
+			log_action("BACKEND", "Ball Search Detection", f"Found {len(detection_result.get('detections', []))} object(s)")
+			
+			return jsonify({
+				"success": detection_result.get('success', False),
+				"detections": detection_result.get('detections', [])
+			})
 
 		elif action == 'stop':
 			camera_opencv.Camera.modeSelect = 'none'
-			camera_opencv.Camera.ball_search_info = None
 			log_action("BACKEND", "Ball Search Stopped", "Ball search mode disabled")
 			return jsonify({"success": True, "message": "Ball search stopped"})
 
