@@ -160,16 +160,13 @@ class CVThread(threading.Thread):
             search_info = getattr(Camera, 'ball_search_info', None)
             if search_info and isinstance(search_info, dict):
                 box = search_info.get('box')
-                label = search_info.get('label')
-                confidence = search_info.get('confidence')
-                if box and label is not None:
+                if box:
                     x = int(box.get('x', 0))
                     y = int(box.get('y', 0))
                     w = int(box.get('w', 0))
                     h = int(box.get('h', 0))
                     color = (74, 222, 128)
                     cv2.rectangle(imgInput, (x, y), (x + w, y + h), color, 2)
-                    cv2.putText(imgInput, f"{label} {confidence:.2f}", (x, max(y - 10, 20)), CVThread.font, 0.5, color, 1, cv2.LINE_AA)
                 else:
                     cv2.putText(imgInput, 'Ball search active, no detection yet', (40,60), CVThread.font, 0.5, (255,255,255), 1, cv2.LINE_AA)
             else:
@@ -439,20 +436,18 @@ class CVThread(threading.Thread):
     def ballSearchCV(self, frame_image):
         try:
             model_path = os.path.join(thisPath, 'FollowObject', 'best.onnx')
-            result = detect(frame_image, model_path=model_path, conf_threshold=0.08, input_is_rgb=False)
+            result = detect(frame_image, model_path=model_path, conf_threshold=0.15, input_is_rgb=False)
             if result.get("success", False) and result.get("detections"):
-                print(f"[ballSearchCV] All detections: {[(d['class_name'], round(d['conf'], 4)) for d in result['detections']]}")
-                ball_detections = [d for d in result["detections"] if d.get("class_name") == "ball"]
+                # Filter for class_id == 1 (ball)
+                ball_detections = [d for d in result["detections"] if d.get("class_id") == 1]
                 if ball_detections:
                     best_det = ball_detections[0]
-                    print(f"[ballSearchCV] Selected ball: {best_det['conf']:.4f}")
                     x1 = int(best_det["x1"])
                     y1 = int(best_det["y1"])
                     w_box = int(best_det["x2"] - best_det["x1"])
                     h_box = int(best_det["y2"] - best_det["y1"])
                     Camera.ball_search_info = {
                         "box": {"x": x1, "y": y1, "w": w_box, "h": h_box},
-                        "label": best_det["class_name"],
                         "confidence": best_det["conf"]
                     }
                 else:

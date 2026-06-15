@@ -77,11 +77,13 @@ def main():
             # --- Step 1: Rectify the frame ---
             flat_frame = cv2.remap(frame, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
             
-            # --- Step 2: Center-Crop a square from the flat frame ---
+            # --- Step 2: Center-Crop a 240x240 square from the flat frame ---
             h_flat, w_flat = flat_frame.shape[:2]
-            start_x = (w_flat - h_flat) // 2
-            cropped_flat = flat_frame[:, start_x:start_x + h_flat]
-            w_crop, h_crop = h_flat, h_flat
+            crop_size = min(h_flat, w_flat, 240)
+            start_x = (w_flat - crop_size) // 2
+            start_y = (h_flat - crop_size) // 2
+            cropped_flat = flat_frame[start_y:start_y + crop_size, start_x:start_x + crop_size]
+            w_crop, h_crop = crop_size, crop_size
             
             # Save visual checkpoints on the first frame
             if not saved_visuals:
@@ -149,11 +151,10 @@ def main():
                         x, y, wb, hb = box
                         
                         # Print details
-                        print(f"     - {name} (conf={conf:.2f}) at [{x}, {y}, {x+wb}, {y+hb}]")
+                        print(f"     - class_id={class_ids[idx]} (conf={conf:.2f}) at [{x}, {y}, {x+wb}, {y+hb}]")
                         
-                        # Draw bounding boxes on the rectified flat image
+                        # Draw bounding box only (no label text)
                         cv2.rectangle(annotated_flat, (x, y), (x + wb, y + hb), (74, 222, 128), 2)
-                        cv2.putText(annotated_flat, f"{name} {conf:.2f}", (x, max(y - 10, 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
                     
                     # Save the detection result
                     cv2.imwrite(os.path.join(this_dir, "detection_result.jpg"), annotated_flat)

@@ -19,7 +19,7 @@ def get_session(model_path=None):
 	_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
 	return _session
 
-def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, input_is_rgb=False):
+def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, input_is_rgb=False, crop_size=240):
 	"""
 	Run object detection using pure onnxruntime.
 	Avoids importing PyTorch/TensorFlow/Ultralytics.
@@ -30,26 +30,21 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 		# Get input details
 		input_name = session.get_inputs()[0].name
 		input_shape = session.get_inputs()[0].shape  # Expecting [1, 3, 416, 416]
-		input_h, input_w = input_shape[2], input_shape[3]  # NCHW: [N, C, H, W]
-		
+		input_h, input_w = input_shape[2], input_shape[3]
 		h_orig, w_orig = frame.shape[:2]
-		start_x, start_y = 0, 0
-		w_crop, h_crop = w_orig, h_orig
 		
-		# Center crop frame to square (removes severe fisheye distortion and zooms in)
-		if w_orig > h_orig:
-			start_x = (w_orig - h_orig) // 2
-			w_crop = h_orig
-			cropped = frame[:, start_x:start_x + w_crop]
-		elif h_orig > w_orig:
-			start_y = (h_orig - w_orig) // 2
-			h_crop = w_orig
-			cropped = frame[start_y:start_y + h_crop, :]
-		else:
-			cropped = frame
+		# Define crop size (e.g., 240 for zoom, or min(h, w) for no aspect ratio distortion)
+		# A smaller crop size acts as a digital zoom, making the ball look larger and removing distortion
+		crop_size = min(h_orig, w_orig, crop_size)
+		start_x = (w_orig - crop_size) // 2
+		start_y = (h_orig - crop_size) // 2
+		cropped = frame[start_y:start_y + crop_size, start_x:start_x + crop_size]
 		
 		# Preprocess frame
 		resized = cv2.resize(cropped, (input_w, input_h))
+		
+		# Model best.onnx expects BGR format. If the camera captures in RGB,
+		# setting input_is_rgb=False will swap RGB to BGR.
 		if not input_is_rgb:
 			rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
 		else:
@@ -59,9 +54,6 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 		input_data = np.expand_dims(input_data, axis=0)   # Add batch dim
 		
 		# CRITICAL: Force contiguous C-order memory layout.
-		# np.transpose() returns a non-contiguous view (different strides, same buffer).
-		# x86 onnxruntime silently copies non-contiguous arrays, but the ARM build
-		# can read stale/wrong memory, producing garbage input and near-zero confidence.
 		input_data = np.ascontiguousarray(input_data, dtype=np.float32)
 		
 		# Run Inference
@@ -71,15 +63,9 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 		# Transpose to [3549, 6] where columns are [xc, yc, w, h, class0_score, class1_score]
 		output = np.transpose(output)
 		
-		max_conf = float(np.max(output[:, 4:]))
-		print(f"[Detect] Max raw confidence score: {max_conf:.4f}")
-		
 		boxes = []
 		confidences = []
 		class_ids = []
-		
-		# Metadata class mapping
-		class_names = {0: "1", 1: "ball"}
 		
 		for row in output:
 			xc, yc, w, h = row[0:4]
@@ -89,8 +75,8 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 			
 			if conf >= conf_threshold:
 				# Convert center coords [xc, yc, w, h] to top-left [x, y, w, h] of original frame
-				x_scale = w_crop / input_w
-				y_scale = h_crop / input_h
+				x_scale = crop_size / input_w
+				y_scale = crop_size / input_h
 				
 				x1 = (xc - w / 2) * x_scale + start_x
 				y1 = (yc - h / 2) * y_scale + start_y
@@ -115,7 +101,6 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 				x1, y1, w_box, h_box = box
 				conf = confidences[idx]
 				class_id = class_ids[idx]
-				name = class_names.get(class_id, f"class_{class_id}")
 				
 				det = {
 					"x1": float(x1),
@@ -123,16 +108,13 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 					"x2": float(x1 + w_box),
 					"y2": float(y1 + h_box),
 					"conf": conf,
-					"class_id": class_id,
-					"class_name": name
+					"class_id": class_id
 				}
 				detections.append(det)
 				
-				# Render bounding box and text label
-				color = (74, 222, 128) if class_id == 1 else (64, 128, 255)  # Green for ball, orange for 1
+				# Render bounding box only (no label text)
+				color = (74, 222, 128) if class_id == 1 else (64, 128, 255)  # Green for ball, orange for class 0
 				cv2.rectangle(annotated_frame, (x1, y1), (x1 + w_box, y1 + h_box), color, 2)
-				label = f"{name} {conf:.2f}"
-				cv2.putText(annotated_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
 				
 		return {
 			"success": True,
