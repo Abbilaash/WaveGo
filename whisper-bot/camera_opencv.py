@@ -439,11 +439,13 @@ class CVThread(threading.Thread):
     def ballSearchCV(self, frame_image):
         try:
             model_path = os.path.join(thisPath, 'FollowObject', 'best.onnx')
-            result = detect(frame_image, model_path=model_path, input_is_rgb=False)
+            result = detect(frame_image, model_path=model_path, conf_threshold=0.08, input_is_rgb=False)
             if result.get("success", False) and result.get("detections"):
+                print(f"[ballSearchCV] All detections: {[(d['class_name'], round(d['conf'], 4)) for d in result['detections']]}")
                 ball_detections = [d for d in result["detections"] if d.get("class_name") == "ball"]
                 if ball_detections:
                     best_det = ball_detections[0]
+                    print(f"[ballSearchCV] Selected ball: {best_det['conf']:.4f}")
                     x1 = int(best_det["x1"])
                     y1 = int(best_det["y1"])
                     w_box = int(best_det["x2"] - best_det["x1"])
@@ -987,8 +989,10 @@ class Camera(BaseCamera):
                     cvt.resume()
                 try:
                     img = cvt.elementDraw(img)
-                except:
-                    pass
+                except Exception as e:
+                    import traceback
+                    print("Error in elementDraw:")
+                    traceback.print_exc()
 
             # encode as a jpeg image and return it
             try:
