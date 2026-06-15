@@ -33,9 +33,23 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 		input_h, input_w = input_shape[2], input_shape[3]  # NCHW: [N, C, H, W]
 		
 		h_orig, w_orig = frame.shape[:2]
+		start_x, start_y = 0, 0
+		w_crop, h_crop = w_orig, h_orig
+		
+		# Center crop frame to square (removes severe fisheye distortion and zooms in)
+		if w_orig > h_orig:
+			start_x = (w_orig - h_orig) // 2
+			w_crop = h_orig
+			cropped = frame[:, start_x:start_x + w_crop]
+		elif h_orig > w_orig:
+			start_y = (h_orig - w_orig) // 2
+			h_crop = w_orig
+			cropped = frame[start_y:start_y + h_crop, :]
+		else:
+			cropped = frame
 		
 		# Preprocess frame
-		resized = cv2.resize(frame, (input_w, input_h))
+		resized = cv2.resize(cropped, (input_w, input_h))
 		if not input_is_rgb:
 			rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
 		else:
@@ -58,7 +72,7 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 		output = np.transpose(output)
 		
 		max_conf = float(np.max(output[:, 4:]))
-		print(f"[Detect] Max raw confidence score: {max_conf:.4f} (input_is_rgb={input_is_rgb})")
+		print(f"[Detect] Max raw confidence score: {max_conf:.4f}")
 		
 		boxes = []
 		confidences = []
@@ -74,12 +88,12 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 			conf = float(scores[class_id])
 			
 			if conf >= conf_threshold:
-				# Convert center coords [xc, yc, w, h] to top-left [x, y, w, h]
-				x_scale = w_orig / input_w
-				y_scale = h_orig / input_h
+				# Convert center coords [xc, yc, w, h] to top-left [x, y, w, h] of original frame
+				x_scale = w_crop / input_w
+				y_scale = h_crop / input_h
 				
-				x1 = (xc - w / 2) * x_scale
-				y1 = (yc - h / 2) * y_scale
+				x1 = (xc - w / 2) * x_scale + start_x
+				y1 = (yc - h / 2) * y_scale + start_y
 				w_box = w * x_scale
 				h_box = h * y_scale
 				
