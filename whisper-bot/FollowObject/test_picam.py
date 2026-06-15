@@ -53,8 +53,23 @@ def main():
                 time.sleep(0.1)
                 continue
             
-            # --- Preprocessing ---
-            resized = cv2.resize(frame, (input_w, input_h))
+            # --- Preprocessing with Center Cropping ---
+            h_orig, w_orig = frame.shape[:2]
+            start_x, start_y = 0, 0
+            w_crop, h_crop = w_orig, h_orig
+            
+            if w_orig > h_orig:
+                start_x = (w_orig - h_orig) // 2
+                w_crop = h_orig
+                cropped = frame[:, start_x:start_x + w_crop]
+            elif h_orig > w_orig:
+                start_y = (h_orig - w_orig) // 2
+                h_crop = w_orig
+                cropped = frame[start_y:start_y + h_crop, :]
+            else:
+                cropped = frame
+                
+            resized = cv2.resize(cropped, (input_w, input_h))
             
             # Path A: Treats frame as BGR and swaps channels to RGB
             rgb_a = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
@@ -87,7 +102,6 @@ def main():
                 boxes = []
                 confidences = []
                 class_ids = []
-                h_orig, w_orig = frame.shape[:2]
                 
                 for row in output:
                     xc, yc, w, h = row[0:4]
@@ -96,10 +110,10 @@ def main():
                     conf = float(scores[class_id])
                     
                     if conf >= threshold:
-                        x_scale = w_orig / input_w
-                        y_scale = h_orig / input_h
-                        x1 = (xc - w / 2) * x_scale
-                        y1 = (yc - h / 2) * y_scale
+                        x_scale = w_crop / input_w
+                        y_scale = h_crop / input_h
+                        x1 = (xc - w / 2) * x_scale + start_x
+                        y1 = (yc - h / 2) * y_scale + start_y
                         w_box = w * x_scale
                         h_box = h * y_scale
                         
