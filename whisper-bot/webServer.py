@@ -725,9 +725,32 @@ def api_search_ball():
 		import camera_opencv
 
 		if action == 'start':
+			# Enable ball search mode for UI feedback
 			camera_opencv.Camera.modeSelect = 'ballSearch'
-			log_action("BACKEND", "Ball Search Started", "Ball search mode enabled")
-			return jsonify({"success": True, "message": "Ball search initiated"})
+			# Capture the latest frame using the existing camera helper
+			camera_obj = get_camera()
+			if camera_obj is None:
+				log_action("BACKEND", "Ball Search Error", "Camera unavailable")
+				return jsonify({"success": False, "error": "Camera unavailable"}), 503
+			frame_bytes = camera_obj.get_frame()
+			if not frame_bytes:
+				log_action("BACKEND", "Ball Search Error", "Could not capture frame")
+				return jsonify({"success": False, "error": "Could not capture frame"}), 500
+			# Decode JPEG bytes to a BGR NumPy array
+			arr = np.frombuffer(frame_bytes, np.uint8)
+			frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+			if frame is None:
+				log_action("BACKEND", "Ball Search Error", "Could not decode frame")
+				return jsonify({"success": False, "error": "Could not decode frame"}), 500
+			# Run detection using the detect function
+			from FollowObject.detect import detect
+			result = detect(frame)
+			log_action("BACKEND", "Ball Search Detection", f"Found {len(result.get('detections', []))} object(s)")
+			return jsonify({
+				"success": result.get('success', False),
+				"detections": result.get('detections', []),
+				"message": result.get('message', '')
+			})
 
 		elif action == 'stop':
 			camera_opencv.Camera.modeSelect = 'none'

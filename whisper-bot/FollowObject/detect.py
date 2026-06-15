@@ -3,6 +3,9 @@ import numpy as np
 import onnxruntime as ort
 import os
 
+# Optional class names mapping – the current model detects a single class (ball)
+CLASS_NAMES = ['ball']
+
 # Global session cache
 _session = None
 _model_path_cached = None
@@ -74,7 +77,8 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
                 "x2": float(real_x2),
                 "y2": float(real_y2),
                 "conf": float(conf),
-                "class_id": int(class_id)
+                "class_id": int(class_id),
+                "class_name": CLASS_NAMES[int(class_id)] if CLASS_NAMES and int(class_id) < len(CLASS_NAMES) else f"class_{int(class_id)}"
             }
             detections.append(det)
             color = (74, 222, 128) if int(class_id) == 1 else (64, 128, 255)
@@ -83,3 +87,5 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
         return {"success": True, "detections": detections, "annotated_frame": annotated_frame, "results": None}
     except Exception as e:
         return {"success": False, "detections": [], "annotated_frame": frame, "results": None, "error": str(e)}
+
+
