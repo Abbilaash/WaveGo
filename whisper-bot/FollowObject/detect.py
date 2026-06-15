@@ -30,7 +30,7 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 		# Get input details
 		input_name = session.get_inputs()[0].name
 		input_shape = session.get_inputs()[0].shape  # Expecting [1, 3, 416, 416]
-		input_w, input_h = input_shape[2], input_shape[3]
+		input_h, input_w = input_shape[2], input_shape[3]  # NCHW: [N, C, H, W]
 		
 		h_orig, w_orig = frame.shape[:2]
 		
@@ -43,6 +43,12 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 		input_data = rgb.astype(np.float32) / 255.0
 		input_data = np.transpose(input_data, (2, 0, 1))  # HWC to CHW
 		input_data = np.expand_dims(input_data, axis=0)   # Add batch dim
+		
+		# CRITICAL: Force contiguous C-order memory layout.
+		# np.transpose() returns a non-contiguous view (different strides, same buffer).
+		# x86 onnxruntime silently copies non-contiguous arrays, but the ARM build
+		# can read stale/wrong memory, producing garbage input and near-zero confidence.
+		input_data = np.ascontiguousarray(input_data, dtype=np.float32)
 		
 		# Run Inference
 		outputs = session.run(None, {input_name: input_data})
