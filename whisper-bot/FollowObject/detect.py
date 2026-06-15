@@ -13,12 +13,18 @@ def get_session(model_path=None):
 		return _session
 	
 	if model_path is None:
-		# Use the wide-angle optimized ONNX model
+		# Default to the wide-angle optimized ONNX model
 		model_path = os.path.join(os.path.dirname(__file__), "best.onnx")
 	
-	# Load with CPU execution provider for Raspberry Pi compatibility
-	_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
-	return _session
+	    # Load with CPU execution provider for Raspberry Pi compatibility
+    try:
+        _session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
+    except Exception as e:
+        print(f"[Detect] Failed to load model at {model_path}: {e}")
+        fallback_path = os.path.join(os.path.dirname(__file__), "best.onnx")
+        print(f"[Detect] Attempting fallback model at {fallback_path}")
+        _session = ort.InferenceSession(fallback_path, providers=["CPUExecutionProvider"])
+    return _session
 
 def detect(frame, model_path=None, conf_threshold=0.10, iou_threshold=0.45, input_is_rgb=False, crop_size=240):
 	"""
@@ -34,12 +40,23 @@ def detect(frame, model_path=None, conf_threshold=0.10, iou_threshold=0.45, inpu
 		input_h, input_w = input_shape[2], input_shape[3]
 		h_orig, w_orig = frame.shape[:2]
 		
+		        # Print debug info about model and frame
+        print(f"[Detect] Using model: {model_path}")
+        print(f"[Detect] Input shape expected: ({input_h}, {input_w})")
+        print(f"[Detect] Frame original size: ({h_orig}, {w_orig})")
+        # Convert to RGB if needed (the model expects RGB)
+        if not input_is_rgb:
+            # Convert BGR (OpenCV default) to RGB
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        else:
+            frame_rgb = frame
+        # Use the possibly converted frame for cropping
 		# Define crop size (e.g., 240 for zoom, or min(h, w) for no aspect ratio distortion)
 		# A smaller crop size acts as a digital zoom, making the ball look larger and removing distortion
 		crop_size = min(h_orig, w_orig, crop_size)
 		start_x = (w_orig - crop_size) // 2
 		start_y = (h_orig - crop_size) // 2
-		cropped = frame[start_y:start_y + crop_size, start_x:start_x + crop_size]
+        cropped = frame_rgb[start_y:start_y + crop_size, start_x:start_x + crop_size]
 		
 		# Preprocess frame
 		resized = cv2.resize(cropped, (input_w, input_h))
