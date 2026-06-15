@@ -99,8 +99,8 @@ def main():
             # --- Step 3: Resize cropped frame for YOLO ---
             resized = cv2.resize(cropped_flat, (input_w, input_h))
             
-            # Convert BGR to RGB for model input
-            rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+            # The picamera is configured for RGB888, so we don't need BGR to RGB conversion
+            rgb = resized
             input_data = rgb.astype(np.float32) / 255.0
             input_data = np.transpose(input_data, (2, 0, 1))
             input_data = np.expand_dims(input_data, axis=0)
@@ -124,12 +124,12 @@ def main():
                 class_id = np.argmax(scores)
                 conf = float(scores[class_id])
                 
-                if conf >= 0.15:
+                if conf >= 0.10:
                     x_scale = w_crop / input_w
                     y_scale = h_crop / input_h
                     # Calculate coordinates relative to the original 640x480 frame
                     x1 = (xc - w / 2) * x_scale + start_x
-                    y1 = (yc - h / 2) * y_scale
+                    y1 = (yc - h / 2) * y_scale + start_y
                     w_box = w * x_scale
                     h_box = h * y_scale
                     
@@ -138,7 +138,7 @@ def main():
                     class_ids.append(int(class_id))
             
             if len(boxes) > 0:
-                indices = cv2.dnn.NMSBoxes(boxes, confidences, 0.15, 0.45)
+                indices = cv2.dnn.NMSBoxes(boxes, confidences, 0.10, 0.45)
                 if len(indices) > 0:
                     flat_indices = indices.flatten() if hasattr(indices, 'flatten') else indices
                     print("  >> DETECTED:")
