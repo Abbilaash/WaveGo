@@ -726,33 +726,8 @@ def api_search_ball():
 
 		if action == 'start':
 			camera_opencv.Camera.modeSelect = 'ballSearch'
-			
-			# Get the latest frame from camera (same way other APIs do it)
-			camera_obj = get_camera()
-			if camera_obj is None:
-				return jsonify({"success": False, "error": "Camera unavailable"}), 503
-			
-			frame_bytes = camera_obj.get_frame()
-			if not frame_bytes:
-				return jsonify({"success": False, "error": "Could not capture frame"}), 500
-			
-			# Convert frame bytes to numpy array
-			nparr = np.frombuffer(frame_bytes, np.uint8)
-			frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-			
-			if frame is None:
-				return jsonify({"success": False, "error": "Could not decode frame"}), 500
-			
-			# Run detection using the detect() function
-			model_path = os.path.join(THIS_DIR, 'FollowObject', 'best.onnx')
-			detection_result = detect(frame, model_path)
-			
-			log_action("BACKEND", "Ball Search Detection", f"Found {len(detection_result.get('detections', []))} object(s)")
-			
-			return jsonify({
-				"success": detection_result.get('success', False),
-				"detections": detection_result.get('detections', [])
-			})
+			log_action("BACKEND", "Ball Search Started", "Ball search mode enabled")
+			return jsonify({"success": True, "message": "Ball search initiated"})
 
 		elif action == 'stop':
 			camera_opencv.Camera.modeSelect = 'none'

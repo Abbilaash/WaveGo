@@ -858,11 +858,6 @@ class CVThread(threading.Thread):
                 self.objectDetectCV(self.imgCV)
                 self.CVThreading = 0
 
-            elif self.CVMode == 'ballSearch':
-                self.CVThreading = 1
-                self.pause()
-                self.CVThreading = 0
-
             elif self.CVMode == 'followColor':
                 self.CVThreading = 1
                 self.followColorCV(self.imgCV)
@@ -982,6 +977,8 @@ class Camera(BaseCamera):
                 if cvt.CVThreading:
                     pass
                 else:
+                    # Print debug status to see if cvt is alive and receiving the mode Select
+                    print(f"[DEBUG Camera.frames] modeSelect={Camera.modeSelect}, CVMode={cvt.CVMode}, CVThreading={cvt.CVThreading}, cvt.is_alive={cvt.is_alive()}")
                     cvt.mode(Camera.modeSelect, img)
                     cvt.resume()
                 try:
