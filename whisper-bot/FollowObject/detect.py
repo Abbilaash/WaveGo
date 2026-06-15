@@ -58,7 +58,7 @@ def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, inpu
 		output = np.transpose(output)
 		
 		max_conf = float(np.max(output[:, 4:]))
-		print(f"[Detect] Max raw confidence score: {max_conf:.4f}")
+		print(f"[Detect] Max raw confidence score: {max_conf:.4f} (input_is_rgb={input_is_rgb})")
 		
 		boxes = []
 		confidences = []

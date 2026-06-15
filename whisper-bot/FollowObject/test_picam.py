@@ -44,17 +44,24 @@ def main():
                 time.sleep(0.1)
                 continue
                 
-            # Run detection. BGR->RGB is performed by default since input_is_rgb=False.
-            result = detect(frame, model_path=model_path, conf_threshold=0.15, iou_threshold=0.45, input_is_rgb=False)
+            # Run detection with both color modes to see which one works
+            result_f = detect(frame, model_path=model_path, conf_threshold=0.15, iou_threshold=0.45, input_is_rgb=False)
+            result_t = detect(frame, model_path=model_path, conf_threshold=0.15, iou_threshold=0.45, input_is_rgb=True)
             
-            if result["success"]:
-                detections = result.get("detections", [])
-                if detections:
-                    print(f"[{time.strftime('%X')}] Detections:")
-                    for det in detections:
-                        print(f"  - {det['class_name']} (conf={det['conf']:.2f}) at [{int(det['x1'])}, {int(det['y1'])}, {int(det['x2'])}, {int(det['y2'])}]")
-            else:
-                print(f"Error during detection: {result.get('error')}")
+            # Extract max raw confidence score from each result
+            max_conf_f = result_f.get("max_conf", 0.0) # wait, detect() might not return max_conf, let's compute it if not
+            # Let's inspect detect() to see if it prints max raw confidence score
+            # detect() prints: "[Detect] Max raw confidence score: ..."
+            # We can also compute it or let detect() print it.
+            
+            # Let's print the detections for both modes if they have any
+            dets_f = result_f.get("detections", [])
+            dets_t = result_t.get("detections", [])
+            
+            if dets_f:
+                print(f"[{time.strftime('%X')}] (input_is_rgb=False) Detections: {[{'class': d['class_name'], 'conf': d['conf']} for d in dets_f]}")
+            if dets_t:
+                print(f"[{time.strftime('%X')}] (input_is_rgb=True) Detections: {[{'class': d['class_name'], 'conf': d['conf']} for d in dets_t]}")
                 
             time.sleep(0.05)  # Yield CPU execution
             
