@@ -1080,7 +1080,45 @@ def api_color_follow(color):
 		return jsonify({"success": False, "error": str(exc)}), 500
 
 
+@app.route("/api/diagnostic")
+def api_diagnostic():
+	try:
+		camera_obj = get_camera()
+		if camera_obj is None:
+			return jsonify({"success": False, "error": "Camera unavailable"})
+		
+		frame_bytes = camera_obj.get_frame()
+		if not frame_bytes:
+			return jsonify({"success": False, "error": "No frame bytes"})
+		
+		nparr = np.frombuffer(frame_bytes, np.uint8)
+		decoded_frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+		
+		latest_bgr = camera_opencv.Camera.latest_bgr_frame
+		
+		model_path = os.path.join(THIS_DIR, 'FollowObject', 'best.onnx')
+		
+		res_decoded_f = detect(decoded_frame, model_path, input_is_rgb=False)
+		res_decoded_t = detect(decoded_frame, model_path, input_is_rgb=True)
+		
+		res_latest_f = detect(latest_bgr, model_path, input_is_rgb=False) if latest_bgr is not None else None
+		res_latest_t = detect(latest_bgr, model_path, input_is_rgb=True) if latest_bgr is not None else None
+		
+		return jsonify({
+			"success": True,
+			"latest_bgr_shape": latest_bgr.shape if latest_bgr is not None else None,
+			"decoded_shape": decoded_frame.shape,
+			"res_decoded_f_detections": res_decoded_f.get("detections"),
+			"res_decoded_t_detections": res_decoded_t.get("detections"),
+			"res_latest_f_detections": res_latest_f.get("detections") if res_latest_f else None,
+			"res_latest_t_detections": res_latest_t.get("detections") if res_latest_t else None,
+		})
+	except Exception as e:
+		return jsonify({"success": False, "error": str(e)})
+
+
 def main() -> None:
+
 	if not os.environ.get("WERKZEUG_RUN_MAIN"):
 		# Execute the pycache cleanup commands requested by user
 		if os.name != "nt":

@@ -89,7 +89,7 @@ class CVThread(threading.Thread):
 
     def mode(self, invar, imgInput):
         self.CVMode = invar
-        self.imgCV = imgInput
+        self.imgCV = imgInput.copy() if imgInput is not None else None
         self.resume()
 
 
