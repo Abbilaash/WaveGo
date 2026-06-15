@@ -7,6 +7,7 @@ import datetime
 import time
 import threading
 import imutils
+from FollowObject.detect import detect
 
 curpath = os.path.realpath(__file__)
 thisPath = os.path.dirname(curpath)
@@ -45,6 +46,7 @@ class CVThread(threading.Thread):
         self.imgCV = None
         self.faces = None
         self.detected_objects = []
+        self.detected_balls = []
         self.object_templates = None
         self.mobilenet_session = None
         self.mobilenet_input_name = None
@@ -431,6 +433,29 @@ class CVThread(threading.Thread):
             robot.lightCtrl('red', 0)
         else:
             robot.lightCtrl('blue', 0)
+        self.pause()
+
+
+    def ballSearchCV(self, frame_image):
+        try:
+            model_path = os.path.join(thisPath, 'FollowObject', 'best.onnx')
+            result = detect(frame_image, model_path=model_path, input_is_rgb=True)
+            if result.get("success", False) and result.get("detections"):
+                best_det = result["detections"][0]
+                x1 = int(best_det["x1"])
+                y1 = int(best_det["y1"])
+                w_box = int(best_det["x2"] - best_det["x1"])
+                h_box = int(best_det["y2"] - best_det["y1"])
+                Camera.ball_search_info = {
+                    "box": {"x": x1, "y": y1, "w": w_box, "h": h_box},
+                    "label": best_det["class_name"],
+                    "confidence": best_det["conf"]
+                }
+            else:
+                Camera.ball_search_info = None
+        except Exception as e:
+            print("Error in ballSearchCV:", e)
+            Camera.ball_search_info = None
         self.pause()
 
 
@@ -841,6 +866,11 @@ class CVThread(threading.Thread):
             elif self.CVMode == 'followColor':
                 self.CVThreading = 1
                 self.followColorCV(self.imgCV)
+                self.CVThreading = 0
+
+            elif self.CVMode == 'ballSearch':
+                self.CVThreading = 1
+                self.ballSearchCV(self.imgCV)
                 self.CVThreading = 0
 
 

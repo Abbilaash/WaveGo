@@ -46,6 +46,7 @@ else:
 	sys.path.insert(1, RPi_DIR)
 
 import camera_opencv
+from FollowObject.detect import detect
 import hardware_info
 import camera_tilt
 import robot
@@ -722,7 +723,6 @@ def api_search_ball():
 	action = data.get('action', '').lower()
 	try:
 		import camera_opencv
-		from FollowObject.detect import detect
 
 		if action == 'start':
 			camera_opencv.Camera.modeSelect = 'ballSearch'

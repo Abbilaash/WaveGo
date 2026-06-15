@@ -1147,12 +1147,27 @@
 
     ballSearchBtn.addEventListener('click', async () => {
       if (isSearching) {
-        isSearching = false;
-        ballSearchBtn.textContent = 'Ball';
-        ballSearchBtn.style.background = '';
-        ballSearchBtn.style.borderColor = '';
-        ballSearchStatus.textContent = 'Ball search stopped';
-        ballSearchStatus.style.color = '#ef4444';
+        try {
+          const response = await fetch('/api/search/ball', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'stop' })
+          });
+          const data = await response.json();
+          if (data.success) {
+            isSearching = false;
+            ballSearchBtn.textContent = 'Ball';
+            ballSearchBtn.style.background = '';
+            ballSearchBtn.style.borderColor = '';
+            ballSearchStatus.textContent = 'Ball search stopped';
+            ballSearchStatus.style.color = '#ef4444';
+          } else {
+            throw new Error(data.error || 'Stop failed');
+          }
+        } catch (err) {
+          ballSearchStatus.textContent = `Error: ${err.message}`;
+          ballSearchStatus.style.color = '#ef4444';
+        }
         return;
       }
 
