@@ -441,16 +441,20 @@ class CVThread(threading.Thread):
             model_path = os.path.join(thisPath, 'FollowObject', 'best.onnx')
             result = detect(frame_image, model_path=model_path, input_is_rgb=False)
             if result.get("success", False) and result.get("detections"):
-                best_det = result["detections"][0]
-                x1 = int(best_det["x1"])
-                y1 = int(best_det["y1"])
-                w_box = int(best_det["x2"] - best_det["x1"])
-                h_box = int(best_det["y2"] - best_det["y1"])
-                Camera.ball_search_info = {
-                    "box": {"x": x1, "y": y1, "w": w_box, "h": h_box},
-                    "label": best_det["class_name"],
-                    "confidence": best_det["conf"]
-                }
+                ball_detections = [d for d in result["detections"] if d.get("class_name") == "ball"]
+                if ball_detections:
+                    best_det = ball_detections[0]
+                    x1 = int(best_det["x1"])
+                    y1 = int(best_det["y1"])
+                    w_box = int(best_det["x2"] - best_det["x1"])
+                    h_box = int(best_det["y2"] - best_det["y1"])
+                    Camera.ball_search_info = {
+                        "box": {"x": x1, "y": y1, "w": w_box, "h": h_box},
+                        "label": best_det["class_name"],
+                        "confidence": best_det["conf"]
+                    }
+                else:
+                    Camera.ball_search_info = None
             else:
                 Camera.ball_search_info = None
         except Exception as e:
@@ -952,7 +956,7 @@ class Camera(BaseCamera):
 
         picam2 = Picamera2()
         picam2.configure(
-            picam2.create_preview_configuration(
+            picam2.create_video_configuration(
                 main={"format": "RGB888", "size": (640, 480)}
             )
         )
