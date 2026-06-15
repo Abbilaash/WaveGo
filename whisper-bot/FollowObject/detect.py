@@ -5,21 +5,25 @@ import os
 
 # Global session cache
 _session = None
+_model_path_cached = None
 
 def get_session(model_path=None):
     """Load and cache the ONNX runtime inference session."""
     global _session
-    if _session is not None:
-        return _session
+    global _session, _model_path_cached
     if model_path is None:
-        model_path = os.path.join(os.path.dirname(__file__), "best.onnx")
+        model_path = os.path.join(os.path.dirname(__file__), "best-wide-angle.onnx")
+    if _session is not None and _model_path_cached == model_path:
+        return _session
     try:
         _session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
+        _model_path_cached = model_path
     except Exception as e:
         print(f"[Detect] Failed to load model at {model_path}: {e}")
-        fallback_path = os.path.join(os.path.dirname(__file__), "best.onnx")
+        fallback_path = os.path.join(os.path.dirname(__file__), "best-wide-angle.onnx")
         print(f"[Detect] Attempting fallback model at {fallback_path}")
         _session = ort.InferenceSession(fallback_path, providers=["CPUExecutionProvider"])
+        _model_path_cached = fallback_path
     return _session
 
 def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop_size=240):
@@ -32,7 +36,9 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
         input_name = session.get_inputs()[0].name
         input_shape = session.get_inputs()[0].shape  # [1, 3, 416, 416]
         input_h, input_w = input_shape[2], input_shape[3]
+        print(f"[Detect] Model loaded from {model_path}, input shape {input_shape}")
         h_orig, w_orig = frame.shape[:2]
+        print(f"[Detect] Processing frame size {h_orig}x{w_orig}, crop size {crop_size}")
         # Wide-angle cropping / digital zoom
         crop_size = min(h_orig, w_orig, crop_size)
         start_x = (w_orig - crop_size) // 2
@@ -55,8 +61,9 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
         y_scale = crop_size / input_h
         for row in detections_raw:
             x1, y1, x2, y2, conf, class_id = row
-            if conf < conf_threshold:
-                continue
+            # Remove confidence threshold filter to display all detections
+            # if conf < conf_threshold:
+            #     continue
             real_x1 = int(x1 * x_scale + start_x)
             real_y1 = int(y1 * y_scale + start_y)
             real_x2 = int(x2 * x_scale + start_x)

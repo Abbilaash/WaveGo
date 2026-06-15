@@ -435,8 +435,13 @@ class CVThread(threading.Thread):
 
     def ballSearchCV(self, frame_image):
         try:
-            model_path = os.path.join(thisPath, 'FollowObject', 'best.onnx')
-            result = detect(frame_image, model_path=model_path, conf_threshold=0.15, input_is_rgb=False)
+            model_path = os.path.join(thisPath, 'FollowObject', 'best-wide-angle.onnx')
+            result = detect(frame_image, model_path=model_path, conf_threshold=0.0, input_is_rgb=False)
+            # Debug: print detection result summary
+            if result.get("success"):
+                print(f"[DEBUG ballSearchCV] Detections: {len(result.get('detections', []))}, Ball detections: {len([d for d in result.get('detections', []) if d.get('class_id') == 1])}")
+            else:
+                print(f"[DEBUG ballSearchCV] Detection failed: {result.get('error')}")
             if result.get("success", False) and result.get("detections"):
                 # Filter for class_id == 1 (ball)
                 ball_detections = [d for d in result["detections"] if d.get("class_id") == 1]
@@ -524,7 +529,10 @@ class CVThread(threading.Thread):
                     print(f"Error: mobilenetv3_embedding.onnx not found at {model_path}")
                     return
                 self.mobilenet_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
-                self.mobilenet_input_name = self.mobilenet_session.get_inputs()[0].name
+                session = get_session(model_path)
+                input_name = session.get_inputs()[0].name
+                input_shape = session.get_inputs()[0].shape  # [1, 3, 416, 416]
+                print(f"[Detect] Model loaded from {model_path}, input shape {input_shape}")
             except Exception as e:
                 print(f"Error initializing ONNX runtime in CVThread: {e}")
                 return
