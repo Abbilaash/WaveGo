@@ -88,4 +88,35 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
     except Exception as e:
         return {"success": False, "detections": [], "annotated_frame": frame, "results": None, "error": str(e)}
 
+# ---------------------------------------------------------------------------
+# Debug entry point – live video capture using OpenCV and the ``detect`` function.
+# Run this script directly to verify the model works on a webcam stream.
+# ---------------------------------------------------------------------------
+'''if __name__ == "__main__":
+    # Open the default camera (index 0)
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("[Detect] Error: Unable to open camera (index 0)")
+        exit(1)
+
+    print("[Detect] Starting live feed – press 'q' to quit.")
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("[Detect] Warning: Failed to read frame from camera")
+            break
+
+        # Run detection on the current frame
+        result = detect(frame)
+        # Show the annotated frame if detection succeeded, otherwise show raw frame
+        display_frame = result.get('annotated_frame') if result.get('success') else frame
+        cv2.imshow('ONNX Detection Debug', display_frame)
+
+        # Exit on 'q' key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()'''
+
 

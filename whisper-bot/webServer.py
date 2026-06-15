@@ -47,6 +47,11 @@ else:
 
 import camera_opencv
 from FollowObject.detect import detect
+# Optional import for Raspberry Pi camera
+try:
+    from picamera2 import Picamera2
+except ImportError:
+    Picamera2 = None  # Will be checked at runtime
 import hardware_info
 import camera_tilt
 import robot
@@ -763,6 +768,57 @@ def api_search_ball():
 	except Exception as exc:
 		log_action("BACKEND", "Ball Search Error", str(exc))
 		return jsonify({"success": False, "error": str(exc)}), 500
+
+
+# ----------------------------------------------------------
+# Raspberry Pi specific ball search endpoint using Picamera2
+# ----------------------------------------------------------
+@app.route('/api/pi/ballsearch', methods=['POST'])
+def api_pi_ballsearch():
+    data = request.get_json()
+    if not data or 'action' not in data:
+        return jsonify({"success": False, "error": "Missing action parameter"}), 400
+
+    action = data.get('action', '').lower()
+    if Picamera2 is None:
+        log_action("BACKEND", "Pi Ball Search Error", "Picamera2 module not available")
+        return jsonify({"success": False, "error": "Picamera2 not available on this system"}), 500
+
+    try:
+        if action == 'start':
+            picam = Picamera2()
+            config = picam.create_video_configuration(main={"format": "RGB888", "size": (640, 480)})
+            picam.configure(config)
+            picam.start()
+            time.sleep(1)  # allow camera to settle
+            frame = picam.capture_array()
+            picam.stop()
+            if frame is None:
+                log_action("BACKEND", "Pi Ball Search Error", "Failed to capture frame from Picamera2")
+                return jsonify({"success": False, "error": "Failed to capture frame"}), 500
+            result = detect(frame, input_is_rgb=True)
+            log_action("BACKEND", "Pi Ball Search Detection", f"Found {len(result.get('detections', []))} object(s)")
+            return jsonify({
+                "success": result.get('success', False),
+                "detections": result.get('detections', []),
+                "message": result.get('message', '')
+            })
+        elif action == 'stop':
+            log_action("BACKEND", "Pi Ball Search Stopped", "Ball search stop requested")
+            return jsonify({"success": True, "message": "Pi ball search stopped"})
+        else:
+            return jsonify({"success": False, "error": "invalid action"}), 400
+    except Exception as exc:
+        log_action("BACKEND", "Pi Ball Search Error", str(exc))
+        return jsonify({"success": False, "error": str(exc)}), 500
+
+@app.route('/api/camera/stream/info', methods=['GET'])
+def api_camera_stream_info():
+	try:
+		import picamera2
+		return jsonify({"success": True, "available": True})
+	except ImportError:
+		return jsonify({"success": True, "available": False})
 
 
 @app.route('/api/object/detect/<action>', methods=['POST'])
