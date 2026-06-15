@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-Live camera test script that captures frames from a normal webcam (non-wide angle)
-using OpenCV and runs object detection on the cropped square frame.
+Combined method live detection script:
+1. Grabs a wide-angle frame from Picamera2.
+2. Rectifies/flattens the frame using OpenCV's fisheye model.
+3. Center-crops a square from the flat frame (digital zoom + aspect ratio correction).
+4. Infers the YOLOv8 ONNX model and prints detected labels.
+5. Saves visual outputs to disk for inspection.
 """
 import os
 import sys
@@ -10,7 +14,11 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 
-# OpenCV VideoCapture will be used for live camera feed
+try:
+    from picamera2 import Picamera2
+except ImportError:
+    print("Error: picamera2 module not found. This script must be run on a Raspberry Pi.")
+    sys.exit(1)
 
 def main():
     this_dir = os.path.dirname(os.path.realpath(__file__))
@@ -25,97 +33,85 @@ def main():
     
     class_names = {0: "1", 1: "ball"}
     
-    # --- Camera Resolution Setup ---
+    # --- Fisheye Rectification Settings ---
     width, height = 640, 480
     
-    # Initialize OpenCV Camera with fallbacks
-    cap = None
-    opened_idx = -1
+    # Empirical Camera Intrinsic Matrix (K)
+    K = np.array([
+        [320.0, 0.0, 320.0],
+        [0.0, 320.0, 240.0],
+        [0.0, 0.0, 1.0]
+    ], dtype=np.float32)
     
-    # Try indices 0, 1, 2 with OS-specific preferences
-    for idx in [0, 1, 2]:
-        print(f"Trying to open camera index {idx}...")
-        if os.name == 'nt':
-            # Windows often requires CAP_DSHOW for USB webcams
-            cap = cv2.VideoCapture(idx, cv2.CAP_DSHOW)
-        else:
-            cap = cv2.VideoCapture(idx)
-            
-        if cap is not None and cap.isOpened():
-            print(f"Successfully opened camera index {idx}!")
-            opened_idx = idx
-            break
-        if cap is not None:
-            cap.release()
-            cap = None
-            
-    if cap is None or not cap.isOpened():
-        # Fallback without specific backends
-        for idx in [0, 1, 2]:
-            print(f"Fallback: Trying to open camera index {idx} without backend...")
-            cap = cv2.VideoCapture(idx)
-            if cap is not None and cap.isOpened():
-                print(f"Successfully opened camera index {idx}!")
-                opened_idx = idx
-                break
-            if cap is not None:
-                cap.release()
-                cap = None
-                
-    if cap is None or not cap.isOpened():
-        print("Error: Could not open any camera index (tried 0, 1, 2).")
-        sys.exit(1)
-        
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+    # Empirical Fisheye Distortion Coefficients [k1, k2, k3, k4]
+    D = np.array([-0.06, 0.02, -0.01, 0.002], dtype=np.float32)
     
-    # Let auto-exposure settle
+    # Precompute undistortion and rectification maps
+    # balance=0.2 retains more FOV while keeping lines relatively straight
+    new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(K, D, (width, height), np.eye(3), balance=0.2)
+    map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), new_K, (width, height), cv2.CV_16SC2)
+    
+    # Initialize Picamera2
+    picam2 = Picamera2()
+    config = picam2.create_video_configuration(
+        main={"format": "RGB888", "size": (width, height)}
+    )
+    picam2.configure(config)
+    picam2.start()
+    
+    # Let auto-exposure and white balance settle
     time.sleep(1.5)
-    print("\nStarting live object detection on normal webcam using OpenCV.")
+    print("\nStarting live combined method (Rectify + Center Crop) detection.")
     print("Press Ctrl+C to stop.\n")
+    
+    saved_visuals = False
     
     try:
         while True:
-            ret, frame = cap.read()
-            if not ret or frame is None:
+            frame = picam2.capture_array()
+            if frame is None:
                 print("Error: Failed to grab frame.")
                 time.sleep(0.1)
                 continue
             
-            # --- Center Crop the frame to square (preserves aspect ratio) ---
-            h_orig, w_orig = frame.shape[:2]
-            start_x, start_y = 0, 0
-            w_crop, h_crop = w_orig, h_orig
+            # --- Step 1: Rectify the frame ---
+            flat_frame = cv2.remap(frame, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
             
-            if w_orig > h_orig:
-                start_x = (w_orig - h_orig) // 2
-                w_crop = h_orig
-                cropped = frame[:, start_x:start_x + w_crop]
-            elif h_orig > w_orig:
-                start_y = (h_orig - w_orig) // 2
-                h_crop = w_orig
-                cropped = frame[start_y:start_y + h_crop, :]
-            else:
-                cropped = frame
+            # --- Step 2: Center-Crop a square from the flat frame ---
+            h_flat, w_flat = flat_frame.shape[:2]
+            start_x = (w_flat - h_flat) // 2
+            cropped_flat = flat_frame[:, start_x:start_x + h_flat]
+            w_crop, h_crop = h_flat, h_flat
             
-            # --- Preprocessing cropped frame ---
-            resized = cv2.resize(cropped, (input_w, input_h))
+            # Save visual checkpoints on the first frame
+            if not saved_visuals:
+                cv2.imwrite(os.path.join(this_dir, "step1_raw_distorted.jpg"), frame)
+                cv2.imwrite(os.path.join(this_dir, "step2_rectified_flat.jpg"), flat_frame)
+                cv2.imwrite(os.path.join(this_dir, "step3_rectified_cropped.jpg"), cropped_flat)
+                print("Saved visualization stages to disk:")
+                print("  - step1_raw_distorted.jpg")
+                print("  - step2_rectified_flat.jpg")
+                print("  - step3_rectified_cropped.jpg")
+                saved_visuals = True
             
-            # Convert channels BGR -> RGB for YOLO
+            # --- Step 3: Resize cropped frame for YOLO ---
+            resized = cv2.resize(cropped_flat, (input_w, input_h))
+            
+            # Convert BGR to RGB for model input
             rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
             input_data = rgb.astype(np.float32) / 255.0
             input_data = np.transpose(input_data, (2, 0, 1))
             input_data = np.expand_dims(input_data, axis=0)
             input_data = np.ascontiguousarray(input_data, dtype=np.float32)
             
-            # --- Run Inference ---
+            # --- Step 4: Run ONNX Inference ---
             outputs = session.run(None, {input_name: input_data})
             output = np.transpose(outputs[0][0])  # Shape [3549, 6]
             max_conf = float(np.max(output[:, 4:]))
             
             print(f"[{time.strftime('%X')}] Max Raw Conf: {max_conf:.4f}")
             
-            # Parse and print detections
+            # Parse detections
             boxes = []
             confidences = []
             class_ids = []
@@ -129,8 +125,9 @@ def main():
                 if conf >= 0.15:
                     x_scale = w_crop / input_w
                     y_scale = h_crop / input_h
+                    # Calculate coordinates relative to the original 640x480 frame
                     x1 = (xc - w / 2) * x_scale + start_x
-                    y1 = (yc - h / 2) * y_scale + start_y
+                    y1 = (yc - h / 2) * y_scale
                     w_box = w * x_scale
                     h_box = h * y_scale
                     
@@ -143,26 +140,30 @@ def main():
                 if len(indices) > 0:
                     flat_indices = indices.flatten() if hasattr(indices, 'flatten') else indices
                     print("  >> DETECTED:")
-                    annotated = frame.copy()
+                    
+                    annotated_flat = flat_frame.copy()
                     for idx in flat_indices:
                         name = class_names.get(class_ids[idx], f"class_{class_ids[idx]}")
                         conf = confidences[idx]
-                        print(f"     - {name} (conf={conf:.2f})")
+                        box = boxes[idx]
+                        x, y, wb, hb = box
                         
-                        # Draw bounding box
-                        bx, by, bw, bh = boxes[idx]
-                        cv2.rectangle(annotated, (bx, by), (bx + bw, by + bh), (74, 222, 128), 2)
-                        cv2.putText(annotated, f"{name} {conf:.2f}", (bx, by - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
+                        # Print details
+                        print(f"     - {name} (conf={conf:.2f}) at [{x}, {y}, {x+wb}, {y+hb}]")
+                        
+                        # Draw bounding boxes on the rectified flat image
+                        cv2.rectangle(annotated_flat, (x, y), (x + wb, y + hb), (74, 222, 128), 2)
+                        cv2.putText(annotated_flat, f"{name} {conf:.2f}", (x, max(y - 10, 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
                     
-                    # Save annotated frame for diagnostics
-                    cv2.imwrite(os.path.join(this_dir, "detected.jpg"), annotated)
+                    # Save the detection result
+                    cv2.imwrite(os.path.join(this_dir, "detection_result.jpg"), annotated_flat)
             
             time.sleep(0.1)
             
     except KeyboardInterrupt:
         print("\nStopping detection...")
     finally:
-        cap.release()
+        picam2.stop()
         print("Camera stopped.")
 
 if __name__ == "__main__":
