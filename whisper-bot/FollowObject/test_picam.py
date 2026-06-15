@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Live camera test script that undistorts/rectifies wide-angle camera frames
-using OpenCV's fisheye model and runs object detection on the flat frame.
+Live camera test script that captures frames from a normal webcam (non-wide angle)
+using OpenCV and runs object detection on the cropped square frame.
 """
 import os
 import sys
@@ -25,24 +25,8 @@ def main():
     
     class_names = {0: "1", 1: "ball"}
     
-    # --- Fisheye Rectification Setup ---
+    # --- Camera Resolution Setup ---
     width, height = 640, 480
-    
-    # Empirical Camera Intrinsic Matrix (K)
-    K = np.array([
-        [320.0, 0.0, 320.0],
-        [0.0, 320.0, 240.0],
-        [0.0, 0.0, 1.0]
-    ], dtype=np.float32)
-    
-    # Empirical Fisheye Distortion Coefficients [k1, k2, k3, k4]
-    # Negative k1 corrects for barrel distortion
-    D = np.array([-0.06, 0.02, -0.01, 0.002], dtype=np.float32)
-    
-    # Precompute undistortion and rectification maps for ultra-fast remapping
-    # balance=0.0 crops the black borders out, giving a clean 640x480 flat frame
-    new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(K, D, (width, height), np.eye(3), balance=0.0)
-    map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), new_K, (width, height), cv2.CV_16SC2)
     
     # Initialize OpenCV Camera (/dev/video1)
     cap = cv2.VideoCapture(1)
@@ -55,11 +39,8 @@ def main():
     
     # Let auto-exposure settle
     time.sleep(1.5)
-    print("\nStarting live fisheye rectification & detection using OpenCV.")
-    print("This script flattens the wide-angle image and runs YOLO detection on the flat image.")
+    print("\nStarting live object detection on normal webcam using OpenCV.")
     print("Press Ctrl+C to stop.\n")
-    
-    saved_visuals = False
     
     try:
         while True:
@@ -69,19 +50,24 @@ def main():
                 time.sleep(0.1)
                 continue
             
-            # --- Rectify the frame ---
-            # cv2.remap runs in ~1.5ms on the Pi CPU
-            flat_frame = cv2.remap(frame, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+            # --- Center Crop the frame to square (preserves aspect ratio) ---
+            h_orig, w_orig = frame.shape[:2]
+            start_x, start_y = 0, 0
+            w_crop, h_crop = w_orig, h_orig
             
-            # Save visual validation files once
-            if not saved_visuals:
-                cv2.imwrite(os.path.join(this_dir, "raw_distorted.jpg"), frame)
-                cv2.imwrite(os.path.join(this_dir, "rectified_flat.jpg"), flat_frame)
-                print(f"Saved 'raw_distorted.jpg' and 'rectified_flat.jpg' to {this_dir} for visual verification.")
-                saved_visuals = True
+            if w_orig > h_orig:
+                start_x = (w_orig - h_orig) // 2
+                w_crop = h_orig
+                cropped = frame[:, start_x:start_x + w_crop]
+            elif h_orig > w_orig:
+                start_y = (h_orig - w_orig) // 2
+                h_crop = w_orig
+                cropped = frame[start_y:start_y + h_crop, :]
+            else:
+                cropped = frame
             
-            # --- Preprocessing Rectified Frame ---
-            resized = cv2.resize(flat_frame, (input_w, input_h))
+            # --- Preprocessing cropped frame ---
+            resized = cv2.resize(cropped, (input_w, input_h))
             
             # Convert channels BGR -> RGB for YOLO
             rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
@@ -109,10 +95,10 @@ def main():
                 conf = float(scores[class_id])
                 
                 if conf >= 0.15:
-                    x_scale = width / input_w
-                    y_scale = height / input_h
-                    x1 = (xc - w / 2) * x_scale
-                    y1 = (yc - h / 2) * y_scale
+                    x_scale = w_crop / input_w
+                    y_scale = h_crop / input_h
+                    x1 = (xc - w / 2) * x_scale + start_x
+                    y1 = (yc - h / 2) * y_scale + start_y
                     w_box = w * x_scale
                     h_box = h * y_scale
                     
@@ -125,10 +111,19 @@ def main():
                 if len(indices) > 0:
                     flat_indices = indices.flatten() if hasattr(indices, 'flatten') else indices
                     print("  >> DETECTED:")
+                    annotated = frame.copy()
                     for idx in flat_indices:
                         name = class_names.get(class_ids[idx], f"class_{class_ids[idx]}")
                         conf = confidences[idx]
                         print(f"     - {name} (conf={conf:.2f})")
+                        
+                        # Draw bounding box
+                        bx, by, bw, bh = boxes[idx]
+                        cv2.rectangle(annotated, (bx, by), (bx + bw, by + bh), (74, 222, 128), 2)
+                        cv2.putText(annotated, f"{name} {conf:.2f}", (bx, by - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (74, 222, 128), 1, cv2.LINE_AA)
+                    
+                    # Save annotated frame for diagnostics
+                    cv2.imwrite(os.path.join(this_dir, "detected.jpg"), annotated)
             
             time.sleep(0.1)
             
