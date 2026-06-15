@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 """
-Test script for running object detection on Raspberry Pi using Picamera2
-without rendering frames.
+Self-contained object detection script for Raspberry Pi using Picamera2 and ONNX runtime.
+Runs headlessly, parses detections, and prints results without relying on detect.py.
 """
 import os
 import sys
 import time
-
-# Add parent directory of FollowObject to sys.path
-THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.dirname(THIS_DIR))
-
-# Import detect function from the current directory
-from detect import detect
+import cv2
+import numpy as np
+import onnxruntime as ort
 
 try:
     from picamera2 import Picamera2
@@ -21,8 +17,17 @@ except ImportError:
     sys.exit(1)
 
 def main():
-    model_path = os.path.join(THIS_DIR, "best.onnx")
+    this_dir = os.path.dirname(os.path.realpath(__file__))
+    model_path = os.path.join(this_dir, "best.onnx")
     print(f"Loading ONNX model from: {model_path}")
+    
+    # Initialize ONNX Session on CPU
+    session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
+    input_name = session.get_inputs()[0].name
+    input_shape = session.get_inputs()[0].shape  # Expecting [1, 3, 416, 416]
+    input_h, input_w = input_shape[2], input_shape[3]
+    
+    class_names = {0: "1", 1: "ball"}
     
     # Initialize and configure Picamera2
     picam2 = Picamera2()
@@ -32,9 +37,13 @@ def main():
     picam2.configure(config)
     picam2.start()
     
-    # Warm up camera
-    time.sleep(1.0)
-    print("Starting Picamera2 object detection. Press Ctrl+C to quit...")
+    # Let auto-exposure and white balance settle
+    time.sleep(1.5)
+    print("\nStarting independent live detection.")
+    print("This script runs inference on every frame using BOTH channel interpretations:")
+    print("  1. BGR-to-RGB (treats frame as BGR and converts to RGB)")
+    print("  2. As-Is (treats frame as RGB directly, no conversion)")
+    print("Press Ctrl+C to stop.\n")
     
     try:
         while True:
@@ -43,27 +52,76 @@ def main():
                 print("Error: Failed to grab frame from Picamera2.")
                 time.sleep(0.1)
                 continue
+            
+            # --- Preprocessing ---
+            resized = cv2.resize(frame, (input_w, input_h))
+            
+            # Path A: Treats frame as BGR and swaps channels to RGB
+            rgb_a = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+            input_a = rgb_a.astype(np.float32) / 255.0
+            input_a = np.transpose(input_a, (2, 0, 1))
+            input_a = np.expand_dims(input_a, axis=0)
+            input_a = np.ascontiguousarray(input_a, dtype=np.float32)
+            
+            # Path B: Treats frame as RGB, no conversion
+            input_b = resized.astype(np.float32) / 255.0
+            input_b = np.transpose(input_b, (2, 0, 1))
+            input_b = np.expand_dims(input_b, axis=0)
+            input_b = np.ascontiguousarray(input_b, dtype=np.float32)
+            
+            # --- Run Inference Path A ---
+            outputs_a = session.run(None, {input_name: input_a})
+            output_a = np.transpose(outputs_a[0][0])  # Shape: [3549, 6]
+            max_conf_a = float(np.max(output_a[:, 4:]))
+            
+            # --- Run Inference Path B ---
+            outputs_b = session.run(None, {input_name: input_b})
+            output_b = np.transpose(outputs_b[0][0])  # Shape: [3549, 6]
+            max_conf_b = float(np.max(output_b[:, 4:]))
+            
+            # Output diagnostics on every frame
+            print(f"[{time.strftime('%X')}] Max Raw Score -> BGR-to-RGB: {max_conf_a:.4f} | As-Is (RGB): {max_conf_b:.4f}")
+            
+            # Helper to parse and print boxes
+            def parse_and_print(output, mode_name, threshold=0.15):
+                boxes = []
+                confidences = []
+                class_ids = []
+                h_orig, w_orig = frame.shape[:2]
                 
-            # Run detection with both color modes to see which one works
-            result_f = detect(frame, model_path=model_path, conf_threshold=0.15, iou_threshold=0.45, input_is_rgb=False)
-            result_t = detect(frame, model_path=model_path, conf_threshold=0.15, iou_threshold=0.45, input_is_rgb=True)
-            
-            # Extract max raw confidence score from each result
-            max_conf_f = result_f.get("max_conf", 0.0) # wait, detect() might not return max_conf, let's compute it if not
-            # Let's inspect detect() to see if it prints max raw confidence score
-            # detect() prints: "[Detect] Max raw confidence score: ..."
-            # We can also compute it or let detect() print it.
-            
-            # Let's print the detections for both modes if they have any
-            dets_f = result_f.get("detections", [])
-            dets_t = result_t.get("detections", [])
-            
-            if dets_f:
-                print(f"[{time.strftime('%X')}] (input_is_rgb=False) Detections: {[{'class': d['class_name'], 'conf': d['conf']} for d in dets_f]}")
-            if dets_t:
-                print(f"[{time.strftime('%X')}] (input_is_rgb=True) Detections: {[{'class': d['class_name'], 'conf': d['conf']} for d in dets_t]}")
+                for row in output:
+                    xc, yc, w, h = row[0:4]
+                    scores = row[4:]
+                    class_id = np.argmax(scores)
+                    conf = float(scores[class_id])
+                    
+                    if conf >= threshold:
+                        x_scale = w_orig / input_w
+                        y_scale = h_orig / input_h
+                        x1 = (xc - w / 2) * x_scale
+                        y1 = (yc - h / 2) * y_scale
+                        w_box = w * x_scale
+                        h_box = h * y_scale
+                        
+                        boxes.append([int(x1), int(y1), int(w_box), int(h_box)])
+                        confidences.append(conf)
+                        class_ids.append(int(class_id))
                 
-            time.sleep(0.05)  # Yield CPU execution
+                if len(boxes) > 0:
+                    indices = cv2.dnn.NMSBoxes(boxes, confidences, threshold, 0.45)
+                    if len(indices) > 0:
+                        flat_indices = indices.flatten() if hasattr(indices, 'flatten') else indices
+                        print(f"  >> {mode_name} DETECTED:")
+                        for idx in flat_indices:
+                            name = class_names.get(class_ids[idx], f"class_{class_ids[idx]}")
+                            conf = confidences[idx]
+                            box = boxes[idx]
+                            print(f"     * {name} (conf={conf:.2f}) at box=[{box[0]},{box[1]},{box[0]+box[2]},{box[1]+box[3]}]")
+            
+            parse_and_print(output_a, "BGR-to-RGB", threshold=0.15)
+            parse_and_print(output_b, "As-Is (RGB)", threshold=0.15)
+            
+            time.sleep(0.1)  # Yield CPU and prevent terminal flooding
             
     except KeyboardInterrupt:
         print("\nStopping detection...")
