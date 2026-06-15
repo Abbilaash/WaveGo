@@ -439,7 +439,7 @@ class CVThread(threading.Thread):
     def ballSearchCV(self, frame_image):
         try:
             model_path = os.path.join(thisPath, 'FollowObject', 'best.onnx')
-            result = detect(frame_image, model_path=model_path, input_is_rgb=True)
+            result = detect(frame_image, model_path=model_path, input_is_rgb=False)
             if result.get("success", False) and result.get("detections"):
                 best_det = result["detections"][0]
                 x1 = int(best_det["x1"])
