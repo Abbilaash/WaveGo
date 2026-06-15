@@ -19,7 +19,7 @@ def get_session(model_path=None):
 	_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
 	return _session
 
-def detect(frame, model_path=None, conf_threshold=0.25, iou_threshold=0.45, input_is_rgb=False):
+def detect(frame, model_path=None, conf_threshold=0.15, iou_threshold=0.45, input_is_rgb=False):
 	"""
 	Run object detection using pure onnxruntime.
 	Avoids importing PyTorch/TensorFlow/Ultralytics.
