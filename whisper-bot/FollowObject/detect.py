@@ -13,7 +13,8 @@ def get_session(model_path=None):
 		return _session
 	
 	if model_path is None:
-		model_path = os.path.join(os.path.dirname(__file__), "best.onnx")
+		# Use the wide-angle optimized ONNX model
+		model_path = os.path.join(os.path.dirname(__file__), "best-wide-angle.onnx")
 	
 	# Load with CPU execution provider for Raspberry Pi compatibility
 	_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
@@ -43,8 +44,7 @@ def detect(frame, model_path=None, conf_threshold=0.10, iou_threshold=0.45, inpu
 		# Preprocess frame
 		resized = cv2.resize(cropped, (input_w, input_h))
 		
-		# Model best.onnx expects BGR format. If the camera captures in RGB,
-		# setting input_is_rgb=False will swap RGB to BGR.
+		# Model expects RGB format.
 		if not input_is_rgb:
 			rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
 		else:
