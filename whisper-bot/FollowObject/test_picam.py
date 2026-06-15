@@ -28,10 +28,42 @@ def main():
     # --- Camera Resolution Setup ---
     width, height = 640, 480
     
-    # Initialize OpenCV Camera (/dev/video1)
-    cap = cv2.VideoCapture(1)
-    if not cap.isOpened():
-        print("Error: Could not open camera.")
+    # Initialize OpenCV Camera with fallbacks
+    cap = None
+    opened_idx = -1
+    
+    # Try indices 0, 1, 2 with OS-specific preferences
+    for idx in [0, 1, 2]:
+        print(f"Trying to open camera index {idx}...")
+        if os.name == 'nt':
+            # Windows often requires CAP_DSHOW for USB webcams
+            cap = cv2.VideoCapture(idx, cv2.CAP_DSHOW)
+        else:
+            cap = cv2.VideoCapture(idx)
+            
+        if cap is not None and cap.isOpened():
+            print(f"Successfully opened camera index {idx}!")
+            opened_idx = idx
+            break
+        if cap is not None:
+            cap.release()
+            cap = None
+            
+    if cap is None or not cap.isOpened():
+        # Fallback without specific backends
+        for idx in [0, 1, 2]:
+            print(f"Fallback: Trying to open camera index {idx} without backend...")
+            cap = cv2.VideoCapture(idx)
+            if cap is not None and cap.isOpened():
+                print(f"Successfully opened camera index {idx}!")
+                opened_idx = idx
+                break
+            if cap is not None:
+                cap.release()
+                cap = None
+                
+    if cap is None or not cap.isOpened():
+        print("Error: Could not open any camera index (tried 0, 1, 2).")
         sys.exit(1)
         
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
