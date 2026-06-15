@@ -11,12 +11,8 @@ def get_session(model_path=None):
     global _session
     if _session is not None:
         return _session
-    
     if model_path is None:
-        # Default to the wide-angle optimized ONNX model
         model_path = os.path.join(os.path.dirname(__file__), "best.onnx")
-    
-    # Load with CPU execution provider for Raspberry Pi compatibility
     try:
         _session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
     except Exception as e:
@@ -26,115 +22,57 @@ def get_session(model_path=None):
         _session = ort.InferenceSession(fallback_path, providers=["CPUExecutionProvider"])
     return _session
 
-def detect(frame, model_path=None, conf_threshold=0.10, iou_threshold=0.45, input_is_rgb=False, crop_size=240):
+def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop_size=240):
     """
-    Run object detection using pure onnxruntime.
-    Avoids importing PyTorch/TensorFlow/Ultralytics.
+    Run object detection using an End-to-End ONNX runtime model (exported with nms=True).
+    Output shape is expected to be [1, 300, 6] in [x1, y1, x2, y2, conf, class_id] format.
     """
     try:
         session = get_session(model_path)
-        
-        # Get input details
         input_name = session.get_inputs()[0].name
-        input_shape = session.get_inputs()[0].shape  # Expecting [1, 3, 416, 416]
+        input_shape = session.get_inputs()[0].shape  # [1, 3, 416, 416]
         input_h, input_w = input_shape[2], input_shape[3]
         h_orig, w_orig = frame.shape[:2]
-        
-        # Print debug info about model and frame
-        print(f"[Detect] Using model: {model_path}")
-        print(f"[Detect] Input shape expected: ({input_h}, {input_w})")
-        print(f"[Detect] Frame original size: ({h_orig}, {w_orig})")
-        # Convert to RGB if needed (the model expects RGB)
-        if not input_is_rgb:
-            # Convert BGR (OpenCV default) to RGB
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        else:
-            frame_rgb = frame
-        # Define crop size (e.g., 240 for zoom, or min(h, w) for no aspect ratio distortion)
+        # Wide-angle cropping / digital zoom
         crop_size = min(h_orig, w_orig, crop_size)
         start_x = (w_orig - crop_size) // 2
         start_y = (h_orig - crop_size) // 2
-        cropped = frame_rgb[start_y:start_y + crop_size, start_x:start_x + crop_size]
-        
-        # Preprocess frame
+        cropped = frame[start_y:start_y + crop_size, start_x:start_x + crop_size]
+        # Resize and color formatting
         resized = cv2.resize(cropped, (input_w, input_h))
-        
-        # Model expects RGB format.
-        if not input_is_rgb:
-            rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
-        else:
-            rgb = resized
+        rgb = resized if input_is_rgb else cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+        # Prepare input tensor
         input_data = rgb.astype(np.float32) / 255.0
-        input_data = np.transpose(input_data, (2, 0, 1))  # HWC to CHW
-        input_data = np.expand_dims(input_data, axis=0)   # Add batch dim
-        
-        # Ensure contiguous memory layout
+        input_data = np.transpose(input_data, (2, 0, 1))
+        input_data = np.expand_dims(input_data, axis=0)
         input_data = np.ascontiguousarray(input_data, dtype=np.float32)
-        
-        # Run Inference
+        # Inference
         outputs = session.run(None, {input_name: input_data})
-        output = outputs[0][0]  # Shape: [6, 3549]
-        
-        # Transpose to [3549, 6] where columns are [xc, yc, w, h, class0_score, class1_score]
-        output = np.transpose(output)
-        
-        max_conf = float(np.max(output[:, 4:]))
-        print(f"[Detect] Max raw confidence score: {max_conf:.4f}")
-        
-        boxes = []
-        confidences = []
-        class_ids = []
-        
-        for row in output:
-            xc, yc, w, h = row[0:4]
-            scores = row[4:]
-            class_id = np.argmax(scores)
-            conf = float(scores[class_id])
-            # No confidence threshold – include all detections
-            x_scale = crop_size / input_w
-            y_scale = crop_size / input_h
-            x1 = (xc - w / 2) * x_scale + start_x
-            y1 = (yc - h / 2) * y_scale + start_y
-            w_box = w * x_scale
-            h_box = h * y_scale
-            boxes.append([int(x1), int(y1), int(w_box), int(h_box)])
-            confidences.append(conf)
-            class_ids.append(int(class_id))
-        
-        # Non-Maximum Suppression (NMS)
-        indices = cv2.dnn.NMSBoxes(boxes, confidences, 0.0, iou_threshold)
-        
+        detections_raw = outputs[0][0]
         detections = []
         annotated_frame = frame.copy()
-        # Draw every detection (no NMS filtering)
-        for idx, box in enumerate(boxes):
-            x1, y1, w_box, h_box = box
-            conf = confidences[idx]
-            class_id = class_ids[idx]
+        x_scale = crop_size / input_w
+        y_scale = crop_size / input_h
+        for row in detections_raw:
+            x1, y1, x2, y2, conf, class_id = row
+            if conf < conf_threshold:
+                continue
+            real_x1 = int(x1 * x_scale + start_x)
+            real_y1 = int(y1 * y_scale + start_y)
+            real_x2 = int(x2 * x_scale + start_x)
+            real_y2 = int(y2 * y_scale + start_y)
             det = {
-                "x1": float(x1),
-                "y1": float(y1),
-                "x2": float(x1 + w_box),
-                "y2": float(y1 + h_box),
-                "conf": conf,
-                "class_id": class_id
+                "x1": float(real_x1),
+                "y1": float(real_y1),
+                "x2": float(real_x2),
+                "y2": float(real_y2),
+                "conf": float(conf),
+                "class_id": int(class_id)
             }
             detections.append(det)
-            # Render bounding box only (no label text)
-            color = (74, 222, 128) if class_id == 1 else (64, 128, 255)  # Green for ball, orange for class 0
-            cv2.rectangle(annotated_frame, (x1, y1), (x1 + w_box, y1 + h_box), color, 2)
-        
-        return {
-            "success": True,
-            "detections": detections,
-            "annotated_frame": annotated_frame,
-            "results": None
-        }
+            color = (74, 222, 128) if int(class_id) == 1 else (64, 128, 255)
+            cv2.rectangle(annotated_frame, (real_x1, real_y1), (real_x2, real_y2), color, 2)
+        print(f"[Detect] Successfully extracted {len(detections)} valid objects.")
+        return {"success": True, "detections": detections, "annotated_frame": annotated_frame, "results": None}
     except Exception as e:
-        return {
-            "success": False,
-            "detections": [],
-            "annotated_frame": frame,
-            "results": None,
-            "error": str(e)
-        }
+        return {"success": False, "detections": [], "annotated_frame": frame, "results": None, "error": str(e)}
