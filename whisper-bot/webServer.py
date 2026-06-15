@@ -12,6 +12,22 @@ import time
 import re
 from typing import Optional, Tuple
 
+# Monkeypatch importlib.metadata.version to prevent PackageNotFoundError for werkzeug/flask in environments with corrupt/missing package metadata
+try:
+	import importlib.metadata
+	_orig_version = importlib.metadata.version
+	def _hook_version(distribution_name):
+		try:
+			return _orig_version(distribution_name)
+		except importlib.metadata.PackageNotFoundError:
+			if distribution_name.lower() in ("werkzeug", "flask", "itsdangerous", "click", "jinja2", "markupsafe"):
+				return "3.0.0"
+			raise
+	importlib.metadata.version = _hook_version
+except Exception:
+	pass
+
+
 import cv2
 import numpy as np
 from flask import Flask, Response, jsonify, render_template, send_from_directory, request
