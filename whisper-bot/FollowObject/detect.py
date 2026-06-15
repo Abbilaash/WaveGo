@@ -14,7 +14,7 @@ def get_session(model_path=None):
 	
 	if model_path is None:
 		# Use the wide-angle optimized ONNX model
-		model_path = os.path.join(os.path.dirname(__file__), "best-wide-angle.onnx")
+		model_path = os.path.join(os.path.dirname(__file__), "best.onnx")
 	
 	# Load with CPU execution provider for Raspberry Pi compatibility
 	_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
@@ -76,48 +76,42 @@ def detect(frame, model_path=None, conf_threshold=0.10, iou_threshold=0.45, inpu
 			class_id = np.argmax(scores)
 			conf = float(scores[class_id])
 			
-			if conf >= conf_threshold:
-				# Convert center coords [xc, yc, w, h] to top-left [x, y, w, h] of original frame
-				x_scale = crop_size / input_w
-				y_scale = crop_size / input_h
-				
-				x1 = (xc - w / 2) * x_scale + start_x
-				y1 = (yc - h / 2) * y_scale + start_y
-				w_box = w * x_scale
-				h_box = h * y_scale
-				
-				boxes.append([int(x1), int(y1), int(w_box), int(h_box)])
-				confidences.append(conf)
-				class_ids.append(int(class_id))
+			# No confidence threshold – include all detections
+			# Convert center coords [xc, yc, w, h] to top-left [x, y, w, h] of original frame
+			x_scale = crop_size / input_w
+			y_scale = crop_size / input_h
+			
+			x1 = (xc - w / 2) * x_scale + start_x
+			y1 = (yc - h / 2) * y_scale + start_y
+			w_box = w * x_scale
+			h_box = h * y_scale
+			
+			boxes.append([int(x1), int(y1), int(w_box), int(h_box)])
+			confidences.append(conf)
+			class_ids.append(int(class_id))
 				
 		# Non-Maximum Suppression (NMS)
-		indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, iou_threshold)
+		indices = cv2.dnn.NMSBoxes(boxes, confidences, 0.0, iou_threshold)
 		
 		detections = []
 		annotated_frame = frame.copy()
-		
-		if len(indices) > 0:
-			# Handle both OpenCV 4.x formats for NMS indexes
-			flat_indices = indices.flatten() if hasattr(indices, 'flatten') else indices
-			for idx in flat_indices:
-				box = boxes[idx]
-				x1, y1, w_box, h_box = box
-				conf = confidences[idx]
-				class_id = class_ids[idx]
-				
-				det = {
-					"x1": float(x1),
-					"y1": float(y1),
-					"x2": float(x1 + w_box),
-					"y2": float(y1 + h_box),
-					"conf": conf,
-					"class_id": class_id
-				}
-				detections.append(det)
-				
-				# Render bounding box only (no label text)
-				color = (74, 222, 128) if class_id == 1 else (64, 128, 255)  # Green for ball, orange for class 0
-				cv2.rectangle(annotated_frame, (x1, y1), (x1 + w_box, y1 + h_box), color, 2)
+		# Draw every detection (no NMS filtering)
+		for idx, box in enumerate(boxes):
+			x1, y1, w_box, h_box = box
+			conf = confidences[idx]
+			class_id = class_ids[idx]
+			det = {
+				"x1": float(x1),
+				"y1": float(y1),
+				"x2": float(x1 + w_box),
+				"y2": float(y1 + h_box),
+				"conf": conf,
+				"class_id": class_id
+			}
+			detections.append(det)
+			# Render bounding box only (no label text)
+			color = (74, 222, 128) if class_id == 1 else (64, 128, 255)  # Green for ball, orange for class 0
+			cv2.rectangle(annotated_frame, (x1, y1), (x1 + w_box, y1 + h_box), color, 2)
 				
 		return {
 			"success": True,

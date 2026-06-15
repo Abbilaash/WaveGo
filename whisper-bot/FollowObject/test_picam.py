@@ -126,19 +126,21 @@ def main():
                 
                 if conf >= 0.10:
                     x_scale = w_crop / input_w
-                    y_scale = h_crop / input_h
-                    # Calculate coordinates relative to the original 640x480 frame
-                    x1 = (xc - w / 2) * x_scale + start_x
-                    y1 = (yc - h / 2) * y_scale + start_y
-                    w_box = w * x_scale
-                    h_box = h * y_scale
-                    
-                    boxes.append([int(x1), int(y1), int(w_box), int(h_box)])
-                    confidences.append(conf)
-                    class_ids.append(int(class_id))
+                # No confidence threshold – include all detections
+                x_scale = w_crop / input_w
+                y_scale = h_crop / input_h
+                # Calculate coordinates relative to the original 640x480 frame
+                x1 = (xc - w / 2) * x_scale + start_x
+                y1 = (yc - h / 2) * y_scale + start_y
+                w_box = w * x_scale
+                h_box = h * y_scale
+                
+                boxes.append([int(x1), int(y1), int(w_box), int(h_box)])
+                confidences.append(conf)
+                class_ids.append(int(class_id))
             
             if len(boxes) > 0:
-                indices = cv2.dnn.NMSBoxes(boxes, confidences, 0.10, 0.45)
+                indices = cv2.dnn.NMSBoxes(boxes, confidences, 0.0, 0.45)
                 if len(indices) > 0:
                     flat_indices = indices.flatten() if hasattr(indices, 'flatten') else indices
                     print("  >> DETECTED:")
