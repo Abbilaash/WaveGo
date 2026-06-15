@@ -19,7 +19,7 @@ def get_session(model_path=None):
 	_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
 	return _session
 
-def detect(frame, model_path=None, conf_threshold=0.25, iou_threshold=0.45):
+def detect(frame, model_path=None, conf_threshold=0.25, iou_threshold=0.45, input_is_rgb=False):
 	"""
 	Run object detection using pure onnxruntime.
 	Avoids importing PyTorch/TensorFlow/Ultralytics.
@@ -36,7 +36,10 @@ def detect(frame, model_path=None, conf_threshold=0.25, iou_threshold=0.45):
 		
 		# Preprocess frame
 		resized = cv2.resize(frame, (input_w, input_h))
-		rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+		if not input_is_rgb:
+			rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+		else:
+			rgb = resized
 		input_data = rgb.astype(np.float32) / 255.0
 		input_data = np.transpose(input_data, (2, 0, 1))  # HWC to CHW
 		input_data = np.expand_dims(input_data, axis=0)   # Add batch dim
@@ -47,6 +50,9 @@ def detect(frame, model_path=None, conf_threshold=0.25, iou_threshold=0.45):
 		
 		# Transpose to [3549, 6] where columns are [xc, yc, w, h, class0_score, class1_score]
 		output = np.transpose(output)
+		
+		max_conf = float(np.max(output[:, 4:]))
+		print(f"[Detect] Max raw confidence score: {max_conf:.4f}")
 		
 		boxes = []
 		confidences = []
