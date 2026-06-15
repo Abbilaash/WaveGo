@@ -10,11 +10,7 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 
-try:
-    from picamera2 import Picamera2
-except ImportError:
-    print("Error: picamera2 module not found. This script must be run on a Raspberry Pi.")
-    sys.exit(1)
+# OpenCV VideoCapture will be used for live camera feed
 
 def main():
     this_dir = os.path.dirname(os.path.realpath(__file__))
@@ -48,17 +44,18 @@ def main():
     new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(K, D, (width, height), np.eye(3), balance=0.0)
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), new_K, (width, height), cv2.CV_16SC2)
     
-    # Initialize Picamera2
-    picam2 = Picamera2()
-    config = picam2.create_video_configuration(
-        main={"format": "RGB888", "size": (width, height)}
-    )
-    picam2.configure(config)
-    picam2.start()
+    # Initialize OpenCV Camera (/dev/video1)
+    cap = cv2.VideoCapture(1)
+    if not cap.isOpened():
+        print("Error: Could not open camera.")
+        sys.exit(1)
+        
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
     
     # Let auto-exposure settle
     time.sleep(1.5)
-    print("\nStarting live fisheye rectification & detection.")
+    print("\nStarting live fisheye rectification & detection using OpenCV.")
     print("This script flattens the wide-angle image and runs YOLO detection on the flat image.")
     print("Press Ctrl+C to stop.\n")
     
@@ -66,8 +63,8 @@ def main():
     
     try:
         while True:
-            frame = picam2.capture_array()
-            if frame is None:
+            ret, frame = cap.read()
+            if not ret or frame is None:
                 print("Error: Failed to grab frame.")
                 time.sleep(0.1)
                 continue
@@ -138,7 +135,7 @@ def main():
     except KeyboardInterrupt:
         print("\nStopping detection...")
     finally:
-        picam2.stop()
+        cap.release()
         print("Camera stopped.")
 
 if __name__ == "__main__":
