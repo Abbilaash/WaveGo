@@ -596,15 +596,13 @@
           <div class="chat-container" id="chatContainer">
             <div class="chat-message bot-msg">
               <div class="chat-bubble">
-                Hello! I am your AI Command Assistant. You can control the WAVEGO robot using natural language. Try
-                saying things like:
-                <ul
-                  style="margin: 6px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.4;">
-                  <li>"please move forward"</li>
-                  <li>"can you turn left"</li>
-                  <li>"turn right immediately"</li>
-                  <li>"stop walking!"</li>
-                </ul>
+                Hello! I am your AI Command Assistant.
+                <br><br>
+                <strong>🤖 Robot Control:</strong> Start your message with the word <strong>"command"</strong> (e.g., <em>"command forward 5"</em>, <em>"command stop"</em>).
+                <br><br>
+                <strong>💬 Chat/Q&A:</strong> Type anything else to query the trained knowledge base.
+                <br><br>
+                <strong>📚 Training:</strong> Type <em>"train on &lt;statement&gt;"</em> to teach me new facts.
               </div>
               <div class="chat-time">System</div>
             </div>
@@ -943,7 +941,7 @@
 
   faceLearnBtn.addEventListener('click', async () => {
     capturedImages = [];
-    learnStatus.textContent = "Starting capture sequence...";
+    learnStatus.textContent = "Starting capture sequence (6 photos, 0.5s interval)...";
     learnPreviews.innerHTML = "";
     learnPreviews.style.display = "flex";
     learnSaveForm.style.display = "none";
@@ -955,50 +953,43 @@
     progressContainer.style.display = "block";
     progressBar.style.width = "0%";
 
-    let anyFace = false;
-    const totalFrames = 30;
+    try {
+      progressBar.style.width = "50%";
+      const response = await fetch('/api/face/capture');
+      if (!response.ok) throw new Error('Capture failed');
+      const data = await response.json();
 
-    for (let i = 0; i < totalFrames; i++) {
-      try {
-        const response = await fetch('/api/face/capture');
-        if (!response.ok) throw new Error('Capture failed');
-        const data = await response.json();
-
-        if (data.success) {
-          capturedImages.push(data.image);
-          if (data.has_face) {
-            anyFace = true;
-          }
-
-          // Display preview image for sampled frames (1st, 15th, and 30th frames)
-          if (i === 0 || i === 14 || i === 29) {
+      if (data.success && data.images) {
+        capturedImages = data.images;
+        
+        // Show previews for 1st, 3rd, and 6th frames (indices 0, 2, 5)
+        const displayIndices = [0, 2, 5];
+        displayIndices.forEach(idx => {
+          if (idx < capturedImages.length) {
             const img = document.createElement('img');
-            img.src = `data:image/jpeg;base64,${data.image}`;
-            img.className = `learn-preview-pic ${data.has_face ? 'has-face' : 'no-face'}`;
+            img.src = `data:image/jpeg;base64,${capturedImages[idx]}`;
+            img.className = 'learn-preview-pic has-face';
             learnPreviews.appendChild(img);
           }
+        });
+        
+        progressBar.style.width = "100%";
+        if (data.has_face) {
+          learnStatus.textContent = "Human face detected! Enter name below:";
+          learnSaveForm.style.display = "flex";
         } else {
-          throw new Error(data.error || 'Unknown error');
+          learnStatus.textContent = "No human faces detected in any frames. Try again!";
+          learnSaveForm.style.display = "flex";
         }
-      } catch (err) {
-        console.error("Frame capture error:", err);
+      } else {
+        throw new Error(data.error || 'Unknown error');
       }
-
-      const percent = Math.round(((i + 1) / totalFrames) * 100);
-      progressBar.style.width = `${percent}%`;
-      learnStatus.textContent = `Capturing: ${percent}%`;
-
-      await sleep(100);
-    }
-
-    progressContainer.style.display = "none";
-    faceLearnBtn.disabled = false;
-
-    if (anyFace) {
-      learnStatus.textContent = "Human face detected! Enter name below:";
-      learnSaveForm.style.display = "flex";
-    } else {
-      learnStatus.textContent = "No human faces detected. Try again!";
+    } catch (err) {
+      console.error("Frame capture error:", err);
+      learnStatus.textContent = `Capture error: ${err.message}`;
+    } finally {
+      progressContainer.style.display = "none";
+      faceLearnBtn.disabled = false;
     }
   });
 
@@ -1312,10 +1303,14 @@
         if (data.prompt_for_param) {
           botResponse = data.action_taken;
           execIndicator.style.background = "#fbbf24";
-        } else if (data.threshold_passed) {
-          botResponse = `Command: "${data.command}" matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
+        } else if (data.intent) {
+          if (data.threshold_passed) {
+            botResponse = `Command: "${data.command}" matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
+          } else {
+            botResponse = `Transcribed command: "${data.command}" but confidence was too low (${scorePercent}%). Try speaking clearly or type: "move forward", "turn left", "turn right", or "stop".`;
+          }
         } else {
-          botResponse = `Transcribed command: "${data.command}" but confidence was too low (${scorePercent}%). Try speaking clearly or type: "move forward", "turn left", "turn right", or "stop".`;
+          botResponse = data.action_taken;
         }
         appendChatMessage('bot', botResponse);
 
@@ -1381,10 +1376,14 @@
       if (data.prompt_for_param) {
         botResponse = data.action_taken;
         execIndicator.style.background = "#fbbf24";
-      } else if (data.threshold_passed) {
-        botResponse = `Command matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
+      } else if (data.intent) {
+        if (data.threshold_passed) {
+          botResponse = `Command matched intent '${data.intent}' with ${scorePercent}% confidence. Action: ${data.action_taken}`;
+        } else {
+          botResponse = `I understood your command with too low confidence (${scorePercent}%). No action was taken. Try saying: "move forward", "turn left", "turn right", or "stop".`;
+        }
       } else {
-        botResponse = `I understood your command with too low confidence (${scorePercent}%). No action was taken. Try saying: "move forward", "turn left", "turn right", or "stop".`;
+        botResponse = data.action_taken;
       }
       appendChatMessage('bot', botResponse);
 

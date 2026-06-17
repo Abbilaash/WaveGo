@@ -1,298 +1,818 @@
-2026-06-10 14:54:24,416 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:24,472 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
-2026-06-10 14:54:24,554 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:24,557 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:54:24,561 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:25,566 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
-2026-06-10 14:54:28,739 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:28,744 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:54:32,732 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:32,733 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:54:36,539 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:36,539 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:54:40,540 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:40,540 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:54:44,727 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:44,729 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:54:48,707 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:48,707 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:54:52,723 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:52,725 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:54:56,710 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:54:56,830 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:00,526 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:00,526 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:04,525 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:04,525 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:08,540 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:08,540 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:12,538 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:12,538 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:16,536 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:16,536 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:20,535 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:20,535 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:24,721 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:24,729 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:28,758 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:28,758 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:32,728 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:32,730 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:36,786 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:36,800 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:40,729 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:40,730 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:44,715 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:44,715 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:48,712 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:48,712 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:52,713 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:52,714 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:55:56,716 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:55:56,716 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:00,535 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:00,535 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:04,529 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:04,529 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:08,535 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:08,543 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:12,533 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:12,542 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:16,565 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:16,624 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:20,543 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:20,543 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:24,540 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:24,540 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:28,538 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:28,538 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:32,537 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:32,537 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:36,716 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:36,716 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:40,714 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:40,714 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:44,713 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:44,713 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:48,710 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:48,710 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:52,709 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:52,709 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:56:56,707 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:56:56,707 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:00,722 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:00,722 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:04,723 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:04,725 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:08,722 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:08,722 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:12,718 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:12,726 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:16,721 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:16,721 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:20,706 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:20,715 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:24,712 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:24,712 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:28,761 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:28,766 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:57:32,711 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:57:32,712 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:06,353 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:06,355 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:08,541 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:08,541 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:12,731 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:12,735 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:16,730 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:16,734 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:20,729 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:20,732 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:24,718 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:24,718 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:28,774 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:28,776 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:32,540 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:32,540 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:36,715 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:36,716 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:40,717 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:40,717 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:44,715 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:44,717 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:48,708 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:48,708 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:52,715 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:52,719 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:58:56,730 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:58:56,730 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:00,727 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:00,738 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:04,724 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:04,727 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:08,719 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:08,719 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:12,710 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:12,711 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:16,735 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:16,739 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:20,714 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:20,714 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:24,726 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:24,743 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:28,748 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:28,750 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:32,724 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:32,725 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:36,714 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:36,718 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:40,721 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:40,724 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:44,730 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:44,736 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:48,718 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:48,718 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:52,730 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:52,733 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 14:59:56,716 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 14:59:56,723 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:00,718 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:00,718 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:20,691 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:20,693 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:24,537 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:24,537 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:28,733 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:28,733 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:32,711 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:32,711 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:34,515 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:34,798 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
-2026-06-10 15:00:34,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:34,900 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:34,911 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:34,911 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
-2026-06-10 15:00:38,869 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:38,869 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:43,644 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:43,647 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:47,711 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:47,711 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:51,714 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:51,715 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:55,728 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:55,730 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:00:59,717 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:00:59,719 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:03,710 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:03,710 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:07,730 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:07,730 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:11,715 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:11,715 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:15,710 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:15,710 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:19,720 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:19,720 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:23,723 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:23,726 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:25,543 - INFO - [API_REQUEST] POST /api/tilt/left/stop - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:25,948 - INFO - [ROBOT] lookStopLR
-2026-06-10 15:01:25,950 - INFO - [BACKEND] Camera Tilt Command Executed - Details: Direction: left, Action: stop, Success: True
-2026-06-10 15:01:25,950 - INFO - [API_RESPONSE] POST /api/tilt/left/stop - Details: Status: 200 OK
-2026-06-10 15:01:27,717 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:27,717 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:31,717 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:31,719 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:35,721 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:35,721 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:39,716 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:39,716 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:43,711 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:43,711 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:47,713 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:47,715 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:51,729 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:51,729 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:55,710 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:55,710 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:01:59,716 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:01:59,716 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:02:03,715 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:02:03,715 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:02:07,710 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:02:07,710 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:02:11,731 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:02:11,733 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:02:15,722 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:02:15,722 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:02:19,723 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:02:19,727 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:02:23,729 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:02:23,731 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:02:28,726 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:02:28,726 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:03:28,743 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:03:28,746 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:03:45,768 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:03:45,770 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:03:47,725 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:03:47,725 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:03:51,721 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:03:51,738 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:03:55,718 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:03:55,718 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:03:59,732 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:03:59,732 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:03,733 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:03,735 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:07,710 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:07,716 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:11,714 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:11,714 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:15,719 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:15,723 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:19,709 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:19,709 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:23,724 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:23,724 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:27,737 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:27,751 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:31,717 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:31,717 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:35,719 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:35,719 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:39,720 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:39,720 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:04:43,712 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:04:43,719 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:05:28,752 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:05:28,752 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:06:28,780 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:06:28,783 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:07:28,729 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:07:28,731 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:08:28,780 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:08:28,781 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:09:28,772 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:09:28,774 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:10:28,757 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:10:28,760 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:11:28,750 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:11:28,750 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:12:28,747 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:12:28,748 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:13:28,747 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:13:28,749 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:14:28,733 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:14:28,733 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:15:28,793 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:15:28,797 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:16:28,732 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:16:28,742 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:17:28,733 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:17:28,737 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:18:28,736 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:18:28,742 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
-2026-06-10 15:19:28,843 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
-2026-06-10 15:19:28,843 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 13:53:40,348 - INFO - [BACKEND] Embedding Generation Error - Details: OpenCV(4.10.0) :-1: error: (-5:Bad argument) in function 'cvtColor'
+> Overload resolution failed:
+>  - src is not a numpy array, neither a scalar
+>  - Expected Ptr<cv::UMat> for argument 'src'
+
+2026-06-16 15:47:14,154 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:14,202 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-16 15:47:14,298 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:14,300 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:14,304 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:15,309 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-16 15:47:15,343 - INFO - [API_REQUEST] GET /favicon.ico - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:15,345 - INFO - [API_RESPONSE] GET /favicon.ico - Details: Status: 404 NOT FOUND
+2026-06-16 15:47:18,274 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:18,276 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:21,178 - INFO - [API_REQUEST] POST /api/chatbot/audio - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:22,280 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:22,284 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:26,556 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:26,562 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:27,748 - INFO - [BACKEND] Speech-to-Text Success - Details: Transcribed: 'mm'
+2026-06-16 15:47:28,712 - INFO - [ROBOT] stopLR
+2026-06-16 15:47:29,122 - INFO - [ROBOT] stopFB
+2026-06-16 15:47:29,122 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'mm', Intent: STOP, Score: 0.9903, Action: Stopped all robot motion and openCV modes.
+2026-06-16 15:47:29,123 - INFO - [API_RESPONSE] POST /api/chatbot/audio - Details: Status: 200 OK
+2026-06-16 15:47:30,278 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:30,397 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:34,818 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:34,819 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:38,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:38,818 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:42,272 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:42,275 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:46,258 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:46,259 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 15:47:50,255 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 15:47:50,257 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:09:41,125 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:09:41,156 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:09:42,261 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:09:42,262 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:09:46,262 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:09:46,264 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:09:50,262 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:09:50,269 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:09:54,261 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:09:54,262 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:09:56,421 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'train on I am made in CSD lab.'}
+2026-06-16 16:09:56,825 - INFO - [BACKEND] Chatbot Trained - Details: Sentence: 'I am made in CSD lab.'
+2026-06-16 16:09:56,826 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:09:58,266 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:09:58,271 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:02,258 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:02,260 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:06,259 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:06,260 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:06,569 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:06,607 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-16 16:10:06,707 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:06,712 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:06,758 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:07,779 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-16 16:10:10,676 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:10,679 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:14,664 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:14,665 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:16,590 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'train on I am made in CSD lab.'}
+2026-06-16 16:10:16,923 - INFO - [BACKEND] Chatbot Trained - Details: Sentence: 'I am made in CSD lab.'
+2026-06-16 16:10:16,925 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:10:18,669 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:18,674 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:22,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:22,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:25,133 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'hello'}
+2026-06-16 16:10:26,481 - INFO - [ROBOT] stopLR
+2026-06-16 16:10:26,702 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:26,862 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:26,902 - INFO - [ROBOT] stopFB
+2026-06-16 16:10:26,902 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'hello', Intent: STOP, Score: 0.9860, Action: Stopped all robot motion and openCV modes.
+2026-06-16 16:10:26,903 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:10:30,671 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:30,673 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:34,678 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:34,680 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:10:35,588 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'who are you?'}
+2026-06-16 16:10:36,668 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'who are you?', Intent: DETECT_FACE, Score: 0.9945, Action: Face detection started. I don't see any faces in front of me.
+2026-06-16 16:10:36,669 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:10:38,688 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:10:38,765 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:11:58,669 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:11:58,670 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:00,197 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'hello'}
+2026-06-16 16:12:01,236 - INFO - [ROBOT] stopLR
+2026-06-16 16:12:01,643 - INFO - [ROBOT] stopFB
+2026-06-16 16:12:01,643 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'hello', Intent: STOP, Score: 0.9860, Action: Stopped all robot motion and openCV modes.
+2026-06-16 16:12:01,644 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:12:02,703 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:02,764 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:06,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:06,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:10,669 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:10,670 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:14,678 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:14,679 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:15,436 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'what can you do?'}
+2026-06-16 16:12:16,801 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'what can you do?', Intent: DETECT_FACE, Score: 0.9891, Action: Face detection started. I don't see any faces in front of me.
+2026-06-16 16:12:16,801 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:12:18,670 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:18,675 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:22,814 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:22,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:26,815 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:26,816 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:30,822 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:30,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:34,825 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:34,826 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:38,819 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:38,820 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:42,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:42,823 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:46,825 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:46,826 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:50,813 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:50,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:54,819 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:54,820 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:12:58,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:12:58,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:13:02,817 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:13:02,818 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:13:06,814 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:13:06,816 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:13:10,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:13:10,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:13:14,811 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:13:14,812 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:13:18,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:13:18,821 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:14:12,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:14:12,826 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:12,889 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:12,893 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:24,525 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:24,527 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:26,811 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:26,812 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:30,812 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:30,813 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:34,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:34,816 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:38,826 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:38,828 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:42,810 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:42,812 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:46,831 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:46,832 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:50,809 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:50,810 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:54,818 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:54,818 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:15:58,814 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:15:58,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:16:02,814 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:16:02,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:16:06,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:16:06,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:16:10,824 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:16:10,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:16:14,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:16:14,816 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:16:18,825 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:16:18,827 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:16:22,819 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:16:22,820 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:12,933 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:12,935 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:30,277 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:30,281 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:30,670 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:30,676 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:34,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:34,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:38,834 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:38,836 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:42,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:42,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:46,822 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:46,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:50,829 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:50,830 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:54,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:54,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:17:58,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:17:58,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:02,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:02,823 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:06,819 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:06,823 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:10,826 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:10,827 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:14,819 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:14,821 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:18,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:18,821 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:22,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:22,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:26,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:26,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:30,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:30,818 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:18:34,828 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:18:34,829 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:03,748 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:03,765 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:04,330 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:04,386 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-16 16:19:04,461 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:04,463 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:04,465 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:04,466 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-16 16:19:08,433 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:08,435 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:12,425 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:12,427 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:16,420 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:16,422 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:20,429 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:20,430 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:23,484 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'command go front 5'}
+2026-06-16 16:19:24,453 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:24,569 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:24,606 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'command go front 5', Intent: MOVE_BACKWARD, Score: 0.9726, Action: Moving backward for 5.0 steps (1.75s).
+2026-06-16 16:19:24,606 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:19:25,015 - INFO - [ROBOT] backward - Details: speed=100
+2026-06-16 16:19:27,168 - INFO - [ROBOT] stopFB
+2026-06-16 16:19:28,421 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:28,423 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:32,422 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:32,425 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:36,418 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:36,419 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:36,637 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'command go front for 5 seconds'}
+2026-06-16 16:19:37,663 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'command go front for 5 seconds', Intent: MOVE_BACKWARD, Score: 0.9508, Action: Moving backward for 5.0 steps (1.75s).
+2026-06-16 16:19:37,664 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:19:38,076 - INFO - [ROBOT] backward - Details: speed=100
+2026-06-16 16:19:40,241 - INFO - [ROBOT] stopFB
+2026-06-16 16:19:40,423 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:40,425 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:44,430 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:44,432 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:44,888 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'go front'}
+2026-06-16 16:19:46,423 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'go front', Intent: MOVE_FORWARD, Score: 0.9815, Action: How many steps would you like to walk?
+2026-06-16 16:19:46,424 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:19:48,140 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': '5'}
+2026-06-16 16:19:48,225 - INFO - [BACKEND] Chatbot Param Command Executed - Details: Intent: MOVE_FORWARD, Param: 5.0, Action: Moving forward for 5.0 steps (1.75s).
+2026-06-16 16:19:48,225 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:19:48,472 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:48,666 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:48,676 - INFO - [ROBOT] forward - Details: speed=100
+2026-06-16 16:19:50,828 - INFO - [ROBOT] stopFB
+2026-06-16 16:19:52,421 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:52,423 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:54,210 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'hello'}
+2026-06-16 16:19:56,228 - INFO - [ROBOT] stopLR
+2026-06-16 16:19:56,513 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:19:56,658 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:19:56,707 - INFO - [ROBOT] stopFB
+2026-06-16 16:19:56,707 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'hello', Intent: STOP, Score: 0.9860, Action: Stopped all robot motion and openCV modes.
+2026-06-16 16:19:56,707 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:20:00,757 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:00,760 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:04,418 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:04,420 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:08,420 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:08,422 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:09,697 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'who are you?'}
+2026-06-16 16:20:10,185 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'who are you?', Intent: DETECT_FACE, Score: 0.9945, Action: Face detection started. I don't see any faces in front of me.
+2026-06-16 16:20:10,189 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:20:12,342 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:12,346 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-16 16:20:12,462 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:12,466 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:12,470 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:12,471 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-16 16:20:16,413 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:16,416 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:16,693 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'who are you?'}
+2026-06-16 16:20:17,119 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'who are you?', Intent: DETECT_FACE, Score: 0.9945, Action: Face detection started. I don't see any faces in front of me.
+2026-06-16 16:20:17,120 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:20:20,836 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:20,839 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:24,810 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:24,812 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:28,822 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:28,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:32,822 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:32,823 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:36,822 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:36,823 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:40,814 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:40,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:44,824 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:44,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:48,814 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:48,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:52,415 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:52,423 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:20:56,419 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:20:56,421 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:00,421 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:00,423 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:04,415 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:04,416 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:08,411 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:08,412 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:12,416 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:12,417 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:16,418 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:16,419 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:20,411 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:20,412 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:24,410 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:24,411 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:28,413 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:28,414 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:32,412 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:32,413 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:36,419 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:36,420 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:40,418 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:40,419 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:44,414 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:44,416 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:48,414 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:48,415 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:52,415 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:52,416 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:21:56,417 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:21:56,418 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:00,416 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:00,417 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:04,414 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:04,415 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:08,409 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:08,410 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:12,413 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:12,415 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:16,439 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:16,441 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:20,415 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:20,416 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:24,410 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:24,412 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:28,415 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:28,416 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:32,416 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:32,418 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:36,414 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:36,415 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:40,413 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:40,414 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:44,413 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:44,414 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:48,423 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:48,425 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:56,769 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:56,834 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:57,490 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:57,534 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-16 16:22:57,612 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:57,622 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:22:57,625 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:22:58,623 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-16 16:22:59,408 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'hello'}
+2026-06-16 16:22:59,594 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'hello', Match: 'I can greet recognized users.', Score: 0.4123
+2026-06-16 16:22:59,596 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:23:01,581 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:01,584 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:23:05,164 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'hello'}
+2026-06-16 16:23:05,604 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:05,685 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:23:05,997 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'hello', Match: 'I can greet recognized users.', Score: 0.4123
+2026-06-16 16:23:05,998 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:23:09,574 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:09,575 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:23:13,586 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:13,586 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:23:17,586 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:17,588 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:23:21,582 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:21,584 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:23:24,113 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'who is your creator?'}
+2026-06-16 16:23:24,763 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'who is your creator?', Match: 'My creator name is Abbilaash', Score: 0.8630
+2026-06-16 16:23:24,771 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:23:25,581 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:25,613 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:23:29,581 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:29,582 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:23:33,582 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:23:33,584 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:26:43,386 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:26:43,407 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-16 16:26:43,469 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:26:43,472 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:26:43,473 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:26:44,481 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-16 16:26:47,447 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:26:47,450 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:26:48,683 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'hello'}
+2026-06-16 16:26:49,010 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'hello', Match: 'I can greet recognized users.', Score: 0.4123
+2026-06-16 16:26:49,011 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:26:51,441 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:26:51,444 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:26:55,480 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:26:55,481 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:26:59,812 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:26:59,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:03,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:03,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:07,453 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:07,455 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:11,813 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:11,814 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:15,811 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:15,811 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:19,448 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:19,450 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:23,812 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:23,813 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:27,818 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:27,820 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:31,824 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:31,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:35,810 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:35,811 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:39,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:39,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:43,829 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:43,831 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:47,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:47,821 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:51,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:51,823 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:55,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:55,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:27:59,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:27:59,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:03,825 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:03,826 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:07,838 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:07,839 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:11,810 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:11,812 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:15,808 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:15,810 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:19,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:19,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:32,612 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:32,616 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:35,811 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:35,814 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:39,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:39,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:43,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:43,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:47,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:47,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:51,818 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:51,819 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:55,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:55,821 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:28:59,832 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:28:59,834 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:29:03,812 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:29:03,813 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:29:07,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:29:07,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:29:11,814 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:29:11,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:29:20,300 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:29:20,303 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:29:23,827 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:29:23,828 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:29:27,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:29:27,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:04,255 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:04,258 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:04,260 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:04,274 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:05,245 - INFO - [API_REQUEST] GET / - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:05,292 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-16 16:30:05,370 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:05,382 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:05,388 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:06,389 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-16 16:30:07,138 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'hello'}
+2026-06-16 16:30:07,309 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'hello', Match: 'I can greet recognized users.', Score: 0.4123
+2026-06-16 16:30:07,310 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:30:09,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:09,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:13,349 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:13,351 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:17,338 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:17,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:19,699 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'command more straight for 10 steps'}
+2026-06-16 16:30:20,805 - INFO - [ROBOT] steadyMode
+2026-06-16 16:30:20,806 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'more straight for 10 steps', Intent: SIT, Score: 0.9487, Action: Robot sitting down (stabilized steady mode).
+2026-06-16 16:30:20,807 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:30:21,350 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:21,463 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:25,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:25,338 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:29,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:29,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:33,336 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:33,337 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:37,362 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:37,363 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:38,120 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'command move straight for 10 steps'}
+2026-06-16 16:30:38,881 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'move straight for 10 steps', Intent: TURN_RIGHT, Score: 0.9521, Action: Turning right by 10.0 degrees (0.12s).
+2026-06-16 16:30:38,882 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:30:39,289 - INFO - [ROBOT] right - Details: speed=100
+2026-06-16 16:30:39,817 - INFO - [ROBOT] stopLR
+2026-06-16 16:30:41,345 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:41,346 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:45,349 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:45,350 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:47,280 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'command more forward for 10 steps'}
+2026-06-16 16:30:49,513 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:49,664 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:50,583 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'more forward for 10 steps', Intent: MOVE_FORWARD, Score: 0.9667, Action: Moving forward for 10.0 steps (3.50s).
+2026-06-16 16:30:50,583 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:30:51,087 - INFO - [ROBOT] forward - Details: speed=100
+2026-06-16 16:30:53,351 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:53,446 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:54,989 - INFO - [ROBOT] stopFB
+2026-06-16 16:30:57,030 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'who is your creator'}
+2026-06-16 16:30:57,363 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:30:57,448 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:30:57,774 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'who is your creator', Match: 'My creator name is Abbilaash', Score: 0.8715
+2026-06-16 16:30:57,775 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:31:01,336 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:01,337 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:05,334 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:05,335 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:08,032 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'who are you?'}
+2026-06-16 16:31:08,452 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'who are you?', Match: 'My creator name is Abbilaash', Score: 0.4024
+2026-06-16 16:31:08,453 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:31:09,340 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:09,366 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:12,767 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'who are you?'}
+2026-06-16 16:31:13,233 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'who are you?', Match: 'My creator name is Abbilaash', Score: 0.4024
+2026-06-16 16:31:13,233 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:31:13,354 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:13,436 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:17,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:17,339 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:18,790 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'what is your name?'}
+2026-06-16 16:31:19,268 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'what is your name?', Match: 'My name is Whisper.', Score: 0.6246
+2026-06-16 16:31:19,271 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:31:21,335 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:21,337 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:23,829 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'what can you do?'}
+2026-06-16 16:31:24,315 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'what can you do?', Match: 'I can respond to voice commands.', Score: 0.3559
+2026-06-16 16:31:24,315 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:31:25,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:25,373 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:27,402 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'nice man'}
+2026-06-16 16:31:28,553 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'nice man', Match: 'My creator name is Abbilaash', Score: 0.2247
+2026-06-16 16:31:28,554 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:31:29,522 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:29,548 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:33,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:33,338 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:37,347 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:37,348 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:40,428 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'what can you do?'}
+2026-06-16 16:31:40,960 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'what can you do?', Match: 'I can respond to voice commands.', Score: 0.3559
+2026-06-16 16:31:40,961 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:31:41,338 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:41,362 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:45,342 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:45,343 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:49,333 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:49,334 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:53,338 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:53,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:57,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:31:57,341 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:31:59,501 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'what is AI?'}
+2026-06-16 16:32:00,054 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'what is AI?', Match: 'Artificial intelligence enables machines to perform intelligent tasks.', Score: 0.6420
+2026-06-16 16:32:00,055 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:32:01,349 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:01,374 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:05,342 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:05,343 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:09,346 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:09,347 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:13,284 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'what is AI?'}
+2026-06-16 16:32:13,351 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:13,452 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:13,606 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'what is AI?', Match: 'Artificial intelligence enables machines to perform intelligent tasks.', Score: 0.6420
+2026-06-16 16:32:13,607 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:32:16,503 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'what is ML?'}
+2026-06-16 16:32:16,676 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'what is ML?', Match: 'Machine learning is a branch of artificial intelligence.', Score: 0.3125
+2026-06-16 16:32:16,676 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:32:17,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:17,365 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:21,341 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:21,342 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:25,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:25,339 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:29,341 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:29,343 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:33,334 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:33,336 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:37,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:37,339 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:41,343 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:41,344 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:45,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:45,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:49,345 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:49,347 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:53,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:53,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:32:57,352 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:32:57,353 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:01,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:01,341 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:05,335 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:05,337 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:09,348 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:09,350 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:13,346 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:13,347 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:17,344 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:17,346 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:21,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:21,338 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:25,346 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:25,347 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:29,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:29,338 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:33,336 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:33,337 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:37,346 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:37,348 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:41,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:41,338 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:45,350 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:45,351 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:49,338 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:49,339 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:53,338 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:53,339 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:33:57,336 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:33:57,337 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:01,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:01,343 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:05,347 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:05,347 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:09,344 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:09,345 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:13,341 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:13,342 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:17,347 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:17,348 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:21,336 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:21,338 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:25,347 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:25,350 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:29,341 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:29,343 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:33,347 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:33,349 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:37,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:37,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:41,345 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:41,346 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:45,345 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:45,347 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:49,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:49,341 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:53,348 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:53,350 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:34:57,349 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:34:57,350 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:01,350 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:01,352 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:05,369 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:05,371 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:09,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:09,339 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:13,343 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:13,344 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:17,341 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:17,342 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:21,348 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:21,349 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:25,349 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:25,352 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:29,346 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:29,347 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:33,337 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:33,338 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:37,350 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:37,351 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:41,336 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:41,337 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:45,336 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:45,338 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:49,347 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:49,347 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:53,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:53,818 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:57,332 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:35:57,334 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:35:59,002 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 127.0.0.1, Payload: {'command': 'command face detection'}
+2026-06-16 16:36:00,894 - INFO - [BACKEND] Chatbot Command Executed - Details: Command: 'face detection', Intent: DETECT_FACE, Score: 0.9885, Action: Face detection started. I don't see any faces in front of me.
+2026-06-16 16:36:00,895 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-16 16:36:01,354 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:01,490 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:05,338 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:05,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:09,811 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:09,813 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:13,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:13,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:17,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:17,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:21,819 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:21,820 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:25,813 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:25,814 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:29,816 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:29,817 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:33,818 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:33,819 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:37,811 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:37,812 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:41,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:41,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:45,824 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:45,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:49,812 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:49,813 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:53,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:53,821 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:36:57,826 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:36:57,827 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:37:01,820 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:37:01,821 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:37:05,817 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:37:05,819 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:37:12,849 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:37:12,851 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:12,844 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:12,846 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:20,089 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:20,120 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:21,340 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:21,342 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:25,349 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:25,353 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:29,339 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:29,340 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:33,345 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:33,346 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:37,813 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:37,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:41,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:41,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:45,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:45,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:49,822 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:49,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:53,827 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:53,829 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:38:57,822 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:38:57,825 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:01,814 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:01,815 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:05,811 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:05,812 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:09,808 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:09,809 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:13,821 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:13,822 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:17,813 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:17,814 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:21,829 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:21,830 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:25,813 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:25,814 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:29,826 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:29,827 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:39:33,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:39:33,823 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:40:12,954 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:40:12,955 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:41:12,822 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:41:12,824 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:42:12,843 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:42:12,844 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:43:12,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:43:12,839 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:44:12,823 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:44:12,826 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:45:12,853 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:45:12,855 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:46:13,130 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:46:13,132 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:47:12,862 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:47:12,864 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-16 16:48:12,842 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
+2026-06-16 16:48:12,844 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK

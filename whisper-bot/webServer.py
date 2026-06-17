@@ -354,247 +354,402 @@ def parse_number(text: str) -> Optional[float]:
 	return None
 
 
+import os
+import numpy as np
+import pickle
+import re
+from MiniLM.knowledge_inference import get_embedding as kb_get_embedding
+
+# Load knowledge base once (global)
+_KB_PATH = os.path.join(os.path.dirname(__file__), "knowledge", "knowledge_db (4).pkl")
+try:
+    with open(_KB_PATH, "rb") as f:
+        _kb_data = pickle.load(f)
+        _kb_chunks = _kb_data.get("chunks", [])
+        _kb_embeddings = np.array(_kb_data.get("embeddings", []), dtype=np.float32) if _kb_data.get("embeddings") else np.empty((0, 0), dtype=np.float32)
+except Exception:
+    _kb_chunks = []
+    _kb_embeddings = np.empty((0, 0), dtype=np.float32)
+
+def _map_sentence_to_intent(sentence: str) -> str | None:
+    """Simple mapping from a stored sentence to a movement intent."""
+    s = sentence.lower()
+    if "forward" in s:
+        return "MOVE_FORWARD"
+    if "backward" in s:
+        return "MOVE_BACKWARD"
+    if "left" in s:
+        return "TURN_LEFT"
+    if "right" in s:
+        return "TURN_RIGHT"
+    if "stop" in s:
+        return "STOP"
+    return None
+
 def process_chatbot_text(command_text: str, client_ip: str) -> dict:
-	global pending_chatbot_actions
-	
-	try:
-		predict_fn = get_chatbot_predict()
-	except Exception as exc:
-		log_action("BACKEND", "Chatbot Initialization Error", str(exc))
-		return {
-			"success": False,
-			"error": f"Failed to initialize chatbot model: {str(exc)}"
-		}
-		
-	# Clean up expired pending states
-	now = time.time()
-	expired_ips = [ip for ip, data in pending_chatbot_actions.items() if now - data.get("timestamp", 0) > PENDING_TIMEOUT]
-	for ip in expired_ips:
-		pending_chatbot_actions.pop(ip, None)
-		
-	pending = pending_chatbot_actions.get(client_ip)
-	
-	CONFIDENCE_THRESHOLD = 0.4
-	
-	# Scenario A: We have a pending action waiting for a numeric parameter
-	if pending is not None:
-		# FIRST priority: Check if the user's input contains a valid number parameter.
-		# If a number is present, we process it directly and NEVER classify it (avoiding "2" matching STOP).
-		num_val = parse_number(command_text)
-		if num_val is not None and num_val > 0:
-			pending_intent = pending["intent"]
-			pending_chatbot_actions.pop(client_ip, None) # Clear pending state
-			
-			action_msg = ""
-			if pending_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
-				duration = num_val * STEP_DURATION
-				action_msg = f"Moving {pending_intent.split('_')[1].lower()} for {num_val} steps ({duration:.2f}s)."
-				
-				def run_move():
-					try:
-						if pending_intent == "MOVE_FORWARD":
-							robot.forward(100)
-						else:
-							robot.backward(100)
-						time.sleep(duration)
-						robot.stopFB()
-					except Exception as e:
-						log_action("BACKEND", "Timed Move Thread Error", str(e))
-				threading.Thread(target=run_move, daemon=True).start()
-				
-			elif pending_intent in ("TURN_LEFT", "TURN_RIGHT"):
-				duration = num_val * DEGREE_DURATION
-				action_msg = f"Turning {pending_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
-				
-				def run_turn():
-					try:
-						if pending_intent == "TURN_LEFT":
-							robot.left(100)
-						else:
-							robot.right(100)
-						time.sleep(duration)
-						robot.stopLR()
-					except Exception as e:
-						log_action("BACKEND", "Timed Turn Thread Error", str(e))
-				threading.Thread(target=run_turn, daemon=True).start()
-				
-			log_action("BACKEND", "Chatbot Param Command Executed", f"Intent: {pending_intent}, Param: {num_val}, Action: {action_msg}")
-			return {
-				"success": True,
-				"command": command_text,
-				"intent": pending_intent,
-				"score": 1.0,
-				"action_taken": action_msg,
-				"execution_success": True,
-				"prompt_for_param": False,
-				"threshold_passed": True
-			}
-		
-		# SECOND priority: If no number is found, run classification to see if the user
-		# entered an entirely different command (e.g. STOP or FOLLOW_BLUE) to abort the prompt.
-		try:
-			best_intent, best_score = predict_fn(command_text)
-		except Exception as exc:
-			log_action("BACKEND", "Chatbot Classification Error", str(exc))
-			return {
-				"success": False,
-				"error": f"Failed to classify intent: {str(exc)}"
-			}
-			
-		if best_score >= CONFIDENCE_THRESHOLD and best_intent not in ("MOVE_FORWARD", "MOVE_BACKWARD", "TURN_LEFT", "TURN_RIGHT", pending["intent"]):
-			# User explicitly wants to do another command; clear pending state and fall through to Scenario B
-			pending_chatbot_actions.pop(client_ip, None)
-			pending = None
-		else:
-			# Prompt again for a valid number since no number or alternative command was recognized
-			prompt_msg = ""
-			if pending["intent"] in ("MOVE_FORWARD", "MOVE_BACKWARD"):
-				prompt_msg = "Please specify the number of steps to walk as a number (e.g. 3 or 5)."
-			else:
-				prompt_msg = "Please specify the angle to turn in degrees as a number (e.g. 45 or 90)."
-			return {
-				"success": True,
-				"command": command_text,
-				"intent": pending["intent"],
-				"score": best_score,
-				"action_taken": prompt_msg,
-				"execution_success": False,
-				"prompt_for_param": True,
-				"threshold_passed": True
-			}
+    global pending_chatbot_actions, _kb_chunks, _kb_embeddings
+    
+    try:
+        predict_fn = get_chatbot_predict()
+    except Exception as exc:
+        log_action("BACKEND", "Chatbot Initialization Error", str(exc))
+        return {
+            "success": False,
+            "error": f"Failed to initialize chatbot model: {str(exc)}"
+        }
+        
+    # Clean up expired pending states
+    now = time.time()
+    expired_ips = [ip for ip, data in pending_chatbot_actions.items() if now - data.get("timestamp", 0) > PENDING_TIMEOUT]
+    for ip in expired_ips:
+        pending_chatbot_actions.pop(ip, None)
+        
+    pending = pending_chatbot_actions.get(client_ip)
+    
+    CONFIDENCE_THRESHOLD = 0.6
 
-	# Scenario B: No pending action, process standard command
-	try:
-		best_intent, best_score = predict_fn(command_text)
-	except Exception as exc:
-		log_action("BACKEND", "Chatbot Classification Error", str(exc))
-		return {
-			"success": False,
-			"error": f"Failed to classify intent: {str(exc)}"
-		}
+    # 1. Training command pattern: train on <full_sentence> (does not need "command" prefix)
+    train_match = re.match(r'^train on (.+)$', command_text, re.IGNORECASE)
+    if train_match:
+        full_sentence = train_match.group(1).strip()
+        try:
+            new_emb = kb_get_embedding(full_sentence)
+            try:
+                with open(_KB_PATH, "rb") as f:
+                    db = pickle.load(f)
+            except FileNotFoundError:
+                db = {"chunks": [], "embeddings": []}
+            
+            db_chunks = db.get("chunks", [])
+            db_embeddings = np.array(db.get("embeddings", []), dtype=np.float32) if len(db.get("embeddings", [])) > 0 else np.empty((0, 0), dtype=np.float32)
+            
+            if db_embeddings.size == 0:
+                db_embeddings = np.expand_dims(new_emb, axis=0)
+            else:
+                db_embeddings = np.vstack([db_embeddings, new_emb])
+            
+            if not isinstance(db_chunks, list):
+                db_chunks = []
+            db_chunks.append(full_sentence)
+            
+            db["chunks"] = db_chunks
+            db["embeddings"] = db_embeddings.tolist()
+            with open(_KB_PATH, "wb") as f:
+                pickle.dump(db, f)
+                
+            _kb_chunks = db_chunks
+            _kb_embeddings = db_embeddings
+            
+            log_action("BACKEND", "Chatbot Trained", f"Sentence: '{full_sentence}'")
+            return {
+                "success": True,
+                "command": command_text,
+                "intent": None,
+                "score": 1.0,
+                "action_taken": f"Trained on: '{full_sentence}'",
+                "execution_success": True,
+                "prompt_for_param": False,
+                "threshold_passed": True
+            }
+        except Exception as exc:
+            log_action("BACKEND", "Chatbot Training Error", str(exc))
+            return {
+                "success": False,
+                "error": f"Failed to train on statement: {str(exc)}"
+            }
 
-	action_msg = ""
-	execution_success = True
-	prompt_for_param = False
-	
-	if best_score >= CONFIDENCE_THRESHOLD:
-		if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD", "TURN_LEFT", "TURN_RIGHT"):
-			# Check if user already provided a number in this command (e.g., "turn left 90")
-			num_val = parse_number(command_text)
-			if num_val is not None and num_val > 0:
-				# Execute immediately
-				if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
-					duration = num_val * STEP_DURATION
-					action_msg = f"Moving {best_intent.split('_')[1].lower()} for {num_val} steps ({duration:.2f}s)."
-					def run_move():
-						try:
-							if best_intent == "MOVE_FORWARD":
-								robot.forward(100)
-							else:
-								robot.backward(100)
-							time.sleep(duration)
-							robot.stopFB()
-						except Exception as e:
-							log_action("BACKEND", "Timed Move Thread Error", str(e))
-					threading.Thread(target=run_move, daemon=True).start()
-				else:
-					duration = num_val * DEGREE_DURATION
-					action_msg = f"Turning {best_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
-					def run_turn():
-						try:
-							if best_intent == "TURN_LEFT":
-								robot.left(100)
-							else:
-								robot.right(100)
-							time.sleep(duration)
-							robot.stopLR()
-						except Exception as e:
-							log_action("BACKEND", "Timed Turn Thread Error", str(e))
-					threading.Thread(target=run_turn, daemon=True).start()
-			else:
-				# No number provided, set pending state and prompt
-				pending_chatbot_actions[client_ip] = {
-					"intent": best_intent,
-					"timestamp": time.time()
-				}
-				prompt_for_param = True
-				if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
-					action_msg = "How many steps would you like to walk?"
-				else:
-					action_msg = "What angle would you like to turn (in degrees)?"
-				execution_success = False
-				
-		elif best_intent == "DETECT_FACE":
-			camera_opencv.Camera.modeSelect = 'faceDetection'
-			camera_obj = get_camera()
-			detected_name = None
-			if camera_obj is not None:
-				# Capture frame and attempt face recognition immediately
-				frame_bytes = camera_obj.get_frame()
-				if frame_bytes:
-					import face_detection
-					faces = face_detection.recognize_faces(frame_bytes)
-					if faces:
-						known_faces = [f for f in faces if f.get("name", "Unknown") != "Unknown"]
-						if known_faces:
-							detected_name = known_faces[0]["name"]
-						else:
-							detected_name = faces[0]["name"]
-			
-			if detected_name and detected_name != "Unknown":
-				action_msg = f"Hello {detected_name}!"
-			elif detected_name == "Unknown":
-				action_msg = "Face detection started. I see someone, but I don't recognize them."
-			else:
-				action_msg = "Face detection started. I don't see any faces in front of me."
+    # 2. Scenario A: pending numeric param handling
+    if pending is not None:
+        num_val = parse_number(command_text)
+        if num_val is not None and num_val > 0:
+            pending_intent = pending["intent"]
+            pending_chatbot_actions.pop(client_ip, None) # Clear pending state
+            action_msg = ""
+            if pending_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+                duration = num_val * STEP_DURATION
+                action_msg = f"Moving {pending_intent.split('_')[1].lower()} for {num_val} steps ({duration:.2f}s)."
+                def run_move():
+                    try:
+                        if pending_intent == "MOVE_FORWARD":
+                            robot.forward(100)
+                        else:
+                            robot.backward(100)
+                        time.sleep(duration)
+                        robot.stopFB()
+                    except Exception as e:
+                        log_action("BACKEND", "Timed Move Thread Error", str(e))
+                threading.Thread(target=run_move, daemon=True).start()
+            elif pending_intent in ("TURN_LEFT", "TURN_RIGHT"):
+                duration = num_val * DEGREE_DURATION
+                action_msg = f"Turning {pending_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
+                def run_turn():
+                    try:
+                        if pending_intent == "TURN_LEFT":
+                            robot.left(100)
+                        else:
+                            robot.right(100)
+                        time.sleep(duration)
+                        robot.stopLR()
+                    except Exception as e:
+                        log_action("BACKEND", "Timed Turn Thread Error", str(e))
+                threading.Thread(target=run_turn, daemon=True).start()
+                
+            log_action("BACKEND", "Chatbot Param Command Executed", f"Intent: {pending_intent}, Param: {num_val}, Action: {action_msg}")
+            return {
+                "success": True,
+                "command": command_text,
+                "intent": pending_intent,
+                "score": 1.0,
+                "action_taken": action_msg,
+                "execution_success": True,
+                "prompt_for_param": False,
+                "threshold_passed": True
+            }
+        
+        # If no number, check if it starts with "command" to abort, otherwise clear pending and query KB.
+        command_prefix_match = re.match(r'^command\b[:\s]*(.*)$', command_text, re.IGNORECASE)
+        if command_prefix_match:
+            clean_command = command_prefix_match.group(1).strip()
+            try:
+                best_intent, best_score = predict_fn(clean_command)
+            except Exception as exc:
+                log_action("BACKEND", "Chatbot Classification Error", str(exc))
+                best_intent, best_score = None, 0.0
+                
+            if best_score >= CONFIDENCE_THRESHOLD and best_intent not in ("MOVE_FORWARD", "MOVE_BACKWARD", "TURN_LEFT", "TURN_RIGHT", pending["intent"]):
+                # User wants to run another command: clear pending state and fall through to standard processing
+                pending_chatbot_actions.pop(client_ip, None)
+                pending = None
+                # Replace command_text with clean_command for command execution below
+                command_text = clean_command
+            else:
+                prompt_msg = ""
+                if pending["intent"] in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+                    prompt_msg = "Please specify the number of steps to walk as a number (e.g. 3 or 5)."
+                else:
+                    prompt_msg = "Please specify the angle to turn in degrees as a number (e.g. 45 or 90)."
+                return {
+                    "success": True,
+                    "command": command_text,
+                    "intent": pending["intent"],
+                    "score": best_score,
+                    "action_taken": prompt_msg,
+                    "execution_success": False,
+                    "prompt_for_param": True,
+                    "threshold_passed": True
+                }
+        else:
+            # Not a number and didn't start with "command": abort pending state and fall back to Q&A
+            pending_chatbot_actions.pop(client_ip, None)
+            pending = None
 
-		elif best_intent == "STOP":
-			global active_follow_color
-			active_follow_color = None
-			camera_opencv.Camera.modeSelect = 'none'
-			camera_opencv.Camera.followColor = 'none'
-			stop_robot()
-			action_msg = "Stopped all robot motion and openCV modes."
-		elif best_intent == "SIT":
-			robot.steadyMode()
-			action_msg = "Robot sitting down (stabilized steady mode)."
-		elif best_intent == "STAND":
-			robot.steadyMode()
-			action_msg = "Robot standing up (stabilized steady mode)."
-		elif best_intent == "FOLLOW_RED":
-			active_follow_color = "red"
-			camera_opencv.Camera.modeSelect = 'followColor'
-			camera_opencv.Camera.followColor = "red"
-			action_msg = "Started color tracking mode following the 'red' ball."
-		elif best_intent == "FOLLOW_GREEN":
-			active_follow_color = "green"
-			camera_opencv.Camera.modeSelect = 'followColor'
-			camera_opencv.Camera.followColor = "green"
-			action_msg = "Started color tracking mode following the 'green' ball."
-		elif best_intent == "FOLLOW_BLUE":
-			active_follow_color = "blue"
-			camera_opencv.Camera.modeSelect = 'followColor'
-			camera_opencv.Camera.followColor = "blue"
-			action_msg = "Started color tracking mode following the 'blue' ball."
-		else:
-			execution_success = False
-			action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
-	else:
-		execution_success = False
-		action_msg = "Command not understood (low match confidence)."
-		
-	log_action("BACKEND", "Chatbot Command Executed", f"Command: '{command_text}', Best Intent: {best_intent}, Score: {best_score:.4f}, Action: {action_msg}")
-	
-	return {
-		"success": True,
-		"command": command_text,
-		"intent": best_intent if best_score >= CONFIDENCE_THRESHOLD else None,
-		"score": best_score,
-		"threshold_passed": bool(best_score >= CONFIDENCE_THRESHOLD),
-		"action_taken": action_msg,
-		"execution_success": execution_success,
-		"prompt_for_param": prompt_for_param
-	}
+    # Check if this input starts with "command" (explicit robot control request)
+    command_prefix_match = re.match(r'^command\b[:\s]*(.*)$', command_text, re.IGNORECASE)
+    
+    if command_prefix_match:
+        # Strip "command" prefix and process as standard command
+        clean_command = command_prefix_match.group(1).strip()
+        
+        # Scenario B: No pending action, process standard command
+        # First: Check KB for high similarity match of a command
+        kb_matched_intent = None
+        kb_best_score = 0.0
+        kb_matched_sentence = None
+        
+        if _kb_embeddings.size > 0:
+            try:
+                kb_emb = kb_get_embedding(clean_command)
+                scores = _kb_embeddings @ kb_emb
+                best_idx = int(np.argmax(scores))
+                kb_best_score = float(scores[best_idx])
+                if kb_best_score > 0.65:
+                    kb_matched_sentence = _kb_chunks[best_idx]
+                    kb_matched_intent = _map_sentence_to_intent(kb_matched_sentence)
+            except Exception as e:
+                log_action("BACKEND", "KB search error", str(e))
+                
+        # Second: Run normal classification to compare with KB match
+        try:
+            classifier_intent, classifier_score = predict_fn(clean_command)
+        except Exception as exc:
+            log_action("BACKEND", "Chatbot Classification Error", str(exc))
+            classifier_intent, classifier_score = None, 0.0
+
+        # Decide on the best intent source (KB vs Classifier)
+        best_intent = None
+        best_score = 0.0
+        
+        if kb_matched_intent is not None:
+            best_intent = kb_matched_intent
+            best_score = kb_best_score
+        elif classifier_score >= CONFIDENCE_THRESHOLD:
+            best_intent = classifier_intent
+            best_score = classifier_score
+
+        # Execute command if detected
+        if best_intent is not None:
+            action_msg = ""
+            execution_success = True
+            prompt_for_param = False
+            
+            if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD", "TURN_LEFT", "TURN_RIGHT"):
+                num_val = parse_number(clean_command)
+                if num_val is not None and num_val > 0:
+                    if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+                        duration = num_val * STEP_DURATION
+                        action_msg = f"Moving {best_intent.split('_')[1].lower()} for {num_val} steps ({duration:.2f}s)."
+                        def run_move():
+                            try:
+                                if best_intent == "MOVE_FORWARD":
+                                    robot.forward(100)
+                                else:
+                                    robot.backward(100)
+                                time.sleep(duration)
+                                robot.stopFB()
+                            except Exception as e:
+                                log_action("BACKEND", "Timed Move Thread Error", str(e))
+                        threading.Thread(target=run_move, daemon=True).start()
+                    else:
+                        duration = num_val * DEGREE_DURATION
+                        action_msg = f"Turning {best_intent.split('_')[1].lower()} by {num_val} degrees ({duration:.2f}s)."
+                        def run_turn():
+                            try:
+                                if best_intent == "TURN_LEFT":
+                                    robot.left(100)
+                                else:
+                                    robot.right(100)
+                                time.sleep(duration)
+                                robot.stopLR()
+                            except Exception as e:
+                                log_action("BACKEND", "Timed Turn Thread Error", str(e))
+                        threading.Thread(target=run_turn, daemon=True).start()
+                else:
+                    pending_chatbot_actions[client_ip] = {"intent": best_intent, "timestamp": time.time()}
+                    prompt_for_param = True
+                    if best_intent in ("MOVE_FORWARD", "MOVE_BACKWARD"):
+                        action_msg = "How many steps would you like to walk?"
+                    else:
+                        action_msg = "What angle would you like to turn (in degrees)?"
+                    execution_success = False
+                    
+            elif best_intent == "DETECT_FACE":
+                camera_opencv.Camera.modeSelect = 'faceDetection'
+                camera_obj = get_camera()
+                detected_name = None
+                if camera_obj is not None:
+                    frame_bytes = camera_obj.get_frame()
+                    if frame_bytes:
+                        import face_detection
+                        faces = face_detection.recognize_faces(frame_bytes)
+                        if faces:
+                            known_faces = [f for f in faces if f.get("name", "Unknown") != "Unknown"]
+                            if known_faces:
+                                detected_name = known_faces[0]["name"]
+                            else:
+                                detected_name = faces[0]["name"]
+                
+                if detected_name and detected_name != "Unknown":
+                    action_msg = f"Hello {detected_name}!"
+                elif detected_name == "Unknown":
+                    action_msg = "Face detection started. I see someone, but I don't recognize them."
+                else:
+                    action_msg = "Face detection started. I don't see any faces in front of me."
+                    
+            elif best_intent == "STOP":
+                global active_follow_color
+                active_follow_color = None
+                camera_opencv.Camera.modeSelect = 'none'
+                camera_opencv.Camera.followColor = 'none'
+                stop_robot()
+                action_msg = "Stopped all robot motion and openCV modes."
+                
+            elif best_intent == "SIT":
+                robot.steadyMode()
+                action_msg = "Robot sitting down (stabilized steady mode)."
+                
+            elif best_intent == "STAND":
+                robot.steadyMode()
+                action_msg = "Robot standing up (stabilized steady mode)."
+                
+            elif best_intent == "FOLLOW_RED":
+                active_follow_color = "red"
+                camera_opencv.Camera.modeSelect = 'followColor'
+                camera_opencv.Camera.followColor = "red"
+                action_msg = "Started color tracking mode following the 'red' ball."
+                
+            elif best_intent == "FOLLOW_GREEN":
+                active_follow_color = "green"
+                camera_opencv.Camera.modeSelect = 'followColor'
+                camera_opencv.Camera.followColor = "green"
+                action_msg = "Started color tracking mode following the 'green' ball."
+                
+            elif best_intent == "FOLLOW_BLUE":
+                active_follow_color = "blue"
+                camera_opencv.Camera.modeSelect = 'followColor'
+                camera_opencv.Camera.followColor = "blue"
+                action_msg = "Started color tracking mode following the 'blue' ball."
+                
+            else:
+                execution_success = False
+                action_msg = f"Intent '{best_intent}' recognized but no execution handler is mapped."
+                
+            log_action("BACKEND", "Chatbot Command Executed", f"Command: '{clean_command}', Intent: {best_intent}, Score: {best_score:.4f}, Action: {action_msg}")
+            return {
+                "success": True,
+                "command": command_text,
+                "intent": best_intent,
+                "score": best_score,
+                "threshold_passed": True,
+                "action_taken": action_msg,
+                "execution_success": execution_success,
+                "prompt_for_param": prompt_for_param
+            }
+        else:
+            return {
+                "success": True,
+                "command": command_text,
+                "intent": None,
+                "score": 0.0,
+                "threshold_passed": False,
+                "action_taken": "Command not understood (low match confidence). Make sure to say e.g., 'command forward 5' or 'command stop'.",
+                "execution_success": False,
+                "prompt_for_param": False
+            }
+
+    # 4. Fallback to normal chat system (Knowledge Base closest match)
+    if _kb_embeddings.size > 0:
+        try:
+            kb_emb = kb_get_embedding(command_text)
+            scores = _kb_embeddings @ kb_emb
+            best_idx = int(np.argmax(scores))
+            best_score = float(scores[best_idx])
+            matched_sentence = _kb_chunks[best_idx]
+            
+            log_action("BACKEND", "Chatbot KB Fallback Match", f"Query: '{command_text}', Match: '{matched_sentence}', Score: {best_score:.4f}")
+            return {
+                "success": True,
+                "command": command_text,
+                "intent": None,
+                "score": best_score,
+                "threshold_passed": False,
+                "action_taken": matched_sentence,
+                "execution_success": True,
+                "prompt_for_param": False
+            }
+        except Exception as e:
+            log_action("BACKEND", "Chatbot KB Fallback error", str(e))
+            
+    # Default fallback
+    return {
+        "success": True,
+        "command": command_text,
+        "intent": None,
+        "score": 0.0,
+        "threshold_passed": False,
+        "action_taken": "I'm sorry, I don't understand that command. Please try again or teach me using 'train on <statement>'.",
+        "execution_success": False,
+        "prompt_for_param": False
+    }
 
 
 @app.route('/api/chatbot/command', methods=['POST'])
@@ -880,18 +1035,32 @@ def api_face_capture():
 	camera_obj = get_camera()
 	if camera_obj is None:
 		return jsonify({"success": False, "error": "Camera unavailable"}), 503
-	frame_bytes = camera_obj.get_frame()
-	if not frame_bytes:
-		return jsonify({"success": False, "error": "Could not capture frame"}), 500
+		
 	import base64
 	import face_detection
-	has_face = face_detection.has_face(frame_bytes)
-	log_action("BACKEND", "Face Capture Command Executed", f"Has human face: {has_face}")
-	encoded_image = base64.b64encode(frame_bytes).decode("utf-8")
+	import time
+	
+	images = []
+	any_face = False
+	
+	for i in range(6):
+		frame_bytes = camera_obj.get_frame()
+		if frame_bytes:
+			encoded_image = base64.b64encode(frame_bytes).decode("utf-8")
+			images.append(encoded_image)
+			if face_detection.has_face(frame_bytes):
+				any_face = True
+		if i < 5:  # sleep 0.5s between captures
+			time.sleep(0.5)
+			
+	if not images:
+		return jsonify({"success": False, "error": "Could not capture any frames"}), 500
+		
+	log_action("BACKEND", "Face Capture Command Executed", f"Captured 6 frames. Any human face: {any_face}")
 	return jsonify({
 		"success": True,
-		"has_face": has_face,
-		"image": encoded_image
+		"has_face": any_face,
+		"images": images
 	})
 
 
