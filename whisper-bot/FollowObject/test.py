@@ -9,7 +9,7 @@ from detect import detect
 
 def main():
 	# Use model_path relative to test.py
-	model_path = os.path.join(os.path.dirname(__file__), "best.onnx")
+	model_path = os.path.join(os.path.dirname(__file__), "best (4).onnx")
 	print(f"Loading ONNX model from: {model_path}")
 	
 	cap = cv2.VideoCapture(0)
