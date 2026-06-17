@@ -5,7 +5,10 @@ mobilenetv3_embedding.onnx
 MiniLM/all-MiniLM.onnx
 intentdbBuild.py
 testIntentDb.py
-MiniLM/
+MiniLM/*.json
+MiniLM/*.pkl
+MiniLM/*.onnx
+MiniLM/*.yaml
 whisper/*.json
 whisper/*.onnx
 whisper/*.npz
