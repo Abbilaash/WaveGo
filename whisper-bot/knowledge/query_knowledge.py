@@ -4,7 +4,7 @@ import pickle
 import numpy as np
 from MiniLM.knowledge_inference import get_embedding
 import os
-DB_PATH = os.path.join(os.path.dirname(__file__), "knowledge_db (4).pkl")
+DB_PATH = os.path.join(os.path.dirname(__file__), "knowledge_db.pkl")
 
 
 # Load or initialize the knowledge database
