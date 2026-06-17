@@ -1344,7 +1344,7 @@ def api_diagnostic():
 		
 		latest_bgr = camera_opencv.Camera.latest_bgr_frame
 		
-		model_path = os.path.join(THIS_DIR, 'FollowObject', 'best.onnx')
+		model_path = os.path.join(THIS_DIR, 'FollowObject', 'best4.onnx')
 		
 		res_decoded_f = detect(decoded_frame, model_path, input_is_rgb=False)
 		res_decoded_t = detect(decoded_frame, model_path, input_is_rgb=True)
