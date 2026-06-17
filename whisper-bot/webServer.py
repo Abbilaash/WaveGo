@@ -361,7 +361,7 @@ import re
 from MiniLM.knowledge_inference import get_embedding as kb_get_embedding
 
 # Load knowledge base once (global)
-_KB_PATH = os.path.join(os.path.dirname(__file__), "knowledge", "knowledge_db (4).pkl")
+_KB_PATH = os.path.join(os.path.dirname(__file__), "knowledge", "knowledge_db.pkl")
 try:
     with open(_KB_PATH, "rb") as f:
         _kb_data = pickle.load(f)
