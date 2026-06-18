@@ -75,6 +75,7 @@ class CVThread(threading.Thread):
 
         self.ball_search_state = 'init'
         self.ball_search_start_time = 0.0
+        self.ball_search_aligned = False
 
         super(CVThread, self).__init__(*args, **kwargs)
         self.__flag = threading.Event()
@@ -94,6 +95,7 @@ class CVThread(threading.Thread):
         if invar == 'ballSearch' and self.CVMode != 'ballSearch':
             self.ball_search_state = 'init'
             self.ball_search_start_time = 0.0
+            self.ball_search_aligned = False
         self.CVMode = invar
         self.imgCV = imgInput.copy() if imgInput is not None else None
         self.resume()
@@ -498,38 +500,44 @@ class CVThread(threading.Thread):
                     # Centering horizontally (center_x = 320)
                     error_x = cx - 320
                     
-                    # Distance Control: target radius is 80 pixels
-                    if radius > 80:
-                        # Close enough, stop movement
+                    # Horizontal alignment hysteresis to prevent oscillations
+                    is_aligned = False
+                    if abs(error_x) < 20:
+                        is_aligned = True
+                    elif abs(error_x) < 45:
+                        if getattr(self, 'ball_search_aligned', False):
+                            is_aligned = True
+                    self.ball_search_aligned = is_aligned
+                    
+                    # Distance Control: stop if ball is too close (radius > 70 or cy > 400)
+                    if radius > 70 or cy > 400:
                         robot.stopFB()
                         robot.stopLR()
-                        print(f"[ballSearchCV] Target distance reached (radius={radius:.1f} > 80). Stopping.")
+                        robot.lookStopUD()
+                        print(f"[ballSearchCV] Close to target (radius={radius:.1f}, cy={cy:.1f}). Stopping.")
                     else:
-                        # Adjust angle to keep the ball centered
-                        if abs(error_x) < 50:
-                            # Centered horizontally, move forward
+                        # Center vertically using camera tilt (allows simultaneous walk and tilt-down)
+                        tor = CVThread.tor
+                        if cy < 240 - tor:
+                            robot.lookUp()
+                        elif cy > 240 + tor:
+                            robot.lookDown()
+                        else:
+                            robot.lookStopUD()
+                            
+                        # Horizontal centering & walking
+                        if is_aligned:
                             robot.stopLR()
                             robot.forward()
-                            print(f"[ballSearchCV] Centered (error={error_x:.1f}). Moving forward.")
+                            print(f"[ballSearchCV] Aligned (error={error_x:.1f}). Moving forward.")
                         elif error_x < 0:
-                            # Turn left
                             robot.stopFB()
                             robot.left()
                             print(f"[ballSearchCV] Off-center left (error={error_x:.1f}). Turning left.")
                         else:
-                            # Turn right
                             robot.stopFB()
                             robot.right()
                             print(f"[ballSearchCV] Off-center right (error={error_x:.1f}). Turning right.")
-                            
-                    # Center vertically using camera tilt
-                    tor = CVThread.tor
-                    if cy < 240 - tor:
-                        robot.lookUp()
-                    elif cy > 240 + tor:
-                        robot.lookDown()
-                    else:
-                        robot.lookStopUD()
                         
                 else:
                     # Ball is lost! Go back to searching state
