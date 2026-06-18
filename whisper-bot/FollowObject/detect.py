@@ -50,13 +50,13 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
             # Circularity metric: C = 4 * pi * Area / Perimeter^2
             circularity = 4 * np.pi * area / (perimeter ** 2)
             
-            # Filter for circularity close to 1.0 (strict range 0.85 to 1.15)
-            if 0.85 <= circularity <= 1.15:
+            # Filter for circularity close to 1.0 (strict range 0.8 to 1.2)
+            if 0.8 <= circularity <= 1.2:
                 x, y, w, h = cv2.boundingRect(c)
                 aspect_ratio = float(w) / h
                 
-                # Check aspect ratio to ensure it is not elongated (strict range 0.85 to 1.15)
-                if 0.85 <= aspect_ratio <= 1.15:
+                # Check aspect ratio to ensure it is not elongated (strict range 0.8 to 1.2)
+                if 0.8 <= aspect_ratio <= 1.2:
                     # Calculate confidence: how close circularity is to 1.0
                     conf = max(0.0, min(1.0, 1.0 - abs(1.0 - circularity)))
                     
@@ -69,21 +69,32 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
                         "x2": float(x + w),
                         "y2": float(y + h),
                         "conf": float(conf),
+                        "area": float(area),
                         "class_id": 1,
                         "class_name": "ball"
                     }
                     detections.append(det)
                     
-                    # Draw green bounding box and label
-                    color = (74, 222, 128)  # Green color for drawing
-                    cv2.rectangle(annotated_frame, (x, y), (x + w, y + h), color, 2)
-                    label = f"ball {conf:.2f}"
-                    cv2.putText(annotated_frame, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
-                    
-        # Sort detections by confidence descending so the best match is first
-        detections = sorted(detections, key=lambda d: d["conf"], reverse=True)
-        
-        print(f"[Detect] Successfully detected {len(detections)} green ball(s).")
+        # Filter to keep only the single largest detection if any exist
+        if detections:
+            detections = sorted(detections, key=lambda d: d["area"], reverse=True)
+            largest_det = detections[0]
+            
+            # Draw green bounding box and label only for the largest detection
+            x1 = int(largest_det["x1"])
+            y1 = int(largest_det["y1"])
+            x2 = int(largest_det["x2"])
+            y2 = int(largest_det["y2"])
+            conf = largest_det["conf"]
+            
+            color = (74, 222, 128)  # Green color for drawing
+            cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, 2)
+            label = f"ball {conf:.2f}"
+            cv2.putText(annotated_frame, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
+            
+            detections = [largest_det]
+         
+        print(f"[Detect] Successfully detected {len(detections)} largest green ball.")
         return {"success": True, "detections": detections, "annotated_frame": annotated_frame, "results": None}
         
     except Exception as e:
