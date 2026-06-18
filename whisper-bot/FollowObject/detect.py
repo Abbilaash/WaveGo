@@ -40,7 +40,7 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
         
         for c in cnts:
             area = cv2.contourArea(c)
-            if area < 100:  # Ignore small noise
+            if area < 30:  # Ignore very small noise (allows detection from further away)
                 continue
                 
             perimeter = cv2.arcLength(c, True)
@@ -50,13 +50,13 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
             # Circularity metric: C = 4 * pi * Area / Perimeter^2
             circularity = 4 * np.pi * area / (perimeter ** 2)
             
-            # Filter for circularity close to 1.0 (e.g. 0.6 to 1.4)
-            if 0.6 <= circularity <= 1.4:
+            # Filter for circularity close to 1.0 (strict range 0.8 to 1.2)
+            if 0.8 <= circularity <= 1.2:
                 x, y, w, h = cv2.boundingRect(c)
                 aspect_ratio = float(w) / h
                 
-                # Check aspect ratio to ensure it is not elongated
-                if 0.6 <= aspect_ratio <= 1.4:
+                # Check aspect ratio to ensure it is not elongated (strict range 0.8 to 1.2)
+                if 0.8 <= aspect_ratio <= 1.2:
                     # Calculate confidence: how close circularity is to 1.0
                     conf = max(0.0, min(1.0, 1.0 - abs(1.0 - circularity)))
                     
