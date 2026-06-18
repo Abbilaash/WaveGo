@@ -73,6 +73,9 @@ class CVThread(threading.Thread):
 
         self.center = None
 
+        self.ball_search_state = 'init'
+        self.ball_search_start_time = 0.0
+
         super(CVThread, self).__init__(*args, **kwargs)
         self.__flag = threading.Event()
         self.__flag.clear()
@@ -88,6 +91,9 @@ class CVThread(threading.Thread):
 
 
     def mode(self, invar, imgInput):
+        if invar == 'ballSearch' and self.CVMode != 'ballSearch':
+            self.ball_search_state = 'init'
+            self.ball_search_start_time = 0.0
         self.CVMode = invar
         self.imgCV = imgInput.copy() if imgInput is not None else None
         self.resume()
@@ -435,30 +441,116 @@ class CVThread(threading.Thread):
 
     def ballSearchCV(self, frame_image):
         try:
-            model_path = os.path.join(thisPath, 'FollowObject', 'best-wide-angle.onnx')
-            result = detect(frame_image, model_path=model_path, conf_threshold=0.0, input_is_rgb=False)
-            # Debug: print detection result summary
-            if result.get("success"):
-                print(f"[DEBUG ballSearchCV] Detections: {len(result.get('detections', []))}, Ball detections: {len([d for d in result.get('detections', []) if d.get('class_id') == 1])}")
-            else:
-                print(f"[DEBUG ballSearchCV] Detection failed: {result.get('error')}")
+            # Run detection on BGR image
+            result = detect(frame_image, conf_threshold=0.0, input_is_rgb=False)
+            
+            # Filter detections by class_id == 1 (ball) and confidence >= 0.50
+            ball_detections = []
             if result.get("success", False) and result.get("detections"):
-                # Filter for class_id == 1 (ball)
-                ball_detections = [d for d in result["detections"] if d.get("class_id") == 1]
+                ball_detections = [d for d in result["detections"] if d.get("class_id") == 1 and d.get("conf") >= 0.50]
+                
+            # Log state & detections
+            print(f"[ballSearchCV] State: {self.ball_search_state}, Detections: {len(ball_detections)}")
+            
+            # --- State Machine ---
+            if self.ball_search_state == 'init':
+                # Transition to searching, start rotating 360 degrees left
+                self.ball_search_state = 'searching'
+                self.ball_search_start_time = time.time()
+                robot.left()
+                print("[ballSearchCV] Initializing search: rotating 360 degrees left...")
+                Camera.ball_search_info = None
+                
+            elif self.ball_search_state == 'searching':
+                if ball_detections:
+                    # Found the ball! Stop turning and follow
+                    self.ball_search_state = 'following'
+                    robot.stopLR()
+                    print("[ballSearchCV] Ball found! Transitioning to following state.")
+                else:
+                    # Check if 360 turn timeout reached (e.g. 6.0 seconds)
+                    elapsed = time.time() - self.ball_search_start_time
+                    if elapsed > 6.0:
+                        self.ball_search_state = 'not_found'
+                        robot.stopLR()
+                        print("[ballSearchCV] 360 turn complete. Ball not found.")
+                    # Otherwise, continue rotating
+                    Camera.ball_search_info = None
+                    
+            elif self.ball_search_state == 'following':
                 if ball_detections:
                     best_det = ball_detections[0]
                     x1 = int(best_det["x1"])
                     y1 = int(best_det["y1"])
                     w_box = int(best_det["x2"] - best_det["x1"])
                     h_box = int(best_det["y2"] - best_det["y1"])
+                    
                     Camera.ball_search_info = {
                         "box": {"x": x1, "y": y1, "w": w_box, "h": h_box},
                         "confidence": best_det["conf"]
                     }
+                    
+                    # Compute center and radius
+                    cx = x1 + w_box / 2
+                    cy = y1 + h_box / 2
+                    radius = (w_box + h_box) / 4
+                    
+                    # Centering horizontally (center_x = 320)
+                    error_x = cx - 320
+                    
+                    # Distance Control: target radius is 80 pixels
+                    if radius > 80:
+                        # Close enough, stop movement
+                        robot.stopFB()
+                        robot.stopLR()
+                        print(f"[ballSearchCV] Target distance reached (radius={radius:.1f} > 80). Stopping.")
+                    else:
+                        # Adjust angle to keep the ball centered
+                        if abs(error_x) < 50:
+                            # Centered horizontally, move forward
+                            robot.stopLR()
+                            robot.forward()
+                            print(f"[ballSearchCV] Centered (error={error_x:.1f}). Moving forward.")
+                        elif error_x < 0:
+                            # Turn left
+                            robot.stopFB()
+                            robot.left()
+                            print(f"[ballSearchCV] Off-center left (error={error_x:.1f}). Turning left.")
+                        else:
+                            # Turn right
+                            robot.stopFB()
+                            robot.right()
+                            print(f"[ballSearchCV] Off-center right (error={error_x:.1f}). Turning right.")
+                            
+                    # Center vertically using camera tilt
+                    tor = CVThread.tor
+                    if cy < 240 - tor:
+                        robot.lookUp()
+                    elif cy > 240 + tor:
+                        robot.lookDown()
+                    else:
+                        robot.lookStopUD()
+                        
                 else:
+                    # Ball is lost! Go back to searching state
+                    print("[ballSearchCV] Ball lost. Transitioning back to searching.")
+                    self.ball_search_state = 'searching'
+                    self.ball_search_start_time = time.time()
+                    robot.left()
                     Camera.ball_search_info = None
-            else:
+                    
+            elif self.ball_search_state == 'not_found':
+                # Stop robot
+                robot.stopLR()
+                robot.stopFB()
+                robot.lookStopUD()
                 Camera.ball_search_info = None
+                
+                # If we see the ball again, recover and follow
+                if ball_detections:
+                    self.ball_search_state = 'following'
+                    print("[ballSearchCV] Ball detected in not_found state. Resuming follow.")
+                    
         except Exception as e:
             print("Error in ballSearchCV:", e)
             Camera.ball_search_info = None
