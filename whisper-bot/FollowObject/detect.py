@@ -40,7 +40,7 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
         
         for c in cnts:
             area = cv2.contourArea(c)
-            if area < 30:  # Ignore very small noise (allows detection from further away)
+            if area < 150:  # Ignore small noise (bounding box must be of a reasonable size)
                 continue
                 
             perimeter = cv2.arcLength(c, True)
@@ -80,8 +80,8 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
                     label = f"ball {conf:.2f}"
                     cv2.putText(annotated_frame, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
                     
-        # Sort detections by confidence descending so the best match is first
-        detections = sorted(detections, key=lambda d: d["conf"], reverse=True)
+        # Sort detections by bounding box area descending so the largest ball is first
+        detections = sorted(detections, key=lambda d: (d["x2"] - d["x1"]) * (d["y2"] - d["y1"]), reverse=True)
         
         print(f"[Detect] Successfully detected {len(detections)} green ball(s).")
         return {"success": True, "detections": detections, "annotated_frame": annotated_frame, "results": None}
