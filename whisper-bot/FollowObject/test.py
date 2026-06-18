@@ -26,7 +26,7 @@ def main():
 			break
 			
 		# Run detection
-		result = detect(frame, model_path=model_path, conf_threshold=0.25, iou_threshold=0.45)
+		result = detect(frame, model_path=model_path, conf_threshold=0.25)
 		
 		# Show the annotated frame
 		cv2.imshow("ONNX Object Detection", result["annotated_frame"])
