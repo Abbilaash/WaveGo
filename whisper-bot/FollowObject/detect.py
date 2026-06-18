@@ -19,9 +19,9 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
         else:
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             
-        # Green HSV range
-        lower_green = np.array([35, 40, 40])
-        upper_green = np.array([85, 255, 255])
+        # Green HSV range (stricter Saturation >= 100, Value >= 80, Hue 40-80)
+        lower_green = np.array([40, 100, 80])
+        upper_green = np.array([80, 255, 255])
         
         # Color mask
         mask = cv2.inRange(hsv, lower_green, upper_green)
@@ -40,7 +40,7 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
         
         for c in cnts:
             area = cv2.contourArea(c)
-            if area < 30:  # Ignore very small noise (allows detection from further away)
+            if area < 100:  # Ignore small noise (prevents tiny background detections)
                 continue
                 
             perimeter = cv2.arcLength(c, True)
