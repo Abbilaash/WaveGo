@@ -50,13 +50,13 @@ def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop
             # Circularity metric: C = 4 * pi * Area / Perimeter^2
             circularity = 4 * np.pi * area / (perimeter ** 2)
             
-            # Filter for circularity close to 1.0 (strict range 0.8 to 1.2)
-            if 0.8 <= circularity <= 1.2:
+            # Filter for circularity close to 1.0 (strict range 0.85 to 1.15)
+            if 0.85 <= circularity <= 1.15:
                 x, y, w, h = cv2.boundingRect(c)
                 aspect_ratio = float(w) / h
                 
-                # Check aspect ratio to ensure it is not elongated (strict range 0.8 to 1.2)
-                if 0.8 <= aspect_ratio <= 1.2:
+                # Check aspect ratio to ensure it is not elongated (strict range 0.85 to 1.15)
+                if 0.85 <= aspect_ratio <= 1.15:
                     # Calculate confidence: how close circularity is to 1.0
                     conf = max(0.0, min(1.0, 1.0 - abs(1.0 - circularity)))
                     

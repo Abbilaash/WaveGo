@@ -454,11 +454,11 @@ class CVThread(threading.Thread):
             
             # --- State Machine ---
             if self.ball_search_state == 'init':
-                # Transition to searching, start rotating 360 degrees left
+                # Transition to searching, start rotating 360 degrees right
                 self.ball_search_state = 'searching'
                 self.ball_search_start_time = time.time()
-                robot.left()
-                print("[ballSearchCV] Initializing search: rotating 360 degrees left...")
+                robot.right()
+                print("[ballSearchCV] Initializing search: rotating 360 degrees right...")
                 Camera.ball_search_info = None
                 
             elif self.ball_search_state == 'searching':
@@ -536,7 +536,7 @@ class CVThread(threading.Thread):
                     print("[ballSearchCV] Ball lost. Transitioning back to searching.")
                     self.ball_search_state = 'searching'
                     self.ball_search_start_time = time.time()
-                    robot.left()
+                    robot.right()
                     Camera.ball_search_info = None
                     
             elif self.ball_search_state == 'not_found':
