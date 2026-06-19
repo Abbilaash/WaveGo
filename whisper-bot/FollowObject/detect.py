@@ -5,10 +5,6 @@ import numpy as np
 CLASS_NAMES = ['0', 'ball']
 
 def detect(frame, model_path=None, conf_threshold=0.25, input_is_rgb=False, crop_size=240):
-    """
-    Run green ball detection using color HSV filtering and contour circularity checking.
-    Replaces the YOLOv8 ONNX-based model detection.
-    """
     if frame is None or not hasattr(frame, 'shape') or len(frame.shape) < 3:
         return {"success": False, "detections": [], "annotated_frame": frame, "results": None, "error": "Invalid frame input"}
         

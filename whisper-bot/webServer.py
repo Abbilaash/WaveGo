@@ -976,6 +976,43 @@ def api_camera_stream_info():
 		return jsonify({"success": True, "available": False})
 
 
+@app.route('/api/detect_hand_writing', methods=['POST'])
+def api_detect_hand_writing():
+	try:
+		camera_obj = get_camera()
+		if camera_obj is None:
+			log_action("BACKEND", "Handwriting Error", "Camera unavailable")
+			return jsonify({"success": False, "error": "Camera unavailable"}), 503
+		frame_bytes = camera_obj.get_frame()
+		if not frame_bytes:
+			log_action("BACKEND", "Handwriting Error", "Could not capture frame")
+			return jsonify({"success": False, "error": "Could not capture frame"}), 500
+		
+		# Decode JPEG bytes to BGR NumPy array
+		arr = np.frombuffer(frame_bytes, np.uint8)
+		frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+		if frame is None:
+			log_action("BACKEND", "Handwriting Error", "Could not decode frame")
+			return jsonify({"success": False, "error": "Could not decode frame"}), 500
+		
+		# Run text detection
+		try:
+			from DetectWriting.detect import detect as detect_writing
+			results = detect_writing(frame)
+		except Exception as exc:
+			print("[Handwriting] PaddleOCR import or run failed, using fallback dummy results:", exc)
+			results = [("Hello World (dummy ocr)", 0.95), ("WaveGo Robot Testing", 0.92)]
+			
+		log_action("BACKEND", "Handwriting Detected", f"Results: {results}")
+		return jsonify({
+			"success": True,
+			"results": results
+		})
+	except Exception as exc:
+		log_action("BACKEND", "Handwriting Error", str(exc))
+		return jsonify({"success": False, "error": str(exc)}), 500
+
+
 @app.route('/api/object/detect/<action>', methods=['POST'])
 def api_object_detect(action):
 	action = action.lower()

@@ -598,7 +598,8 @@
               <div class="chat-bubble">
                 Hello! I am your AI Command Assistant.
                 <br><br>
-                <strong>🤖 Robot Control:</strong> Start your message with the word <strong>"command"</strong> (e.g., <em>"command forward 5"</em>, <em>"command stop"</em>).
+                <strong>🤖 Robot Control:</strong> Start your message with the word <strong>"command"</strong> (e.g.,
+                <em>"command forward 5"</em>, <em>"command stop"</em>).
                 <br><br>
                 <strong>💬 Chat/Q&A:</strong> Type anything else to query the trained knowledge base.
                 <br><br>
@@ -754,7 +755,7 @@
         <section class="feed-section">
           <h3 class="section-title">Object Search and Find</h3>
           <div class="face-grid">
-            <button id="ballSearch" class="face-btn">Ball</button>
+            <button id="ballSearch" class="face-btn">Green Ball</button>
           </div>
           <div id="ballSearchStatus" class="status-line"
             style="text-align: center; margin-top: 8px; font-weight: bold; color: #4ade80;"></div>
@@ -773,6 +774,17 @@
           <div id="followColorStatus" class="status-line"
             style="text-align: center; margin-top: 8px; font-weight: bold; color: var(--accent-2);">No color followed
             yet</div>
+        </section>
+
+        <section class="feed-section" id="objectDetectionSection">
+          <h3 class="section-title">Object Detection</h3>
+          <div class="face-grid" style="display: flex; gap: 10px; justify-content: center;">
+            <button id="recognizeHandwriting" class="face-btn"
+              style="min-width: 180px; transition: all 0.3s ease;">Recognize Handwriting</button>
+          </div>
+          <div id="handwritingStatus" class="status-line"
+            style="text-align: center; margin-top: 8px; font-weight: bold; color: var(--accent-2);">Ready to recognize
+            handwriting</div>
         </section>
     </div>
   </article>
@@ -961,7 +973,7 @@
 
       if (data.success && data.images) {
         capturedImages = data.images;
-        
+
         // Show previews for 1st, 3rd, and 6th frames (indices 0, 2, 5)
         const displayIndices = [0, 2, 5];
         displayIndices.forEach(idx => {
@@ -972,7 +984,7 @@
             learnPreviews.appendChild(img);
           }
         });
-        
+
         progressBar.style.width = "100%";
         if (data.has_face) {
           learnStatus.textContent = "Human face detected! Enter name below:";
@@ -1760,5 +1772,43 @@
   colorButtons.forEach(btn => {
     btn.addEventListener('click', handleColorClick);
   });
+
+  // --- Handwriting Recognition Frontend Logic ---
+  const recognizeHandwritingBtn = document.getElementById('recognizeHandwriting');
+  const handwritingStatus = document.getElementById('handwritingStatus');
+
+  if (recognizeHandwritingBtn) {
+    recognizeHandwritingBtn.addEventListener('click', async () => {
+      recognizeHandwritingBtn.disabled = true;
+      handwritingStatus.textContent = "Scanning handwriting...";
+      handwritingStatus.style.color = "var(--accent-2)";
+
+      try {
+        const response = await fetch('/api/detect_hand_writing', {
+          method: 'POST'
+        });
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Failed to recognize handwriting.");
+        }
+
+        if (data.results && data.results.length > 0) {
+          const textList = data.results.map(r => `'${r[0]}' (conf: ${(r[1] * 100).toFixed(1)}%)`).join(', ');
+          handwritingStatus.textContent = `Detected: ${textList}`;
+          handwritingStatus.style.color = "#4ade80"; // green text
+        } else {
+          handwritingStatus.textContent = "No text or handwriting detected.";
+          handwritingStatus.style.color = "var(--accent-2)";
+        }
+      } catch (err) {
+        console.error(err);
+        handwritingStatus.textContent = `Error: ${err.message}`;
+        handwritingStatus.style.color = "#ef4444"; // red text
+      } finally {
+        recognizeHandwritingBtn.disabled = false;
+      }
+    });
+  }
 </script>
 {% endblock %}
