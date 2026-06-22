@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED=1
 # Install system dependencies for OpenCV, camera, and serial communication
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libgstreamer1.0-0 \
     libgstreamer-plugins-base1.0-0 \
