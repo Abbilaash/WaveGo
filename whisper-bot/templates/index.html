@@ -575,7 +575,19 @@
               <div class="stat-value" id="cpuUseValue">{{ state.cpu_use }}%</div>
             </div>
           </div>
-          <div class="status-badge"><span class="status-dot"></span><span id="statusBadgeText">Network ready</span>
+          <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap;">
+            <div class="status-badge" style="margin-top: 0;">
+              <span class="status-dot"></span>
+              <span id="statusBadgeText">Network ready</span>
+            </div>
+            <div class="status-badge" id="bluetoothBadge" style="margin-top: 0; gap: 6px; cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255, 255, 255, 0.05); display: inline-flex; align-items: center;">
+              <span class="status-dot" id="bluetoothStatusDot" style="background: #9fb1ce; box-shadow: none;"></span>
+              <select id="bluetoothDropdown" style="background: transparent; border: none; color: #fff; font-size: 13px; font-family: inherit; outline: none; cursor: pointer; padding: 0 0 0 4px; margin: 0; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                <option value="" style="background: #101c31; color: #fff;">Bluetooth Disconnected</option>
+                <option value="scan" style="background: #101c31; color: #fff;">🔍 Scan Devices...</option>
+              </select>
+              <span style="font-size: 8px; opacity: 0.6; pointer-events: none; margin-left: 2px;">▼</span>
+            </div>
           </div>
         </section>
 
@@ -1809,6 +1821,105 @@
         recognizeHandwritingBtn.disabled = false;
       }
     });
+  }
+
+  // --- Bluetooth Connection Logic ---
+  const bluetoothDropdown = document.getElementById('bluetoothDropdown');
+  const bluetoothStatusDot = document.getElementById('bluetoothStatusDot');
+  let connectedBluetoothDevice = null;
+
+  if (bluetoothDropdown) {
+    bluetoothDropdown.addEventListener('change', async () => {
+      const val = bluetoothDropdown.value;
+      if (val === 'scan') {
+        if (!navigator.bluetooth) {
+          alert('Web Bluetooth API is not available in this context.\n\nNote: Web Bluetooth requires a secure context (HTTPS) or a localhost connection.');
+          bluetoothDropdown.value = '';
+          return;
+        }
+
+        try {
+          bluetoothDropdown.disabled = true;
+          // Set connecting status (yellow/amber dot)
+          bluetoothStatusDot.style.background = '#f59e0b';
+          bluetoothStatusDot.style.boxShadow = '0 0 8px #f59e0b';
+
+          const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true
+          });
+
+          // Connect to the device's GATT server
+          const server = await device.gatt.connect();
+          connectedBluetoothDevice = device;
+
+          // Remove any existing connected-device option
+          const existingOpt = bluetoothDropdown.querySelector('.connected-device-option');
+          if (existingOpt) existingOpt.remove();
+
+          // Add connected option
+          const newOpt = document.createElement('option');
+          newOpt.value = 'connected';
+          newOpt.className = 'connected-device-option';
+          newOpt.textContent = `Connected: ${device.name || 'Unnamed'}`;
+          newOpt.style.background = '#101c31';
+          newOpt.style.color = '#fff';
+          bluetoothDropdown.appendChild(newOpt);
+          bluetoothDropdown.value = 'connected';
+
+          // Add disconnect option if not already present
+          let discOpt = bluetoothDropdown.querySelector('.disconnect-option');
+          if (!discOpt) {
+            discOpt = document.createElement('option');
+            discOpt.value = 'disconnect';
+            discOpt.className = 'disconnect-option';
+            discOpt.textContent = '❌ Disconnect';
+            discOpt.style.background = '#101c31';
+            discOpt.style.color = '#fca5a5';
+            bluetoothDropdown.appendChild(discOpt);
+          }
+
+          // Update status to connected (green dot)
+          bluetoothStatusDot.style.background = '#10b981';
+          bluetoothStatusDot.style.boxShadow = '0 0 8px #10b981';
+
+          // Listen for disconnection
+          device.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
+
+        } catch (err) {
+          console.error('Bluetooth connection error:', err);
+          // Only show alert if it was not cancelled by the user
+          if (err.name !== 'NotFoundError' && !err.message.includes('User cancelled')) {
+            alert(`Could not connect to Bluetooth device: ${err.message || err}`);
+          }
+          resetBluetoothUI();
+        } finally {
+          bluetoothDropdown.disabled = false;
+        }
+      } else if (val === 'disconnect') {
+        if (connectedBluetoothDevice && connectedBluetoothDevice.gatt.connected) {
+          connectedBluetoothDevice.gatt.disconnect();
+        }
+        resetBluetoothUI();
+      }
+    });
+  }
+
+  function onBluetoothDisconnected() {
+    resetBluetoothUI();
+  }
+
+  function resetBluetoothUI() {
+    connectedBluetoothDevice = null;
+    bluetoothStatusDot.style.background = '#9fb1ce';
+    bluetoothStatusDot.style.boxShadow = 'none';
+
+    const connectedOpt = bluetoothDropdown.querySelector('.connected-device-option');
+    if (connectedOpt) connectedOpt.remove();
+
+    const discOpt = bluetoothDropdown.querySelector('.disconnect-option');
+    if (discOpt) discOpt.remove();
+
+    bluetoothDropdown.value = '';
   }
 </script>
 {% endblock %}

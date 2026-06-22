@@ -1,5 +1,10 @@
 flask
 imutils
 face-recognition
-# On Windows (Python 3.11), install dlib using:
-# pip install https://huggingface.co/hanamizuki-ai/pypi-wheels/resolve/main/dlib/dlib-19.24.1-cp311-cp311-win_amd64.whl
+numpy
+opencv-python-headless
+pyserial
+onnxruntime
+# Optional handwriting recognition dependencies (uncomment to include in build)
+# paddleocr
+# paddlepaddle

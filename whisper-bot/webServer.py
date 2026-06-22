@@ -38,12 +38,16 @@ if THIS_DIR in sys.path:
 	sys.path.remove(THIS_DIR)
 sys.path.insert(0, THIS_DIR)
 
+CORE_DIR = os.path.join(THIS_DIR, "core")
+if CORE_DIR not in sys.path:
+	sys.path.insert(1, CORE_DIR)
+
 RPi_DIR = os.path.normpath(os.path.join(THIS_DIR, "..", "RPi"))
 if RPi_DIR not in sys.path:
-	sys.path.insert(1, RPi_DIR)
+	sys.path.insert(2, RPi_DIR)
 else:
 	sys.path.remove(RPi_DIR)
-	sys.path.insert(1, RPi_DIR)
+	sys.path.insert(2, RPi_DIR)
 
 import camera_opencv
 from FollowObject.detect import detect

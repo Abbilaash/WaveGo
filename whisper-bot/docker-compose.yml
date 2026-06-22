@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  whisper-bot:
+    build: .
+    image: whisper-bot:latest
+    container_name: wavego_bot
+    restart: always
+    network_mode: host  # Using host network mode allows the flask server to advertise/bind to the local network interfaces easily
+    privileged: true    # Gives full access to GPU/VCHIQ and camera modules on the Pi
+    devices:
+      - "/dev/ttyS0:/dev/ttyS0"      # UART/Serial command port to the ESP32 motion board
+      - "/dev/video0:/dev/video0"    # Camera module access
+    volumes:
+      - ./logs:/app/logs             # Persist robot log files on the host machine
+      - ./knowledge:/app/knowledge   # Persist the chatbot's trained knowledge base
