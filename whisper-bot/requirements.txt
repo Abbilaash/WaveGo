@@ -5,6 +5,4 @@ numpy
 opencv-python-headless
 pyserial
 onnxruntime
-# Optional handwriting recognition dependencies (uncomment to include in build)
-# paddleocr
-# paddlepaddle
+psutil
