@@ -4,7 +4,7 @@ services:
   whisper-bot:
     build: .
     image: whisper-bot:latest
-    container_name: wavego_bot
+    container_name: whisper-bot
     restart: always
     network_mode: host  # Using host network mode allows the flask server to advertise/bind to the local network interfaces easily
     privileged: true    # Gives full access to GPU/VCHIQ and camera modules on the Pi

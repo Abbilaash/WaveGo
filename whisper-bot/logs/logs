@@ -603,3 +603,158 @@
 2026-06-22 09:46:53,033 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
 2026-06-22 09:46:57,432 - INFO - [API_REQUEST] GET /api/status - Details: IP: 127.0.0.1, Payload: None
 2026-06-22 09:46:57,433 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:27:29,084 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:29,088 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:27:29,830 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:30,848 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-22 16:27:33,261 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:33,262 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:27:37,249 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:37,251 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:27:41,249 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:41,251 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:27:45,254 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:45,256 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:27:46,458 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 192.168.4.19, Payload: {'command': 'hello'}
+2026-06-22 16:27:46,781 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'hello', Match: 'I can greet recognized users.', Score: 0.4123
+2026-06-22 16:27:46,781 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-22 16:27:49,273 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:49,275 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:27:53,271 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:53,272 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:27:55,318 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 192.168.4.19, Payload: {'command': 'who is ur creator'}
+2026-06-22 16:27:55,405 - INFO - [BACKEND] Chatbot KB Fallback Match - Details: Query: 'who is ur creator', Match: 'My creator name is Abbilaash', Score: 0.7926
+2026-06-22 16:27:55,405 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-22 16:27:57,354 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:27:57,355 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:01,179 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:01,180 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-22 16:28:01,258 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:01,259 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:05,260 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:05,262 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:09,264 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:09,267 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:13,268 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:13,270 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:17,275 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:17,277 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:21,268 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:21,280 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:25,267 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:25,270 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:29,261 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:29,264 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:33,270 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:33,273 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:37,257 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:37,259 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:41,276 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:41,280 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:45,273 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:45,276 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:49,250 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:49,255 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:53,250 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:53,250 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:28:57,251 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:28:57,254 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:00,439 - INFO - [API_REQUEST] POST /api/move/stop - Details: IP: 192.168.4.19, Payload: {'speed': 100}
+2026-06-22 16:29:00,845 - INFO - [ROBOT] stopLR
+2026-06-22 16:29:01,246 - INFO - [ROBOT] stopFB
+2026-06-22 16:29:01,246 - INFO - [BACKEND] Movement Command Executed - Details: Action: stop, Speed: 100
+2026-06-22 16:29:01,246 - INFO - [API_RESPONSE] POST /api/move/stop - Details: Status: 200 OK
+2026-06-22 16:29:01,248 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:01,248 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:01,310 - INFO - [API_REQUEST] POST /api/move/forward - Details: IP: 192.168.4.19, Payload: {'speed': 100}
+2026-06-22 16:29:01,313 - INFO - [API_REQUEST] POST /api/move/stop - Details: IP: 192.168.4.19, Payload: {'speed': 100}
+2026-06-22 16:29:01,714 - INFO - [ROBOT] forward - Details: speed=100
+2026-06-22 16:29:01,714 - INFO - [BACKEND] Movement Command Executed - Details: Action: forward, Speed: 100
+2026-06-22 16:29:01,714 - INFO - [API_RESPONSE] POST /api/move/forward - Details: Status: 200 OK
+2026-06-22 16:29:01,787 - INFO - [API_REQUEST] POST /api/move/right - Details: IP: 192.168.4.19, Payload: {'speed': 100}
+2026-06-22 16:29:01,914 - INFO - [API_REQUEST] POST /api/move/stop - Details: IP: 192.168.4.19, Payload: {'speed': 100}
+2026-06-22 16:29:02,116 - INFO - [ROBOT] stopLR
+2026-06-22 16:29:02,416 - INFO - [API_REQUEST] POST /api/move/right - Details: IP: 192.168.4.19, Payload: {'speed': 100}
+2026-06-22 16:29:02,496 - INFO - [API_REQUEST] POST /api/move/stop - Details: IP: 192.168.4.19, Payload: {'speed': 100}
+2026-06-22 16:29:02,518 - INFO - [ROBOT] right - Details: speed=100
+2026-06-22 16:29:02,518 - INFO - [BACKEND] Movement Command Executed - Details: Action: right, Speed: 100
+2026-06-22 16:29:02,518 - INFO - [API_RESPONSE] POST /api/move/right - Details: Status: 200 OK
+2026-06-22 16:29:02,920 - INFO - [ROBOT] stopLR
+2026-06-22 16:29:03,321 - INFO - [ROBOT] stopFB
+2026-06-22 16:29:03,321 - INFO - [BACKEND] Movement Command Executed - Details: Action: stop, Speed: 100
+2026-06-22 16:29:03,321 - INFO - [API_RESPONSE] POST /api/move/stop - Details: Status: 200 OK
+2026-06-22 16:29:03,723 - INFO - [ROBOT] right - Details: speed=100
+2026-06-22 16:29:03,723 - INFO - [BACKEND] Movement Command Executed - Details: Action: right, Speed: 100
+2026-06-22 16:29:03,723 - INFO - [API_RESPONSE] POST /api/move/right - Details: Status: 200 OK
+2026-06-22 16:29:04,125 - INFO - [ROBOT] stopLR
+2026-06-22 16:29:04,527 - INFO - [ROBOT] stopFB
+2026-06-22 16:29:04,527 - INFO - [BACKEND] Movement Command Executed - Details: Action: stop, Speed: 100
+2026-06-22 16:29:04,527 - INFO - [API_RESPONSE] POST /api/move/stop - Details: Status: 200 OK
+2026-06-22 16:29:04,929 - INFO - [ROBOT] stopFB
+2026-06-22 16:29:04,929 - INFO - [BACKEND] Movement Command Executed - Details: Action: stop, Speed: 100
+2026-06-22 16:29:04,929 - INFO - [API_RESPONSE] POST /api/move/stop - Details: Status: 200 OK
+2026-06-22 16:29:05,251 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:05,251 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:05,931 - INFO - [API_REQUEST] POST /api/default/jump - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:06,337 - INFO - [ROBOT] jump
+2026-06-22 16:29:06,337 - INFO - [BACKEND] Default Action Command Executed - Details: Action: jump
+2026-06-22 16:29:06,337 - INFO - [API_RESPONSE] POST /api/default/jump - Details: Status: 200 OK
+2026-06-22 16:29:09,261 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:09,261 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:12,879 - INFO - [API_REQUEST] POST /api/default/handshake - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:13,250 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:13,252 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:13,281 - INFO - [ROBOT] handShake
+2026-06-22 16:29:13,281 - INFO - [BACKEND] Default Action Command Executed - Details: Action: handshake
+2026-06-22 16:29:13,281 - INFO - [API_RESPONSE] POST /api/default/handshake - Details: Status: 200 OK
+2026-06-22 16:29:17,257 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:17,258 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:18,296 - INFO - [API_REQUEST] POST /api/search/ball - Details: IP: 192.168.4.19, Payload: {'action': 'start'}
+2026-06-22 16:29:18,296 - INFO - [BACKEND] Ball Search Error - Details: Camera unavailable
+2026-06-22 16:29:18,296 - INFO - [API_RESPONSE] POST /api/search/ball - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-22 16:29:19,415 - INFO - [API_REQUEST] POST /api/search/ball - Details: IP: 192.168.4.19, Payload: {'action': 'stop'}
+2026-06-22 16:29:19,415 - INFO - [BACKEND] Ball Search Stopped - Details: Ball search mode disabled
+2026-06-22 16:29:19,415 - INFO - [API_RESPONSE] POST /api/search/ball - Details: Status: 200 OK
+2026-06-22 16:29:21,252 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:21,254 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:21,513 - INFO - [API_REQUEST] POST /api/color/follow/green - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:21,513 - INFO - [BACKEND] Follow Color - Details: Color: green, Status: activated
+2026-06-22 16:29:21,513 - INFO - [API_RESPONSE] POST /api/color/follow/green - Details: Status: 200 OK
+2026-06-22 16:29:22,892 - INFO - [API_REQUEST] POST /api/color/follow/none - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:23,293 - INFO - [ROBOT] stopFB
+2026-06-22 16:29:23,695 - INFO - [ROBOT] stopLR
+2026-06-22 16:29:23,696 - INFO - [BACKEND] Follow Color - Details: Color: none, Status: deactivated
+2026-06-22 16:29:23,696 - INFO - [API_RESPONSE] POST /api/color/follow/none - Details: Status: 200 OK
+2026-06-22 16:29:25,239 - INFO - [API_REQUEST] POST /api/detect_hand_writing - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:25,239 - INFO - [BACKEND] Handwriting Error - Details: Camera unavailable
+2026-06-22 16:29:25,240 - INFO - [API_RESPONSE] POST /api/detect_hand_writing - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-22 16:29:25,252 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:25,255 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:29,259 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:29,260 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:33,275 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:33,277 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:37,330 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:37,332 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:41,278 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:41,280 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:45,257 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:45,258 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:49,285 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:49,287 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:53,279 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:53,281 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:29:57,372 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:29:57,374 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:30:01,275 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:30:01,277 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:30:05,274 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:30:05,276 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:30:09,262 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:30:09,263 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:30:13,271 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:30:13,273 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:30:16,663 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:30:16,664 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-22 16:30:16,815 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-22 16:30:16,817 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
