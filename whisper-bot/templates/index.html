@@ -792,11 +792,10 @@
           <h3 class="section-title">Object Detection</h3>
           <div class="face-grid" style="display: flex; gap: 10px; justify-content: center;">
             <button id="recognizeHandwriting" class="face-btn"
-              style="min-width: 180px; transition: all 0.3s ease;">Recognize Handwriting</button>
+              style="min-width: 180px; transition: all 0.3s ease;">Detect Digit with CNN</button>
           </div>
           <div id="handwritingStatus" class="status-line"
-            style="text-align: center; margin-top: 8px; font-weight: bold; color: var(--accent-2);">Ready to recognize
-            handwriting</div>
+            style="text-align: center; margin-top: 8px; font-weight: bold; color: var(--accent-2);">Ready to detect digit</div>
         </section>
     </div>
   </article>
@@ -1785,33 +1784,35 @@
     btn.addEventListener('click', handleColorClick);
   });
 
-  // --- Handwriting Recognition Frontend Logic ---
+  // --- CNN Digit Detection Frontend Logic ---
   const recognizeHandwritingBtn = document.getElementById('recognizeHandwriting');
   const handwritingStatus = document.getElementById('handwritingStatus');
 
   if (recognizeHandwritingBtn) {
     recognizeHandwritingBtn.addEventListener('click', async () => {
       recognizeHandwritingBtn.disabled = true;
-      handwritingStatus.textContent = "Scanning handwriting...";
+      handwritingStatus.textContent = "Scanning digit with CNN...";
       handwritingStatus.style.color = "var(--accent-2)";
 
       try {
-        const response = await fetch('/api/detect_hand_writing', {
+        const response = await fetch('/api/detect_digit', {
           method: 'POST'
         });
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-          throw new Error(data.error || "Failed to recognize handwriting.");
+          throw new Error(data.error || "Failed to detect digit.");
         }
 
-        if (data.results && data.results.length > 0) {
-          const textList = data.results.map(r => `'${r[0]}' (conf: ${(r[1] * 100).toFixed(1)}%)`).join(', ');
-          handwritingStatus.textContent = `Detected: ${textList}`;
-          handwritingStatus.style.color = "#4ade80"; // green text
-        } else {
-          handwritingStatus.textContent = "No text or handwriting detected.";
-          handwritingStatus.style.color = "var(--accent-2)";
+        const prediction = data.prediction;
+        const confidence = data.confidence;
+        
+        handwritingStatus.textContent = `Detected: '${prediction}' (conf: ${confidence.toFixed(1)}%)`;
+        handwritingStatus.style.color = "#4ade80"; // green text
+        
+        // Send output to the user in AI command assistant chat
+        if (typeof appendChatMessage === 'function') {
+          appendChatMessage('bot', data.message);
         }
       } catch (err) {
         console.error(err);

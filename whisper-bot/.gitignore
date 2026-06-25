@@ -16,3 +16,6 @@ whisper/vosk-model-small-en-us-0.15
 yoloServer/
 FollowObject/*.onnx
 logs/
+knowledge/*.json
+knowledge/*.onnx
+knowledge/*.onnx_data

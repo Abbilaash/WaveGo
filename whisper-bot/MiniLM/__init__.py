@@ -87,3 +87,4 @@ def predict_intent(text):
 				best_intent = intent
 				
 	return best_intent, best_score
+

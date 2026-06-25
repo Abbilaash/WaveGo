@@ -375,6 +375,41 @@ except Exception:
     _kb_chunks = []
     _kb_embeddings = np.empty((0, 0), dtype=np.float32)
 
+# --------------------------------
+# Gemma3 Lazy Initialization
+# --------------------------------
+_gemma_session = None
+_gemma_tokenizer = None
+_gemma_lock = threading.Lock()
+_gemma_load_error = None
+
+def get_gemma3_session_and_tokenizer():
+    global _gemma_session, _gemma_tokenizer, _gemma_load_error
+    with _gemma_lock:
+        if _gemma_session is None and _gemma_load_error is None:
+            try:
+                import onnxruntime as ort
+                from tokenizers import Tokenizer
+                
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                model_path = os.path.join(script_dir, "knowledge", "gemma3.onnx")
+                tokenizer_path = os.path.join(script_dir, "knowledge", "tokenizer.json")
+                
+                if not os.path.exists(tokenizer_path):
+                    raise FileNotFoundError(f"Gemma3 tokenizer.json not found at '{tokenizer_path}'.")
+                if not os.path.exists(model_path):
+                    raise FileNotFoundError(f"Gemma3 model not found at '{model_path}'.")
+                
+                _gemma_tokenizer = Tokenizer.from_file(tokenizer_path)
+                _gemma_session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
+            except Exception as e:
+                _gemma_load_error = str(e)
+                log_action("BACKEND", "Gemma3 Load Error", _gemma_load_error)
+                
+    if _gemma_load_error:
+        raise RuntimeError(f"Gemma3 initialization failed: {_gemma_load_error}")
+    return _gemma_session, _gemma_tokenizer
+
 def _map_sentence_to_intent(sentence: str) -> str | None:
     """Simple mapping from a stored sentence to a movement intent."""
     s = sentence.lower()
@@ -720,26 +755,70 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
                 "prompt_for_param": False
             }
 
-    # 4. Fallback to normal chat system (Knowledge Base closest match)
+    # 4. Fallback to normal chat system (Knowledge Base closest match + Gemma3 LLM generator)
     if _kb_embeddings.size > 0:
         try:
             kb_emb = kb_get_embedding(command_text)
             scores = _kb_embeddings @ kb_emb
-            best_idx = int(np.argmax(scores))
-            best_score = float(scores[best_idx])
-            matched_sentence = _kb_chunks[best_idx]
             
-            log_action("BACKEND", "Chatbot KB Fallback Match", f"Query: '{command_text}', Match: '{matched_sentence}', Score: {best_score:.4f}")
-            return {
-                "success": True,
-                "command": command_text,
-                "intent": None,
-                "score": best_score,
-                "threshold_passed": False,
-                "action_taken": matched_sentence,
-                "execution_success": True,
-                "prompt_for_param": False
-            }
+            # Retrieve top 3 context chunks
+            top_k = min(3, len(_kb_chunks))
+            top_indices = np.argsort(scores)[::-1][:top_k]
+            retrieved_chunks = [_kb_chunks[idx] for idx in top_indices]
+            best_score = float(scores[top_indices[0]])
+            context = "\n\n".join(retrieved_chunks)
+            
+            try:
+                # Lazy load Gemma3 ONNX session and tokenizer
+                session, tokenizer = get_gemma3_session_and_tokenizer()
+                from knowledge.inference import generate_response
+                
+                # Construct the prompt
+                prompt = f"<start_of_turn>user\nContext:\n{context}\n\nQuestion:\n{command_text}\n\nInstructions: Answer the question concisely in 1 sentence.<end_of_turn>\n<start_of_turn>model\n"
+                
+                log_action("BACKEND", "Chatbot Gemma3 Generation Started", f"Prompt length: {len(prompt)}")
+                response_text = generate_response(
+                    session=session,
+                    tokenizer=tokenizer,
+                    prompt=prompt,
+                    max_new_tokens=100,
+                    temperature=0.0,
+                    print_stream=False
+                )
+                log_action("BACKEND", "Chatbot Gemma3 Response", response_text)
+                
+                return {
+                    "success": True,
+                    "command": command_text,
+                    "intent": None,
+                    "score": best_score,
+                    "threshold_passed": False,
+                    "action_taken": response_text,
+                    "execution_success": True,
+                    "prompt_for_param": False
+                }
+            except Exception as exc:
+                log_action("BACKEND", "Gemma3 Generation Error/Fallback", str(exc))
+                # Fallback to returning just the closest matching sentence (old behavior)
+                best_idx = top_indices[0]
+                matched_sentence = _kb_chunks[best_idx]
+                
+                fallback_msg = matched_sentence
+                if "model.onnx_data" in str(exc) or "external data" in str(exc).lower():
+                    fallback_msg = f"[Fallback: Gemma3 weights missing. Place 'model.onnx_data' in knowledge/]\nMatched Context: {matched_sentence}"
+                else:
+                    fallback_msg = f"[Fallback: Gemma3 error - {str(exc)}]\nMatched Context: {matched_sentence}"
+                    
+                return {
+                    "success": True,
+                    "command": command_text,
+                    "intent": None,
+                    "score": best_score,
+                    "threshold_passed": False,
+                    "action_taken": fallback_msg,
+                    "execution_success": True,
+                    "prompt_for_param": False
+                }
         except Exception as e:
             log_action("BACKEND", "Chatbot KB Fallback error", str(e))
             
@@ -771,6 +850,82 @@ def api_chatbot_command():
 		return jsonify(res), 500
 	return jsonify(res)
 
+
+def convert_words_to_numbers(text: str) -> str:
+    units = {
+        "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9,
+        "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
+        "seventeen": 17, "eighteen": 18, "nineteen": 19
+    }
+    tens = {
+        "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90
+    }
+    scales = {
+        "hundred": 100, "thousand": 1000, "million": 1000000
+    }
+    
+    words = text.split()
+    new_words = []
+    i = 0
+    while i < len(words):
+        num_block = []
+        while i < len(words):
+            word_clean = words[i].lower().strip(".,?!;:")
+            if word_clean in units or word_clean in tens or word_clean in scales or word_clean == "and":
+                if word_clean == "and" and not num_block:
+                    break
+                num_block.append(words[i])
+                i += 1
+            else:
+                break
+        
+        if num_block:
+            if len(num_block) == 1 and num_block[0].lower().strip(".,?!;:") == "and":
+                new_words.append(num_block[0])
+                continue
+                
+            last_word = num_block[-1]
+            punctuation = ""
+            for char in reversed(last_word):
+                if char in ".,?!;:":
+                    punctuation = char + punctuation
+                else:
+                    break
+            
+            clean_block = []
+            for w in num_block:
+                clean_w = w.lower().strip(".,?!;:")
+                if clean_w:
+                    clean_block.append(clean_w)
+            
+            try:
+                val = 0
+                current = 0
+                for w in clean_block:
+                    if w in units:
+                        current += units[w]
+                    elif w in tens:
+                        current += tens[w]
+                    elif w in scales:
+                        scale = scales[w]
+                        if current == 0:
+                            current = 1
+                        if scale == 100:
+                            current *= 100
+                        else:
+                            val += current * scale
+                            current = 0
+                    elif w == "and":
+                        continue
+                val += current
+                new_words.append(str(val) + punctuation)
+            except Exception:
+                new_words.extend(num_block)
+        else:
+            new_words.append(words[i])
+            i += 1
+            
+    return " ".join(new_words)
 
 _audio_transcriber = None
 
@@ -826,7 +981,11 @@ def api_chatbot_audio():
 	if not transcribed_text:
 		return jsonify({"success": False, "error": "Speech was not recognized or transcription is empty. Please speak clearly."}), 400
 
-	res = process_chatbot_text(transcribed_text, request.remote_addr)
+	# Convert spoken numbers to digit representations
+	normalized_text = convert_words_to_numbers(transcribed_text)
+	log_action("BACKEND", "Speech-to-Text Normalized", f"Original: '{transcribed_text}', Normalized: '{normalized_text}'")
+
+	res = process_chatbot_text(normalized_text, request.remote_addr)
 	if not res.get("success", True):
 		return jsonify(res), 500
 	return jsonify(res)
@@ -980,40 +1139,45 @@ def api_camera_stream_info():
 		return jsonify({"success": True, "available": False})
 
 
-@app.route('/api/detect_hand_writing', methods=['POST'])
-def api_detect_hand_writing():
+@app.route('/api/detect_digit', methods=['POST'])
+def api_detect_digit():
 	try:
 		camera_obj = get_camera()
 		if camera_obj is None:
-			log_action("BACKEND", "Handwriting Error", "Camera unavailable")
+			log_action("BACKEND", "Digit Detection Error", "Camera unavailable")
 			return jsonify({"success": False, "error": "Camera unavailable"}), 503
 		frame_bytes = camera_obj.get_frame()
 		if not frame_bytes:
-			log_action("BACKEND", "Handwriting Error", "Could not capture frame")
+			log_action("BACKEND", "Digit Detection Error", "Could not capture frame")
 			return jsonify({"success": False, "error": "Could not capture frame"}), 500
 		
 		# Decode JPEG bytes to BGR NumPy array
 		arr = np.frombuffer(frame_bytes, np.uint8)
 		frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
 		if frame is None:
-			log_action("BACKEND", "Handwriting Error", "Could not decode frame")
+			log_action("BACKEND", "Digit Detection Error", "Could not decode frame")
 			return jsonify({"success": False, "error": "Could not decode frame"}), 500
 		
-		# Run text detection
-		try:
-			from DetectWriting.detect import detect as detect_writing
-			results = detect_writing(frame)
-		except Exception as exc:
-			print("[Handwriting] PaddleOCR import or run failed, using fallback dummy results:", exc)
-			results = [("Hello World (dummy ocr)", 0.95), ("WaveGo Robot Testing", 0.92)]
+		# Run digit detection using the new CNN model
+		from lenet5.detect import detect as detect_digit
+		res = detect_digit(frame)
+		
+		if not res.get("success", False):
+			log_action("BACKEND", "Digit Detection Failed", res.get("error", "Unknown error"))
+			return jsonify(res), 400
 			
-		log_action("BACKEND", "Handwriting Detected", f"Results: {results}")
+		log_action("BACKEND", "Digit Detected", f"Prediction: {res['prediction']}, Conf: {res['confidence']:.2f}%")
+		
+		chatbot_msg = f"CNN Digit Detection: I detected the digit '{res['prediction']}' with a confidence of {res['confidence']:.2f}%."
+		
 		return jsonify({
 			"success": True,
-			"results": results
+			"prediction": res["prediction"],
+			"confidence": res["confidence"],
+			"message": chatbot_msg
 		})
 	except Exception as exc:
-		log_action("BACKEND", "Handwriting Error", str(exc))
+		log_action("BACKEND", "Digit Detection Error", str(exc))
 		return jsonify({"success": False, "error": str(exc)}), 500
 
 
