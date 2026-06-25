@@ -1588,6 +1588,19 @@ def main() -> None:
 		print("network mode:", state["mode"])
 		print("advertising ip:", state["ip"])
 
+	# Trigger a non-blocking startup beep
+	def startup_beep():
+		time.sleep(1.5)
+		try:
+			robot.buzzerCtrl(1, 0)
+			time.sleep(0.15)
+			robot.buzzerCtrl(0, 0)
+			print("Startup beep triggered.")
+		except Exception as e:
+			print("Failed to beep buzzer on startup:", e)
+
+	threading.Thread(target=startup_beep, daemon=True).start()
+
 	app.run(
 		host=FLASK_HOST,
 		port=FLASK_PORT,
