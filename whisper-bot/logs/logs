@@ -1263,3 +1263,62 @@
 2026-06-25 02:20:56,069 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
 2026-06-25 02:21:00,069 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
 2026-06-25 02:21:00,073 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:04,283 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:04,284 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:04,858 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:05,872 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-26 17:39:08,467 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:08,468 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:10,061 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:10,061 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:12,457 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:12,458 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:16,425 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:16,427 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:18,313 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:18,313 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:18,885 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:18,886 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:19,540 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:19,541 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:20,067 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:20,068 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:20,235 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:20,236 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:20,403 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:20,403 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:20,425 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:20,428 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:20,723 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:20,724 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:20,866 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:20,866 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:21,027 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:21,027 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-26 17:39:24,419 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:24,421 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:28,427 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:28,428 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:32,420 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:32,420 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:32,754 - INFO - [API_REQUEST] POST /api/chatbot/audio - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:36,174 - INFO - [BACKEND] Speech-to-Text Success - Details: Transcribed: 'hello can you say about yourself'
+2026-06-26 17:39:36,175 - INFO - [BACKEND] Speech-to-Text Normalized - Details: Original: 'hello can you say about yourself', Normalized: 'hello can you say about yourself'
+2026-06-26 17:39:36,451 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:36,629 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:43,367 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:43,370 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:43,378 - INFO - [BACKEND] Chatbot Gemma3 Generation Started - Details: Prompt length: 2421
+2026-06-26 17:39:44,423 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:44,427 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:47,005 - INFO - [BACKEND] Chatbot Gemma3 Response - Details: Hello! I am Whisper, an AI-powered bionic robotic dog designed to educate and inspire young children about artificial intelligence and robotics.
+
+2026-06-26 17:39:47,006 - INFO - [API_RESPONSE] POST /api/chatbot/audio - Details: Status: 200 OK
+2026-06-26 17:39:48,425 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:48,426 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:52,440 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:52,442 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:39:56,437 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:39:56,438 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-26 17:40:00,440 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-26 17:40:00,442 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK

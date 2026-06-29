@@ -1142,25 +1142,44 @@ def api_camera_stream_info():
 @app.route('/api/detect_digit', methods=['POST'])
 def api_detect_digit():
 	try:
-		camera_obj = get_camera()
-		if camera_obj is None:
-			log_action("BACKEND", "Digit Detection Error", "Camera unavailable")
-			return jsonify({"success": False, "error": "Camera unavailable"}), 503
-		frame_bytes = camera_obj.get_frame()
-		if not frame_bytes:
-			log_action("BACKEND", "Digit Detection Error", "Could not capture frame")
-			return jsonify({"success": False, "error": "Could not capture frame"}), 500
+		# Check JSON payload for optional base64 image
+		data = request.get_json(silent=True) or {}
+		img_b64 = data.get("image")
+		explain = data.get("explain", False) or request.args.get("explain", "false").lower() == "true"
 		
-		# Decode JPEG bytes to BGR NumPy array
-		arr = np.frombuffer(frame_bytes, np.uint8)
-		frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-		if frame is None:
-			log_action("BACKEND", "Digit Detection Error", "Could not decode frame")
-			return jsonify({"success": False, "error": "Could not decode frame"}), 500
+		if img_b64:
+			import base64
+			if "," in img_b64:
+				img_b64 = img_b64.split(",")[1]
+			img_bytes = base64.b64decode(img_b64)
+			arr = np.frombuffer(img_bytes, np.uint8)
+			frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+			if frame is None:
+				return jsonify({"success": False, "error": "Could not decode drawing image"}), 400
+		else:
+			camera_obj = get_camera()
+			if camera_obj is None:
+				log_action("BACKEND", "Digit Detection Error", "Camera unavailable")
+				return jsonify({"success": False, "error": "Camera unavailable"}), 503
+			frame_bytes = camera_obj.get_frame()
+			if not frame_bytes:
+				log_action("BACKEND", "Digit Detection Error", "Could not capture frame")
+				return jsonify({"success": False, "error": "Could not capture frame"}), 500
+			
+			# Decode JPEG bytes to BGR NumPy array
+			arr = np.frombuffer(frame_bytes, np.uint8)
+			frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+			if frame is None:
+				log_action("BACKEND", "Digit Detection Error", "Could not decode frame")
+				return jsonify({"success": False, "error": "Could not decode frame"}), 500
 		
-		# Run digit detection using the new CNN model
-		from lenet5.detect import detect as detect_digit
-		res = detect_digit(frame)
+		# Run digit detection using LeNet5 MNIST CNN model
+		if explain:
+			from lenet5.detect import detect_explain
+			res = detect_explain(frame)
+		else:
+			from lenet5.detect import detect as detect_digit
+			res = detect_digit(frame)
 		
 		if not res.get("success", False):
 			log_action("BACKEND", "Digit Detection Failed", res.get("error", "Unknown error"))
@@ -1170,15 +1189,173 @@ def api_detect_digit():
 		
 		chatbot_msg = f"CNN Digit Detection: I detected the digit '{res['prediction']}' with a confidence of {res['confidence']:.2f}%."
 		
-		return jsonify({
+		response_data = {
 			"success": True,
 			"prediction": res["prediction"],
 			"confidence": res["confidence"],
 			"message": chatbot_msg
-		})
+		}
+		if explain and "explanation" in res:
+			response_data["explanation"] = res["explanation"]
+			
+		return jsonify(response_data)
 	except Exception as exc:
 		log_action("BACKEND", "Digit Detection Error", str(exc))
 		return jsonify({"success": False, "error": str(exc)}), 500
+
+
+def is_linux() -> bool:
+	return sys.platform.startswith("linux")
+
+def get_connected_macs() -> set[str]:
+	import subprocess
+	import re
+	connected = set()
+	if not is_linux():
+		return connected
+	try:
+		res = subprocess.run(["hcitool", "con"], capture_output=True, text=True, check=False)
+		mac_pattern = re.compile(r"((?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2})")
+		for mac in mac_pattern.findall(res.stdout):
+			connected.add(mac.upper())
+	except Exception:
+		pass
+	return connected
+
+def is_device_connected(mac: str, connected_set: set[str]) -> bool:
+	if mac.upper() in connected_set:
+		return True
+	if not is_linux():
+		return False
+	try:
+		res = subprocess.run(["bluetoothctl", "info", mac], capture_output=True, text=True, check=False)
+		return "Connected: yes" in res.stdout
+	except Exception:
+		return False
+
+def scan_bluetooth_devices_helper() -> list[dict]:
+	if not is_linux():
+		return [
+			{"mac": "00:11:22:33:44:55", "name": "JBL Flip 5 (Mock Speaker)", "connected": False},
+			{"mac": "AA:BB:CC:DD:EE:FF", "name": "Sony WH-1000XM4 (Mock Headphones)", "connected": True},
+			{"mac": "12:34:56:78:90:AB", "name": "Bose SoundLink (Mock Speaker)", "connected": False}
+		]
+
+	import subprocess
+	import re
+
+	subprocess.run(["bluetoothctl", "power", "on"], capture_output=True, text=True, check=False)
+	try:
+		subprocess.run(["timeout", "8", "bluetoothctl", "scan", "on"], capture_output=True, text=True, check=False)
+	except Exception:
+		pass
+
+	devices = []
+	seen_macs = set()
+	connected_set = get_connected_macs()
+
+	try:
+		res = subprocess.run(["bluetoothctl", "devices"], capture_output=True, text=True, check=False)
+		mac_pattern = re.compile(r"Device\s+((?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2})\s+(.*)")
+		for line in res.stdout.splitlines():
+			match = mac_pattern.search(line)
+			if match:
+				mac = match.group(1)
+				name = match.group(2).strip()
+				if mac not in seen_macs:
+					seen_macs.add(mac)
+					devices.append({
+						"mac": mac,
+						"name": name,
+						"connected": is_device_connected(mac, connected_set)
+					})
+	except Exception as e:
+		log_action("BACKEND", "Bluetooth Scan Error", str(e))
+
+	return devices
+
+def connect_bluetooth_device_helper(mac: str) -> tuple[bool, str]:
+	if not is_linux():
+		time.sleep(1.5)
+		return True, f"Connected successfully (Mock) to {mac}"
+
+	import subprocess
+	subprocess.run(["bluetoothctl", "power", "on"], capture_output=True, text=True, check=False)
+	subprocess.run(["bluetoothctl", "agent", "on"], capture_output=True, text=True, check=False)
+	subprocess.run(["bluetoothctl", "default-agent"], capture_output=True, text=True, check=False)
+
+	subprocess.run(["bluetoothctl", "trust", mac], capture_output=True, text=True, check=False)
+	subprocess.run(["bluetoothctl", "pair", mac], capture_output=True, text=True, check=False)
+	res = subprocess.run(["bluetoothctl", "connect", mac], capture_output=True, text=True, check=False)
+
+	stdout = res.stdout or ""
+	stderr = res.stderr or ""
+	combined = stdout + "\n" + stderr
+	if "Connection successful" in combined or "successful" in combined.lower() or res.returncode == 0:
+		return True, combined
+	return False, combined
+
+def disconnect_bluetooth_device_helper(mac: str) -> tuple[bool, str]:
+	if not is_linux():
+		time.sleep(0.5)
+		return True, f"Disconnected successfully (Mock) from {mac}"
+
+	import subprocess
+	res = subprocess.run(["bluetoothctl", "disconnect", mac], capture_output=True, text=True, check=False)
+	stdout = res.stdout or ""
+	if res.returncode == 0 or "successful" in stdout.lower() or "disconnect" in stdout.lower():
+		return True, stdout
+	return False, stdout
+
+
+@app.route('/api/bluetooth/scan', methods=['GET'])
+def api_bluetooth_scan():
+	try:
+		devices = scan_bluetooth_devices_helper()
+		return jsonify({"success": True, "devices": devices})
+	except Exception as e:
+		log_action("BACKEND", "API Bluetooth Scan Error", str(e))
+		return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/bluetooth/connect', methods=['POST'])
+def api_bluetooth_connect():
+	data = request.json
+	if not data or "mac" not in data:
+		return jsonify({"success": False, "error": "Missing mac address"}), 400
+	mac = data["mac"].strip()
+	if not mac:
+		return jsonify({"success": False, "error": "MAC address cannot be empty"}), 400
+	try:
+		success, output = connect_bluetooth_device_helper(mac)
+		if success:
+			log_action("BACKEND", "Bluetooth Connect Success", f"Connected to {mac}")
+			return jsonify({"success": True, "message": f"Connected to {mac}", "details": output})
+		else:
+			log_action("BACKEND", "Bluetooth Connect Failed", f"Failed connecting to {mac}: {output}")
+			return jsonify({"success": False, "error": "Connection failed", "details": output}), 500
+	except Exception as e:
+		log_action("BACKEND", "API Bluetooth Connect Error", str(e))
+		return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/bluetooth/disconnect', methods=['POST'])
+def api_bluetooth_disconnect():
+	data = request.json
+	if not data or "mac" not in data:
+		return jsonify({"success": False, "error": "Missing mac address"}), 400
+	mac = data["mac"].strip()
+	if not mac:
+		return jsonify({"success": False, "error": "MAC address cannot be empty"}), 400
+	try:
+		success, output = disconnect_bluetooth_device_helper(mac)
+		if success:
+			log_action("BACKEND", "Bluetooth Disconnect Success", f"Disconnected from {mac}")
+			return jsonify({"success": True, "message": f"Disconnected from {mac}", "details": output})
+		else:
+			log_action("BACKEND", "Bluetooth Disconnect Failed", f"Failed disconnecting from {mac}: {output}")
+			return jsonify({"success": False, "error": "Disconnection failed", "details": output}), 500
+	except Exception as e:
+		log_action("BACKEND", "API Bluetooth Disconnect Error", str(e))
+		return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route('/api/object/detect/<action>', methods=['POST'])
