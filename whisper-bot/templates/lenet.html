@@ -1,0 +1,888 @@
+{% extends "base.html" %}
+
+{% block title %}LeNet-5 Character Recognition{% endblock %}
+
+{% block head %}
+<style>
+  .lenet-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .back-btn {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s ease;
+    font-size: 15px;
+  }
+
+  .back-btn:hover {
+    color: var(--accent-2);
+  }
+
+  .lenet-header h2 {
+    margin: 8px 0 20px;
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  /* Main Workspace Split */
+  .lenet-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 768px) {
+    .lenet-grid {
+      grid-template-columns: 1.2fr 1fr;
+    }
+  }
+
+  .panel-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .canvas-header {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .canvas-wrapper {
+    aspect-ratio: 1;
+    max-width: 320px;
+    width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  #lenetCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+
+  /* Button Actions */
+  .action-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+    justify-content: center;
+  }
+
+  .btn-icon-clear {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-icon-clear:hover {
+    background: rgba(239, 68, 68, 0.25);
+  }
+
+  .btn-recognize {
+    flex: 1;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 12px;
+  }
+
+  .btn-recognize:hover:not(:disabled) {
+    background: var(--accent-2);
+    box-shadow: 0 0 15px rgba(125, 211, 252, 0.3);
+  }
+
+  .btn-recognize:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Telemetry Card */
+  .telemetry-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    background: rgba(12, 21, 38, 0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+  }
+
+  .telemetry-section-title {
+    color: var(--accent-2);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .prediction-display {
+    font-size: 72px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin: 8px 0;
+  }
+
+  .confidence-display {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--accent-2);
+  }
+
+  .info-tip {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--muted);
+    line-height: 1.5;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 14px;
+  }
+
+  /* Interactive Topology Visualization */
+  .visualizer-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+  }
+
+  .visualizer-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .svg-container {
+    width: 100%;
+    overflow-x: auto;
+    background: rgba(7, 17, 31, 0.5);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  #networkSvg {
+    display: block;
+    min-width: 800px;
+    margin: 0 auto;
+  }
+
+  .svg-node {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .svg-node:hover {
+    stroke-width: 3px;
+    r: 12;
+  }
+
+  .active-node {
+    stroke: var(--accent);
+    stroke-width: 2.5px;
+  }
+
+  .text-label {
+    font-family: inherit;
+    font-weight: bold;
+    fill: rgba(255, 255, 255, 0.85);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Connection Animation Path */
+  @keyframes pulseGlow {
+    0% { stroke-dashoffset: 20; }
+    100% { stroke-dashoffset: 0; }
+  }
+
+  .firing-path {
+    stroke: var(--accent) !important;
+    stroke-width: 2px !important;
+    stroke-dasharray: 4, 4;
+    animation: pulseGlow 1s linear infinite;
+    opacity: 0.85 !important;
+    transition: all 0.3s ease;
+  }
+
+  /* Inspector Modal overlays */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .modal-content {
+    background: #0c1526;
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-lg);
+    max-width: 480px;
+    width: 100%;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .modal-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .bias-text {
+    color: var(--accent);
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 4px 0;
+  }
+
+  .weight-grid {
+    display: grid;
+    gap: 3px;
+    width: 100%;
+    max-height: 280px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.2);
+    padding: 8px;
+    border-radius: var(--radius-md);
+  }
+
+  .grid-cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    font-size: 9px;
+    color: #fff;
+    font-weight: bold;
+    position: relative;
+  }
+
+  .grid-cell[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(12, 21, 38, 0.95);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 100;
+  }
+
+  .grid-cell[data-tooltip]:hover::after {
+    opacity: 1;
+  }
+
+  .btn-close {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: bold;
+    align-self: flex-end;
+    transition: background 0.2s ease;
+  }
+
+  .btn-close:hover {
+    background: rgba(255,255,255,0.15);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lenet-container">
+  <div class="lenet-header">
+    <a href="/" class="back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Dashboard
+    </a>
+    <h2>🧠 LeNet Digit Recognition Visualizer</h2>
+  </div>
+
+  <div class="lenet-grid">
+    <!-- Left column: Drawing board -->
+    <div class="panel-card">
+      <div class="canvas-header">Draw a single digit (0-9) below:</div>
+      <div class="canvas-wrapper">
+        <canvas id="lenetCanvas" width="280" height="280"></canvas>
+      </div>
+      
+      <div class="action-row">
+        <!-- Clear canvas button -->
+        <button id="btnClear" class="btn-icon-clear" title="Clear Drawing">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+        </button>
+        <!-- Recognize button -->
+        <button id="btnRecognize" class="btn-recognize">RECOGNIZE DIGIT</button>
+      </div>
+    </div>
+
+    <!-- Right column: Inference Results -->
+    <div class="telemetry-card">
+      <div class="telemetry-section-title">Inference Telemetry</div>
+      <div id="telemetryStatus" style="font-size: 14px; color: var(--muted); line-height: 1.5;">
+        Draw a digit on the white canvas and tap "RECOGNIZE DIGIT" to run real-time CNN weight inspections.
+      </div>
+      
+      <div id="resultsView" style="display: none;">
+        <div style="font-size: 12px; color: var(--muted);">Predicted Digit</div>
+        <div id="predictionVal" class="prediction-display">-</div>
+        
+        <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">Confidence Score</div>
+        <div id="confidenceVal" class="confidence-display">0.00%</div>
+      </div>
+
+      <div class="info-tip">
+        Tip: Hover or tap on any circular neuron map layer node below to inspect its local kernel filters, connection weights, and biases.
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Network Map Card -->
+  <div class="visualizer-card" id="networkCard" style="display: none;">
+    <div class="visualizer-title">📊 LeNet-5 Activation Topology Map</div>
+    <div class="svg-container">
+      <svg id="networkSvg" viewBox="0 0 900 400" width="100%" height="400">
+        <!-- Lines group dynamically filled on load -->
+        <g id="connectorLines"></g>
+        
+        <!-- Nodes group -->
+        <g id="networkNodes"></g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- Glassmorphic inspector modal overlay -->
+<div id="inspectorModal" class="modal-backdrop" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4 id="modalTitle">Node Title</h4>
+      <p id="modalSubtitle" class="bias-text">Bias: -</p>
+    </div>
+    <div style="font-size: 11px; color: var(--muted);" id="modalDescription">5x5 Weight Grid</div>
+    <div id="modalGrid" class="weight-grid"></div>
+    <button class="btn-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // --- Canvas Drawing Code ---
+  const canvas = document.getElementById('lenetCanvas');
+  const ctx = canvas.getContext('2d');
+  const btnClear = document.getElementById('btnClear');
+  const btnRecognize = document.getElementById('btnRecognize');
+  
+  // Set solid white background
+  function resetCanvas() {
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  resetCanvas();
+
+  let drawing = false;
+  ctx.lineWidth = 14;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#000000';
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  function startDraw(e) {
+    drawing = true;
+    ctx.beginPath();
+    const pos = getPos(e);
+    ctx.moveTo(pos.x, pos.y);
+    e.preventDefault();
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+    const pos = getPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    e.preventDefault();
+  }
+
+  function stopDraw() {
+    drawing = false;
+  }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  window.addEventListener('mouseup', stopDraw);
+
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove', draw, { passive: false });
+  window.addEventListener('touchend', stopDraw);
+
+  btnClear.addEventListener('click', () => {
+    resetCanvas();
+    document.getElementById('resultsView').style.display = 'none';
+    document.getElementById('networkCard').style.display = 'none';
+    document.getElementById('telemetryStatus').style.display = 'block';
+    document.getElementById('telemetryStatus').textContent = 'Draw a digit on the white canvas and tap "RECOGNIZE DIGIT" to run real-time CNN weight inspections.';
+    document.getElementById('telemetryStatus').style.color = 'var(--muted)';
+  });
+
+  // Downsample to 28x28 grayscale base64 png
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = 28;
+  tempCanvas.height = 28;
+  const tempCtx = tempCanvas.getContext('2d');
+
+  function get28x28Base64() {
+    tempCtx.fillStyle = '#FFFFFF';
+    tempCtx.fillRect(0, 0, 28, 28);
+    // Draw and downscale image
+    tempCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 28, 28);
+    const dataURL = tempCanvas.toDataURL('image/png');
+    return dataURL.replace(/^data:image\/png;base64,/, "");
+  }
+
+  // --- Topology Map Nodes and Data Models ---
+  let telemetryData = null; // store weights and activations locally
+
+  // Column spacing specifications
+  const xInput = 80;
+  const xConv1 = 240;
+  const xConv2 = 420;
+  const xDense = 600;
+  const xOutput = 780;
+
+  const yConv1 = Array.from({length: 8}, (_, i) => 30 + i * 48);
+  const yConv2 = Array.from({length: 16}, (_, i) => 15 + i * 24);
+  const yDense = Array.from({length: 24}, (_, i) => 10 + i * 16);
+  const yOutput = Array.from({length: 10}, (_, i) => 20 + i * 38);
+
+  // Initialize network map links
+  function initLines() {
+    const linesGroup = document.getElementById('connectorLines');
+    linesGroup.innerHTML = '';
+
+    // Conv1 -> Conv2
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 16; j++) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', xConv1);
+        line.setAttribute('y1', yConv1[i]);
+        line.setAttribute('x2', xConv2);
+        line.setAttribute('y2', yConv2[j]);
+        line.setAttribute('stroke', 'rgba(125, 211, 252, 0.04)');
+        line.setAttribute('stroke-width', '1');
+        linesGroup.appendChild(line);
+      }
+    }
+
+    // Conv2 -> Dense
+    for (let i = 0; i < 16; i++) {
+      for (let j = 0; j < 24; j++) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', xConv2);
+        line.setAttribute('y1', yConv2[i]);
+        line.setAttribute('x2', xDense);
+        line.setAttribute('y2', yDense[j]);
+        line.setAttribute('stroke', 'rgba(255,255,255,0.03)');
+        line.setAttribute('stroke-width', '0.8');
+        linesGroup.appendChild(line);
+      }
+    }
+
+    // Dense -> Output
+    for (let i = 0; i < 24; i++) {
+      for (let j = 0; j < 10; j++) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', xDense);
+        line.setAttribute('y1', yDense[i]);
+        line.setAttribute('x2', xOutput);
+        line.setAttribute('y2', yOutput[j]);
+        line.setAttribute('stroke', 'rgba(125, 211, 252, 0.04)');
+        line.setAttribute('stroke-width', '1');
+        line.setAttribute('class', `connector-line dense-output-link-${j}`);
+        linesGroup.appendChild(line);
+      }
+    }
+  }
+
+  // Helper to compute average activation values for channel representations
+  function getMeanValue(arr) {
+    if (!Array.isArray(arr)) return 0.0;
+    let sum = 0.0;
+    let count = 0;
+    for (let r = 0; r < arr.length; r++) {
+      if (Array.isArray(arr[r])) {
+        for (let c = 0; c < arr[r].length; c++) {
+          sum += Number(arr[r][c] || 0.0);
+          count++;
+        }
+      } else {
+        sum += Number(arr[r] || 0.0);
+        count++;
+      }
+    }
+    return count > 0 ? (sum / count) : 0.0;
+  }
+
+  // Redraw node circles based on activations
+  function updateNodes() {
+    const nodesGroup = document.getElementById('networkNodes');
+    nodesGroup.innerHTML = '';
+
+    const activations = telemetryData.explanation.activations;
+    const weights = telemetryData.explanation.weights;
+
+    // 1. Input Block rendering
+    const foreignObj = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+    foreignObj.setAttribute('x', (xInput - 25).toString());
+    foreignObj.setAttribute('y', '150');
+    foreignObj.setAttribute('width', '50');
+    foreignObj.setAttribute('height', '50');
+
+    const inputCanvas = document.createElement('canvas');
+    inputCanvas.width = 28;
+    inputCanvas.height = 28;
+    inputCanvas.style.width = '100%';
+    inputCanvas.style.height = '100%';
+    inputCanvas.style.border = '1px solid rgba(255,255,255,0.2)';
+    inputCanvas.style.borderRadius = '4px';
+
+    const inputCtx = inputCanvas.getContext('2d');
+    const inputData = activations.input;
+    for (let r = 0; r < 28; r++) {
+      for (let c = 0; c < 28; c++) {
+        const val = Math.floor(inputData[r][c] * 255);
+        inputCtx.fillStyle = `rgb(${val}, ${val}, ${val})`;
+        inputCtx.fillRect(c, r, 1, 1);
+      }
+    }
+    foreignObj.appendChild(inputCanvas);
+    nodesGroup.appendChild(foreignObj);
+
+    // Labels
+    drawText(nodesGroup, xInput, 385, 'Input\n(28x28)');
+    drawText(nodesGroup, xConv1, 385, 'Conv1\n(8ch)');
+    drawText(nodesGroup, xConv2, 385, 'Conv2\n(16ch)');
+    drawText(nodesGroup, xDense, 385, 'Dense\n(256)');
+    drawText(nodesGroup, xOutput, 385, 'Output\n(10)');
+
+    // 2. Conv1 Circles (8 nodes)
+    for (let i = 0; i < 8; i++) {
+      const val = getMeanValue(activations.conv1[i]);
+      const color = lerpColor('#1e293b', '#4de3b7', Math.min(val * 2.0, 1.0));
+      const circle = createCircleNode(xConv1, yConv1[i], 10, color, `Inspect Conv1 Node ${i}`);
+      circle.addEventListener('click', () => {
+        openConvModal("Conv1", i, weights.conv1[i][0], weights.bias1[i]);
+      });
+      nodesGroup.appendChild(circle);
+    }
+
+    // 3. Conv2 Circles (16 nodes)
+    for (let i = 0; i < 16; i++) {
+      const val = getMeanValue(activations.conv2[i]);
+      const color = lerpColor('#1e293b', '#7dd3fc', Math.min(val * 2.5, 1.0));
+      const circle = createCircleNode(xConv2, yConv2[i], 8, color, `Inspect Conv2 Node ${i}`);
+      circle.addEventListener('click', () => {
+        // Average kernel parameters for visual inspection
+        const nodeWeights = weights.conv2[i];
+        let avgKernel = Array.from({length: 5}, () => Array(5).fill(0.0));
+        for (let r = 0; r < 5; r++) {
+          for (let c = 0; c < 5; c++) {
+            let sum = 0.0;
+            for (let ch = 0; ch < nodeWeights.length; ch++) {
+              sum += nodeWeights[ch][r][c];
+            }
+            avgKernel[r][c] = sum / nodeWeights.length;
+          }
+        }
+        openConvModal("Conv2", i, avgKernel, weights.bias2[i]);
+      });
+      nodesGroup.appendChild(circle);
+    }
+
+    // 4. Dense Circles (24 nodes, subset of 256)
+    for (let i = 0; i < 24; i++) {
+      const sampleIdx = Math.floor(i * (256 / 24));
+      const val = activations.fc_input[sampleIdx];
+      const color = lerpColor('#0f172a', '#9fb1ce', Math.min(val * 1.5, 1.0));
+      const circle = createCircleNode(xDense, yDense[i], 4, color);
+      nodesGroup.appendChild(circle);
+    }
+
+    // 5. Output Circles (10 nodes)
+    const predDigit = telemetryData.prediction;
+    for (let i = 0; i < 10; i++) {
+      const prob = activations.probabilities[i];
+      const logit = activations.logits[i];
+      const isPred = (i === predDigit);
+      const color = isPred ? '#4de3b7' : '#07111f';
+
+      const circle = createCircleNode(xOutput, yOutput[i], 14, color, `Inspect Output Node ${i}`);
+      circle.setAttribute('stroke', isPred ? '#4de3b7' : 'rgba(255,255,255,0.3)');
+      circle.setAttribute('stroke-width', isPred ? '2' : '1');
+
+      // Add text label index on node center
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', xOutput.toString());
+      text.setAttribute('y', (yOutput[i] + 4).toString());
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('font-size', '11');
+      text.setAttribute('font-weight', 'bold');
+      text.setAttribute('fill', isPred ? '#07111f' : 'rgba(255,255,255,0.7)');
+      text.textContent = i.toString();
+      text.style.pointerEvents = 'none';
+
+      circle.addEventListener('click', () => {
+        openFCModal(i, logit, prob, weights.fc, weights.bias3[i]);
+      });
+
+      nodesGroup.appendChild(circle);
+      nodesGroup.appendChild(text);
+    }
+  }
+
+  function createCircleNode(cx, cy, r, fill, titleText) {
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', cx.toString());
+    circle.setAttribute('cy', cy.toString());
+    circle.setAttribute('r', r.toString());
+    circle.setAttribute('fill', fill);
+    circle.setAttribute('class', 'svg-node');
+    if (titleText) {
+      const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      title.textContent = titleText;
+      circle.appendChild(title);
+    }
+    return circle;
+  }
+
+  function drawText(svg, x, y, labelText) {
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x.toString());
+    text.setAttribute('y', y.toString());
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('font-size', '10');
+    text.setAttribute('class', 'text-label');
+    
+    // Support multi-line layout via tspan tags
+    const lines = labelText.split('\n');
+    lines.forEach((lineText, idx) => {
+      const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspan.setAttribute('x', x.toString());
+      if (idx > 0) tspan.setAttribute('dy', '12');
+      tspan.textContent = lineText;
+      text.appendChild(tspan);
+    });
+    
+    svg.appendChild(text);
+  }
+
+  function lerpColor(a, b, amount) { 
+    const ah = parseInt(a.replace(/#/g, ''), 16),
+          ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
+          bh = parseInt(b.replace(/#/g, ''), 16),
+          br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
+          rr = ar + amount * (br - ar),
+          rg = ag + amount * (bg - ag),
+          rb = ab + amount * (bb - ab);
+    return '#' + ((1 << 24) + (Math.round(rr) << 16) + (Math.round(rg) << 8) + Math.round(rb)).toString(16).slice(1);
+  }
+
+  // --- Network Flow Firing Animation ---
+  function animateFiringFlow(digit) {
+    // De-activate all firing paths first
+    document.querySelectorAll('.connector-line').forEach(line => {
+      line.classList.remove('firing-path');
+    });
+
+    // Add active path animation classes matching the output node connection index
+    setTimeout(() => {
+      document.querySelectorAll(`.dense-output-link-${digit}`).forEach(line => {
+        line.classList.add('firing-path');
+      });
+    }, 50);
+  }
+
+  // --- Inspector Modals & Grids ---
+  const modal = document.getElementById('inspectorModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalSubtitle = document.getElementById('modalSubtitle');
+  const modalDescription = document.getElementById('modalDescription');
+  const modalGrid = document.getElementById('modalGrid');
+
+  window.closeModal = function() {
+    modal.style.display = 'none';
+  }
+
+  function openConvModal(layerName, channelIndex, kernelWeights, bias) {
+    modalTitle.textContent = `${layerName} Channel ${channelIndex} Kernels`;
+    modalSubtitle.textContent = `Bias: ${bias.toFixed(6)}`;
+    modalDescription.textContent = `5x5 Spatial Weight Kernel (Blue = Positive, Red = Negative)`;
+    modalGrid.style.gridTemplateColumns = 'repeat(5, 1fr)';
+    modalGrid.innerHTML = '';
+
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 5; c++) {
+        const w = kernelWeights[r][c];
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.textContent = w.toFixed(2);
+        
+        // Color mapping
+        if (w >= 0) {
+          cell.style.background = `rgba(59, 130, 246, ${Math.min(w * 5.0, 1.0)})`;
+        } else {
+          cell.style.background = `rgba(239, 68, 68, ${Math.min(Math.abs(w) * 5.0, 1.0)})`;
+        }
+        cell.setAttribute('data-tooltip', `W[${r}][${c}]: ${w.toFixed(5)}`);
+        modalGrid.appendChild(cell);
+      }
+    }
+    modal.style.display = 'flex';
+  }
+
+  function openFCModal(digitIndex, logit, probability, fcWeights, bias) {
+    modalTitle.textContent = `Output Class "${digitIndex}" Metrics`;
+    modalSubtitle.innerHTML = `Logit: ${logit.toFixed(4)} &nbsp;|&nbsp; Prob: ${(probability * 100).toFixed(2)}%<br/>Bias: ${bias.toFixed(6)}`;
+    modalDescription.textContent = `256 Connection Weights (16x16 Heat-map Grid)`;
+    modalGrid.style.gridTemplateColumns = 'repeat(16, 1fr)';
+    modalGrid.innerHTML = '';
+
+    // Extract connecting weights from Dense layer nodes
+    for (let i = 0; i < 256; i++) {
+      const w = fcWeights[i][digitIndex];
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      cell.style.aspectRatio = '1';
+      
+      if (w >= 0) {
+        cell.style.background = `rgba(59, 130, 246, ${Math.min(w * 10.0, 1.0)})`;
+      } else {
+        cell.style.background = `rgba(239, 68, 68, ${Math.min(Math.abs(w) * 10.0, 1.0)})`;
+      }
+      cell.setAttribute('data-tooltip', `Node ${i} -> Output ${digitIndex}: ${w.toFixed(5)}`);
+      modalGrid.appendChild(cell);
+    }
+    modal.style.display = 'flex';
+  }
+
+  // Close modal when clicking outside contents
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // --- Recognition API Request ---
+  btnRecognize.addEventListener('click', async () => {
+    btnRecognize.disabled = true;
+    const telemetryStatus = document.getElementById('telemetryStatus');
+    telemetryStatus.textContent = 'Uploading drawing and starting LeNet-5 model inference...';
+    telemetryStatus.style.color = 'var(--accent-2)';
+
+    try {
+      const base64Image = get28x28Base64();
+      const res = await fetch('/api/detect_digit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Image, explain: true })
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to analyze digit.');
+      }
+
+      telemetryData = data;
+
+      // Update telemetry display values
+      telemetryStatus.style.display = 'none';
+      document.getElementById('resultsView').style.display = 'block';
+      document.getElementById('predictionVal').textContent = data.prediction;
+      document.getElementById('confidenceVal').textContent = `${data.confidence.toFixed(2)}%`;
+
+      // Render interactive networks and fire pulses
+      document.getElementById('networkCard').style.display = 'block';
+      initLines();
+      updateNodes();
+      animateFiringFlow(data.prediction);
+
+    } catch (err) {
+      console.error(err);
+      telemetryStatus.textContent = `Inference Failed: ${err.message}`;
+      telemetryStatus.style.color = '#ef4444';
+    } finally {
+      btnRecognize.disabled = false;
+    }
+  });
+
+</script>
+{% endblock %}

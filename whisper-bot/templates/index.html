@@ -1786,41 +1786,10 @@
 
   // --- CNN Digit Detection Frontend Logic ---
   const recognizeHandwritingBtn = document.getElementById('recognizeHandwriting');
-  const handwritingStatus = document.getElementById('handwritingStatus');
-
   if (recognizeHandwritingBtn) {
-    recognizeHandwritingBtn.addEventListener('click', async () => {
-      recognizeHandwritingBtn.disabled = true;
-      handwritingStatus.textContent = "Scanning digit with CNN...";
-      handwritingStatus.style.color = "var(--accent-2)";
-
-      try {
-        const response = await fetch('/api/detect_digit', {
-          method: 'POST'
-        });
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-          throw new Error(data.error || "Failed to detect digit.");
-        }
-
-        const prediction = data.prediction;
-        const confidence = data.confidence;
-        
-        handwritingStatus.textContent = `Detected: '${prediction}' (conf: ${confidence.toFixed(1)}%)`;
-        handwritingStatus.style.color = "#4ade80"; // green text
-        
-        // Send output to the user in AI command assistant chat
-        if (typeof appendChatMessage === 'function') {
-          appendChatMessage('bot', data.message);
-        }
-      } catch (err) {
-        console.error(err);
-        handwritingStatus.textContent = `Error: ${err.message}`;
-        handwritingStatus.style.color = "#ef4444"; // red text
-      } finally {
-        recognizeHandwritingBtn.disabled = false;
-      }
+    recognizeHandwritingBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = '/lenet';
     });
   }
 

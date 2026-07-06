@@ -1,0 +1,22 @@
+[Unit]
+Description=WaveGo Whisper Bot Flask Service
+After=network.target bluetooth.target
+
+[Service]
+Type=simple
+# If deploying under a different username, please edit the User field below
+User=rpi
+WorkingDirectory=/home/rpi/WaveGo/whisper-bot
+ExecStart=/usr/bin/python3 webServer.py
+Restart=always
+RestartSec=5
+
+# Environment variables can be configured here if required
+# Environment=PORT=5000
+
+# Capture stdout and stderr in systemd logs (viewable with journalctl -u whisper-bot)
+StandardOutput=inherit
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

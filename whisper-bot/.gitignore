@@ -19,3 +19,6 @@ logs/
 knowledge/*.json
 knowledge/*.onnx
 knowledge/*.onnx_data
+lenet5/*.onnx
+lenet5/data/
+lenet5/mlruns/

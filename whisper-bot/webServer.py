@@ -217,6 +217,11 @@ def index():
 	return render_template("index.html", state=state)
 
 
+@app.route("/lenet")
+def lenet_page():
+	return render_template("lenet.html")
+
+
 @app.route("/video_feed")
 def video_feed():
 	camera_obj = get_camera()
@@ -835,6 +840,54 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
     }
 
 
+def speak_text_async(text: str):
+	import threading
+	import re
+	import sys
+
+	# Clean text to remove any markup, brackets, or system indicators
+	clean_text = re.sub(r'\[.*?\]', '', text).strip()
+	clean_text = re.sub(r'<.*?>', '', clean_text).strip()
+	if not clean_text:
+		return
+
+	def run_tts():
+		# Check if a Bluetooth device is connected (or assume Windows mock is connected)
+		connected_macs = set()
+		if sys.platform.startswith("linux"):
+			try:
+				import subprocess
+				res = subprocess.run(["hcitool", "con"], capture_output=True, text=True, check=False)
+				mac_pattern = re.compile(r"((?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2})")
+				for mac in mac_pattern.findall(res.stdout):
+					connected_macs.add(mac)
+			except Exception:
+				pass
+		else:
+			connected_macs.add("MOCK_DEV_MAC")
+
+		if len(connected_macs) == 0:
+			return
+
+		try:
+			import pyttsx3
+			engine = pyttsx3.init()
+			engine.setProperty('rate', 150)
+			engine.say(clean_text)
+			engine.runAndWait()
+			del engine
+		except Exception as e:
+			print(f"pyttsx3 failed: {e}. Falling back to espeak...")
+			if sys.platform.startswith("linux"):
+				try:
+					import subprocess
+					subprocess.run(["espeak", "-v", "en-us", "-s", "150", clean_text], capture_output=True)
+				except Exception as es:
+					print(f"espeak fallback failed: {es}")
+
+	threading.Thread(target=run_tts, daemon=True).start()
+
+
 @app.route('/api/chatbot/command', methods=['POST'])
 def api_chatbot_command():
 	data = request.json
@@ -848,6 +901,10 @@ def api_chatbot_command():
 	res = process_chatbot_text(command_text, request.remote_addr)
 	if not res.get("success", True):
 		return jsonify(res), 500
+		
+	if "action_taken" in res:
+		speak_text_async(res["action_taken"])
+		
 	return jsonify(res)
 
 
@@ -988,6 +1045,10 @@ def api_chatbot_audio():
 	res = process_chatbot_text(normalized_text, request.remote_addr)
 	if not res.get("success", True):
 		return jsonify(res), 500
+		
+	if "action_taken" in res:
+		speak_text_async(res["action_taken"])
+		
 	return jsonify(res)
 
 
@@ -1142,36 +1203,22 @@ def api_camera_stream_info():
 @app.route('/api/detect_digit', methods=['POST'])
 def api_detect_digit():
 	try:
-		# Check JSON payload for optional base64 image
+		# Check JSON payload for base64 image
 		data = request.get_json(silent=True) or {}
 		img_b64 = data.get("image")
 		explain = data.get("explain", False) or request.args.get("explain", "false").lower() == "true"
 		
-		if img_b64:
-			import base64
-			if "," in img_b64:
-				img_b64 = img_b64.split(",")[1]
-			img_bytes = base64.b64decode(img_b64)
-			arr = np.frombuffer(img_bytes, np.uint8)
-			frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-			if frame is None:
-				return jsonify({"success": False, "error": "Could not decode drawing image"}), 400
-		else:
-			camera_obj = get_camera()
-			if camera_obj is None:
-				log_action("BACKEND", "Digit Detection Error", "Camera unavailable")
-				return jsonify({"success": False, "error": "Camera unavailable"}), 503
-			frame_bytes = camera_obj.get_frame()
-			if not frame_bytes:
-				log_action("BACKEND", "Digit Detection Error", "Could not capture frame")
-				return jsonify({"success": False, "error": "Could not capture frame"}), 500
-			
-			# Decode JPEG bytes to BGR NumPy array
-			arr = np.frombuffer(frame_bytes, np.uint8)
-			frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-			if frame is None:
-				log_action("BACKEND", "Digit Detection Error", "Could not decode frame")
-				return jsonify({"success": False, "error": "Could not decode frame"}), 500
+		if not img_b64:
+			return jsonify({"success": False, "error": "Missing canvas drawing image payload (base64)"}), 400
+
+		import base64
+		if "," in img_b64:
+			img_b64 = img_b64.split(",")[1]
+		img_bytes = base64.b64decode(img_b64)
+		arr = np.frombuffer(img_bytes, np.uint8)
+		frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+		if frame is None:
+			return jsonify({"success": False, "error": "Could not decode drawing image"}), 400
 		
 		# Run digit detection using LeNet5 MNIST CNN model
 		if explain:
@@ -1198,6 +1245,7 @@ def api_detect_digit():
 		if explain and "explanation" in res:
 			response_data["explanation"] = res["explanation"]
 			
+		speak_text_async(chatbot_msg)
 		return jsonify(response_data)
 	except Exception as exc:
 		log_action("BACKEND", "Digit Detection Error", str(exc))

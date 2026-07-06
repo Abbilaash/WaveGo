@@ -14,6 +14,12 @@ except ImportError:
 		pass
 
 SERIAL_PORT = "/dev/ttyS0"
+# Fallback logic for systems/OS configurations where port mappings differ
+if not os.path.exists(SERIAL_PORT):
+	if os.path.exists("/dev/serial0"):
+		SERIAL_PORT = "/dev/serial0"
+	elif os.path.exists("/dev/ttyAMA0"):
+		SERIAL_PORT = "/dev/ttyAMA0"
 SERIAL_BAUDRATE = 115200
 ser = None
 serial_lock = threading.Lock()

@@ -57,30 +57,18 @@ except Exception as e:
 def detect(frame):
     """
     Detects a single digit in the given frame using the LeNet5 MNIST CNN model.
-    
-    Args:
-        frame (np.ndarray): Input image array (BGR color or grayscale).
-        
-    Returns:
-        dict: {"success": bool, "prediction": int, "confidence": float, "error": str}
+    Assumes frame is a direct canvas drawing.
     """
     try:
         if frame is None or frame.size == 0:
-            return {"success": False, "error": "Empty camera frame"}
+            return {"success": False, "error": "Empty canvas drawing"}
 
-        h_f, w_f = frame.shape[:2]
+        # Convert to Grayscale
+        if len(frame.shape) == 3:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = frame.copy()
 
-        # Define a 200x200 Region of Interest (ROI) box in the center
-        roi_size = min(200, h_f, w_f)
-        x1 = (w_f - roi_size) // 2
-        y1 = (h_f - roi_size) // 2
-        x2 = x1 + roi_size
-        y2 = y1 + roi_size
-
-        # Crop to the localized ROI box
-        roi = frame[y1:y2, x1:x2]
-
-        gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
 
         # Otsu's thresholding automatically calculates the optimal threshold value
@@ -91,7 +79,7 @@ def detect(frame):
             cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
         )
 
-        # Find contours inside the ROI
+        # Find contours inside the whole image
         contours, _ = cv2.findContours(
             thresh,
             cv2.RETR_EXTERNAL,
@@ -99,21 +87,19 @@ def detect(frame):
         )
 
         if len(contours) == 0:
-            return {"success": False, "error": "No digit contour found in the target area"}
+            return {"success": False, "error": "No drawing marks detected on the canvas"}
 
-        # Get the largest contour in the ROI
+        # Get the largest contour in the image
         largest = max(contours, key=cv2.contourArea)
 
         # Ignore if the detected contour is too tiny (noise)
-        if cv2.contourArea(largest) < 80:
-            return {"success": False, "error": "Digit too small or low contrast"}
+        if cv2.contourArea(largest) < 2:
+            return {"success": False, "error": "Drawing too faint or small"}
 
-        # Ignore if the contour boundary spans the entire ROI (detecting ROI box edges)
+        # Get bounding box of largest contour
         x_c, y_c, w_c, h_c = cv2.boundingRect(largest)
-        if w_c >= roi_size - 10 and h_c >= roi_size - 10:
-            return {"success": False, "error": "ROI border detected instead of a digit"}
 
-        # Mask other noise in the ROI to keep only the digit
+        # Mask other noise to keep only the digit
         mask = np.zeros_like(thresh)
         cv2.drawContours(mask, [largest], -1, 255, thickness=cv2.FILLED)
         digit = cv2.bitwise_and(thresh, mask)
@@ -188,25 +174,21 @@ def detect(frame):
 def detect_explain(frame):
     """
     Runs LeNet5 inference, returns prediction, confidence, and ALL weights/activations.
+    Assumes frame is a direct canvas drawing.
     """
     try:
         if frame is None or frame.size == 0:
-            return {"success": False, "error": "Empty camera frame"}
+            return {"success": False, "error": "Empty canvas drawing"}
 
-        h_f, w_f = frame.shape[:2]
+        # Convert to Grayscale
+        if len(frame.shape) == 3:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = frame.copy()
 
-        # Region of Interest (ROI) box in the center (same as detect)
-        roi_size = min(200, h_f, w_f)
-        x1 = (w_f - roi_size) // 2
-        y1 = (h_f - roi_size) // 2
-        x2 = x1 + roi_size
-        y2 = y1 + roi_size
-
-        roi = frame[y1:y2, x1:x2]
-
-        gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
 
+        # Otsu's thresholding automatically calculates the optimal threshold value
         _, thresh = cv2.threshold(
             blur,
             0,
@@ -214,6 +196,7 @@ def detect_explain(frame):
             cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
         )
 
+        # Find contours inside the whole image
         contours, _ = cv2.findContours(
             thresh,
             cv2.RETR_EXTERNAL,
@@ -221,38 +204,45 @@ def detect_explain(frame):
         )
 
         if len(contours) == 0:
-            return {"success": False, "error": "No digit contour found in the target area"}
+            return {"success": False, "error": "No drawing marks detected on the canvas"}
 
+        # Get the largest contour in the image
         largest = max(contours, key=cv2.contourArea)
 
-        if cv2.contourArea(largest) < 80:
-            return {"success": False, "error": "Digit too small or low contrast"}
+        # Ignore if the detected contour is too tiny (noise)
+        if cv2.contourArea(largest) < 2:
+            return {"success": False, "error": "Drawing too faint or small"}
 
+        # Get bounding box of largest contour
         x_c, y_c, w_c, h_c = cv2.boundingRect(largest)
-        if w_c >= roi_size - 10 and h_c >= roi_size - 10:
-            return {"success": False, "error": "ROI border detected instead of a digit"}
 
+        # Mask other noise to keep only the digit
         mask = np.zeros_like(thresh)
         cv2.drawContours(mask, [largest], -1, 255, thickness=cv2.FILLED)
         digit = cv2.bitwise_and(thresh, mask)
 
+        # Crop tightly to the digit's bounding box
         digit_crop = digit[y_c:y_c+h_c, x_c:x_c+w_c]
 
+        # Preserve aspect ratio (pad to square)
         size = max(w_c, h_c)
         square = np.zeros((size, size), dtype=np.uint8)
         x_offset = (size - w_c) // 2
         y_offset = (size - h_c) // 2
         square[y_offset:y_offset+h_c, x_offset:x_offset+w_c] = digit_crop
 
+        # Resize dynamically to 70% of model input height/width
         target_digit_h = int(height * 0.7)
         target_digit_w = int(width * 0.7)
         digit_resized = cv2.resize(square, (target_digit_w, target_digit_h))
 
+        # Place the resized digit in the center of the model-sized canvas
         canvas = np.zeros((height, width), dtype=np.uint8)
         off_y = (height - target_digit_h) // 2
         off_x = (width - target_digit_w) // 2
         canvas[off_y:off_y+target_digit_h, off_x:off_x+target_digit_w] = digit_resized
 
+        # Center by Center of Mass (Weighted Centroid) to match MNIST training distribution
         moments = cv2.moments(canvas)
         if moments["m00"] > 0:
             cx = moments["m10"] / moments["m00"]
@@ -264,6 +254,7 @@ def detect_explain(frame):
 
         canvas = cv2.GaussianBlur(canvas, (3, 3), 0)
 
+        # Normalize & Reshape
         img = canvas.astype(np.float32) / 255.0
 
         if channels == 3:
