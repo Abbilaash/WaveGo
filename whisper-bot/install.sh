@@ -28,7 +28,10 @@ sudo apt-get install -y \
     v4l-utils \
     wget \
     curl \
-    unzip
+    unzip \
+    libcap-dev \
+    build-essential \
+    python3-dev
 
 # 2. Grant serial port permissions for ESP32 locomotion control
 echo "🔌 Configuring hardware serial interface (/dev/ttyS0)..."
@@ -98,7 +101,7 @@ done
 # Knowledge (Gemma3) models and external weights
 echo "  -> Downloading Gemma3 SLM models and data..."
 mkdir -p knowledge
-GEMMA_FILES=("gemma3.onnx" "model.onnx_data")
+GEMMA_FILES=("gemma3.onnx" "model.onnx_data" "config.json" "generation_config.json" "tokenizer.json" "tokenizer_config.json")
 for file in "${GEMMA_FILES[@]}"; do
     if [ ! -f "knowledge/$file" ]; then
         echo "     Downloading $file..."
