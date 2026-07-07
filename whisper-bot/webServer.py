@@ -142,7 +142,12 @@ def get_interface_ip(interface: str) -> Optional[str]:
 
 def start_access_point() -> None:
 	"""Start the fallback AP in a background process."""
-	command = ["sudo", "create_ap", "wlan0", "eth0", "WAVE_BOT", "12345678"]
+	command = [
+		"sudo", "nmcli", "device", "wifi", "hotspot",
+		"ifname", "wlan0",
+		"ssid", "WAVE_BOT",
+		"password", "12345678"
+	]
 	subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
