@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+import vosk  # Must be imported first to prevent OpenBLAS library conflicts
 import sys
 import socket
 import subprocess
