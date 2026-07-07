@@ -13,7 +13,7 @@ class AudioToTextTranscriber:
         Initializes the Vosk transcriber.
         """
         self.model_dir = model_dir
-        vosk_model_path = os.path.join(model_dir, "vosk-model-small-en-us-0.15")
+        vosk_model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vosk-model-small-en-us-0.15")
         
         if not os.path.exists(vosk_model_path):
             raise FileNotFoundError(
