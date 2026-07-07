@@ -38,6 +38,15 @@ if THIS_DIR in sys.path:
 	sys.path.remove(THIS_DIR)
 sys.path.insert(0, THIS_DIR)
 
+# Clear whisper/__pycache__ on startup to prevent stale compiled file loads
+try:
+	import shutil
+	pycache_path = os.path.join(THIS_DIR, "whisper", "__pycache__")
+	if os.path.exists(pycache_path):
+		shutil.rmtree(pycache_path)
+except Exception:
+	pass
+
 CORE_DIR = os.path.join(THIS_DIR, "core")
 if CORE_DIR not in sys.path:
 	sys.path.insert(1, CORE_DIR)
