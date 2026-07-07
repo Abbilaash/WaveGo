@@ -1057,51 +1057,157 @@ class Camera(BaseCamera):
 
     @staticmethod
     def frames():
-        from picamera2 import Picamera2
-
-        picam2 = Picamera2()
-        picam2.configure(
-            picam2.create_video_configuration(
-                main={"format": "RGB888", "size": (640, 480)}
-            )
-        )
-        picam2.start()
-
-        cvt = CVThread()
-        cvt.start()
-
-        print("DEBUG: Running frames() from whisper-bot/camera_opencv.py - Using frame directly")
-        while True:
-            frame = picam2.capture_array()
-            if frame is None:
-                raise RuntimeError('Camera started but could not read frames. Check the Pi camera and Picamera2 configuration.')
-
-            img = frame
-            Camera.latest_bgr_frame = img.copy() if isinstance(img, np.ndarray) else None
-
-            if Camera.modeSelect == 'none':
-                cvt.pause()
-                robot.buzzerCtrl(0, 0)
-            else:
-                if cvt.CVThreading:
-                    pass
-                else:
-                    # Print debug status to see if cvt is alive and receiving the mode Select
-                    print(f"[DEBUG Camera.frames] modeSelect={Camera.modeSelect}, CVMode={cvt.CVMode}, CVThreading={cvt.CVThreading}, cvt.is_alive={cvt.is_alive()}")
-                    cvt.mode(Camera.modeSelect, img)
-                    cvt.resume()
-                try:
-                    img = cvt.elementDraw(img)
-                except Exception as e:
-                    import traceback
-                    print("Error in elementDraw:")
-                    traceback.print_exc()
-
-            # encode as a jpeg image and return it
+        use_picam2 = False
+        use_legacy_picam = False
+        
+        try:
+            from picamera2 import Picamera2
+            use_picam2 = True
+        except ImportError:
             try:
-                yield cv2.imencode('.jpg', img)[1].tobytes()
-            except:
+                import picamera
+                import picamera.array
+                use_legacy_picam = True
+            except ImportError:
                 pass
+
+        if use_picam2:
+            from picamera2 import Picamera2
+            picam2 = Picamera2()
+            picam2.configure(
+                picam2.create_video_configuration(
+                    main={"format": "RGB888", "size": (640, 480)}
+                )
+            )
+            picam2.start()
+            
+            cvt = CVThread()
+            cvt.start()
+            
+            print("DEBUG: Running frames() from whisper-bot/camera_opencv.py - Using Picamera2")
+            try:
+                while True:
+                    frame = picam2.capture_array()
+                    if frame is None:
+                        print("Warning: Could not read frame from Picamera2.")
+                        time.sleep(0.05)
+                        continue
+                        
+                    img = frame
+                    Camera.latest_bgr_frame = img.copy() if isinstance(img, np.ndarray) else None
+                    
+                    if Camera.modeSelect == 'none':
+                        cvt.pause()
+                        robot.buzzerCtrl(0, 0)
+                    else:
+                        if cvt.CVThreading:
+                            pass
+                        else:
+                            print(f"[DEBUG Camera.frames] modeSelect={Camera.modeSelect}, CVMode={cvt.CVMode}, CVThreading={cvt.CVThreading}, cvt.is_alive={cvt.is_alive()}")
+                            cvt.mode(Camera.modeSelect, img)
+                            cvt.resume()
+                        try:
+                            img = cvt.elementDraw(img)
+                        except Exception as e:
+                            import traceback
+                            print("Error in elementDraw:")
+                            traceback.print_exc()
+                            
+                    try:
+                        yield cv2.imencode('.jpg', img)[1].tobytes()
+                    except:
+                        pass
+            finally:
+                picam2.stop()
+                
+        elif use_legacy_picam:
+            import picamera
+            import picamera.array
+            print("DEBUG: Running frames() from whisper-bot/camera_opencv.py - Using legacy PiCamera")
+            with picamera.PiCamera() as camera:
+                camera.resolution = (640, 480)
+                camera.framerate = 24
+                rawCapture = picamera.array.PiRGBArray(camera, size=(640, 480))
+                time.sleep(0.1) # warmup
+                
+                cvt = CVThread()
+                cvt.start()
+                
+                try:
+                    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+                        img = frame.array
+                        Camera.latest_bgr_frame = img.copy() if isinstance(img, np.ndarray) else None
+                        
+                        if Camera.modeSelect == 'none':
+                            cvt.pause()
+                            robot.buzzerCtrl(0, 0)
+                        else:
+                            if cvt.CVThreading:
+                                pass
+                            else:
+                                print(f"[DEBUG Camera.frames] modeSelect={Camera.modeSelect}, CVMode={cvt.CVMode}, CVThreading={cvt.CVThreading}, cvt.is_alive={cvt.is_alive()}")
+                                cvt.mode(Camera.modeSelect, img)
+                                cvt.resume()
+                            try:
+                                img = cvt.elementDraw(img)
+                            except Exception as e:
+                                import traceback
+                                print("Error in elementDraw:")
+                                traceback.print_exc()
+                                
+                        try:
+                            yield cv2.imencode('.jpg', img)[1].tobytes()
+                        except:
+                            pass
+                        rawCapture.truncate(0)
+                finally:
+                    pass
+        else:
+            cap = cv2.VideoCapture("/dev/video0", cv2.CAP_V4L2)
+            if not cap.isOpened():
+                raise RuntimeError('Could not open video device /dev/video0 and neither picamera nor picamera2 is available.')
+            
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            
+            cvt = CVThread()
+            cvt.start()
+            
+            print("DEBUG: Running frames() from whisper-bot/camera_opencv.py - Using OpenCV Fallback")
+            try:
+                while True:
+                    ret, frame = cap.read()
+                    if not ret or frame is None:
+                        print("Warning: Could not read frame from video capture device.")
+                        time.sleep(0.05)
+                        continue
+                        
+                    img = frame
+                    Camera.latest_bgr_frame = img.copy() if isinstance(img, np.ndarray) else None
+                    
+                    if Camera.modeSelect == 'none':
+                        cvt.pause()
+                        robot.buzzerCtrl(0, 0)
+                    else:
+                        if cvt.CVThreading:
+                            pass
+                        else:
+                            print(f"[DEBUG Camera.frames] modeSelect={Camera.modeSelect}, CVMode={cvt.CVMode}, CVThreading={cvt.CVThreading}, cvt.is_alive={cvt.is_alive()}")
+                            cvt.mode(Camera.modeSelect, img)
+                            cvt.resume()
+                        try:
+                            img = cvt.elementDraw(img)
+                        except Exception as e:
+                            import traceback
+                            print("Error in elementDraw:")
+                            traceback.print_exc()
+                            
+                    try:
+                        yield cv2.imencode('.jpg', img)[1].tobytes()
+                    except:
+                        pass
+            finally:
+                cap.release()
 
 
 def commandAct(act, inputA):
