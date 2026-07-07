@@ -141,14 +141,39 @@ def get_interface_ip(interface: str) -> Optional[str]:
 
 
 def start_access_point() -> None:
-	"""Start the fallback AP in a background process."""
-	command = [
-		"sudo", "nmcli", "device", "wifi", "hotspot",
-		"ifname", "wlan0",
-		"ssid", "WAVE_BOT",
-		"password", "12345678"
-	]
-	subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+	"""Start the fallback AP in a background process and configure static IP 192.168.4.1."""
+	def run_ap_setup():
+		try:
+			# 1. Start the hotspot
+			cmd_start = [
+				"sudo", "nmcli", "device", "wifi", "hotspot",
+				"ifname", "wlan0",
+				"ssid", "WAVE_BOT",
+				"password", "12345678"
+			]
+			subprocess.run(cmd_start, check=True)
+			
+			# 2. Modify connection profile to use 192.168.4.1
+			cmd_modify_ip = [
+				"sudo", "nmcli", "connection", "modify", "Hotspot",
+				"ipv4.addresses", "192.168.4.1/24"
+			]
+			subprocess.run(cmd_modify_ip, check=True)
+			
+			cmd_modify_method = [
+				"sudo", "nmcli", "connection", "modify", "Hotspot",
+				"ipv4.method", "shared"
+			]
+			subprocess.run(cmd_modify_method, check=True)
+			
+			# 3. Bring the connection up to apply the changes
+			cmd_up = ["sudo", "nmcli", "connection", "up", "Hotspot"]
+			subprocess.run(cmd_up, check=True)
+			print("[AccessPoint] Fallback AP started on static IP 192.168.4.1")
+		except Exception as e:
+			print(f"[AccessPoint] Error starting fallback AP: {e}")
+
+	threading.Thread(target=run_ap_setup, daemon=True).start()
 
 
 def get_camera():
