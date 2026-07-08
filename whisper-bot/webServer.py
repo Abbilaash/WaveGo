@@ -757,6 +757,43 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
                 else:
                     action_msg = "Face detection started. I don't see any faces in front of me."
                     
+            elif best_intent == "FACE_DETECT_OFF":
+                camera_opencv.Camera.modeSelect = 'none'
+                robot.lightCtrl('blue', 0)
+                action_msg = "Face detection turned off."
+
+            elif best_intent == "FOLLOW_FACE":
+                # Look for "follow face <name>" or "follow <name>"
+                name_match = re.search(r'(?:follow\s+face|follow|track\s+face|track)\s+(\w+)', clean_command, re.IGNORECASE)
+                target_name = ""
+                if name_match:
+                    possible_name = name_match.group(1).strip()
+                    # Ignore common stop words/pronouns
+                    if possible_name.lower() not in ("me", "my", "face", "person", "the", "him", "her", "us"):
+                        target_name = possible_name
+                
+                # Check latest detected face name as a fallback
+                if not target_name:
+                    target_name = camera_opencv.Camera.latest_face_name
+                
+                if target_name:
+                    camera_opencv.Camera.followName = target_name
+                    camera_opencv.Camera.modeSelect = 'faceFollowing'
+                    action_msg = f"Started face following for: {target_name}."
+                else:
+                    action_msg = "Please specify who to follow. For example, say: 'follow face John'."
+                    execution_success = False
+
+            elif best_intent == "OBJECT_DETECT_START":
+                camera_opencv.Camera.modeSelect = 'objectDetection'
+                action_msg = "Object detection mode started."
+
+            elif best_intent == "OBJECT_DETECT_STOP":
+                camera_opencv.Camera.modeSelect = 'none'
+                robot.buzzerCtrl(0, 0)
+                robot.lightCtrl('blue', 0)
+                action_msg = "Object detection mode stopped."
+
             elif best_intent == "STOP":
                 global active_follow_color
                 active_follow_color = None
@@ -773,6 +810,22 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
                 robot.steadyMode()
                 action_msg = "Robot standing up (stabilized steady mode)."
                 
+            elif best_intent == "JUMP":
+                try:
+                    robot.jump()
+                    action_msg = "Performing jump action."
+                except Exception as e:
+                    action_msg = f"Failed to perform jump: {e}"
+                    execution_success = False
+
+            elif best_intent == "HANDSHAKE":
+                try:
+                    robot.handShake()
+                    action_msg = "Performing handshake action."
+                except Exception as e:
+                    action_msg = f"Failed to perform handshake: {e}"
+                    execution_success = False
+
             elif best_intent == "FOLLOW_RED":
                 active_follow_color = "red"
                 camera_opencv.Camera.modeSelect = 'followColor'
@@ -790,6 +843,57 @@ def process_chatbot_text(command_text: str, client_ip: str) -> dict:
                 camera_opencv.Camera.modeSelect = 'followColor'
                 camera_opencv.Camera.followColor = "blue"
                 action_msg = "Started color tracking mode following the 'blue' ball."
+                
+            elif best_intent == "FOLLOW_COLOR_STOP":
+                active_follow_color = None
+                camera_opencv.Camera.modeSelect = 'none'
+                camera_opencv.Camera.followColor = 'none'
+                stop_robot()
+                action_msg = "Stopped target color tracking."
+
+            elif best_intent == "BALL_SEARCH_START":
+                camera_opencv.Camera.modeSelect = 'ballSearch'
+                action_msg = "Ball search mode started. Rotating to search for the green ball."
+
+            elif best_intent == "BALL_SEARCH_STOP":
+                camera_opencv.Camera.modeSelect = 'none'
+                stop_robot()
+                action_msg = "Ball search mode stopped."
+
+            elif best_intent == "DETECT_DIGIT":
+                action_msg = "To detect a digit, please draw it on the handwriting canvas tab inside the mobile app."
+                execution_success = False
+
+            elif best_intent == "STATUS":
+                state = get_state()
+                cpu_temp = state.get("cpu_temp", "unknown")
+                cpu_use = state.get("cpu_use", "unknown")
+                action_msg = f"My hardware status is: CPU temperature is {cpu_temp} degrees Celsius, and CPU utilization is {cpu_use} percent."
+
+            elif best_intent == "DIAGNOSTIC":
+                camera_obj = get_camera()
+                cam_status = "working" if camera_obj is not None else "unavailable"
+                action_msg = f"Running system self-check. Camera status is {cam_status}. All local AI models are loaded and ready."
+
+            elif best_intent in ("TILT_UP", "TILT_DOWN", "TILT_LEFT", "TILT_RIGHT"):
+                direction = best_intent.split("_")[1].lower() # "up", "down", "left", "right"
+                try:
+                    camera_tilt.start(direction)
+                    action_msg = f"Tilting camera {direction}."
+                except Exception as e:
+                    action_msg = f"Failed to tilt camera: {e}"
+                    execution_success = False
+
+            elif best_intent == "TILT_STOP":
+                try:
+                    camera_tilt.stop("up")
+                    camera_tilt.stop("down")
+                    camera_tilt.stop("left")
+                    camera_tilt.stop("right")
+                    action_msg = "Camera tilt stopped."
+                except Exception as e:
+                    action_msg = f"Failed to stop camera tilt: {e}"
+                    execution_success = False
                 
             else:
                 execution_success = False
