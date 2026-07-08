@@ -1322,3 +1322,1059 @@
 2026-06-26 17:39:56,438 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
 2026-06-26 17:40:00,440 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
 2026-06-26 17:40:00,442 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:00:47,006 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:00:47,006 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:00:47,826 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:00:48,842 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-30 14:00:51,169 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:00:51,169 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:00:55,163 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:00:55,163 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:00:59,163 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:00:59,171 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:03,160 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:03,160 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:07,188 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:07,193 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:11,171 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:11,172 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:15,176 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:15,176 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:19,092 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAN1JREFUSIntllEKwzAMQ9Wxe8U3q3MyxyfzfuYwaJIm4JbBJshXaR6SZdrNzAw36nEn7DeAz9UXSilQVQBASglEtHaBTUhEjIgMwOEQ0cwVVacOc85gZgAAEWHf9/pMVZFSinPorlZdjNQFMrMBMGYOg3WBV8G6QI+yJxExEYkDtubWa+pqCs2W+m7lnIH37pVSDk1V1drgz/Yut1REmvvWinF13sO1mJ3V2cyngbPyRGZchgBtwWUY0F2ejSAMaJ11uhTosY5chgI91pHL0C8+EdXT02b/v7Y/8NuBL+8HwJFSy9DNAAAAAElFTkSuQmCC', 'explain': True}
+2026-06-30 14:01:19,222 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:19,222 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:19,726 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:01:19,726 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:01:23,174 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:23,180 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:24,916 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAOhJREFUSIntlmEOgzAIhZ/L7iWeTG4GPRn7BZlatV3QH9te0sTUyOcDig5mZrhRjzthvwF89j6gqiilAADGcQQR9QWwBomIEZEB2CwiagkROgUy8yK4iMQ1M5uI5AHd1dqF7/fCDoHujJk3995dpgCPYC53mQI8CyYi8VIpNayla69Te9M6WGWWTtMEAHHGVBWqGnvzPAMASilgZjBz7H10Dr0p1k5q6Wup9yJ7RzdFpKlGPQ3U32YVeUZaXKYArcNlGtBdnpUgDWg7x+lSYMuMTQW2zNjULz4RxdpTddJcqe//ifoD0/UCjC4EUmrOJMQAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:01:24,919 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:01:24,920 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:01:25,940 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAOhJREFUSIntlmEOgzAIhZ/L7iWeTG4GPRn7BZlatV3QH9te0sTUyOcDig5mZrhRjzthvwF89j6gqiilAADGcQQR9QWwBomIEZEB2CwiagkROgUy8yK4iMQ1M5uI5AHd1dqF7/fCDoHujJk3995dpgCPYC53mQI8CyYi8VIpNayla69Te9M6WGWWTtMEAHHGVBWqGnvzPAMASilgZjBz7H10Dr0p1k5q6Wup9yJ7RzdFpKlGPQ3U32YVeUZaXKYArcNlGtBdnpUgDWg7x+lSYMuMTQW2zNjULz4RxdpTddJcqe//ifoD0/UCjC4EUmrOJMQAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:01:25,943 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:01:25,944 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:01:27,173 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:27,173 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:31,188 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:31,196 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:35,181 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:35,182 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:39,175 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:39,177 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:43,173 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:43,175 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:47,182 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:47,182 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:51,160 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:51,160 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:55,291 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:55,295 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:01:59,172 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:01:59,173 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:03,108 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAOBJREFUSIntlsEVhCAMRIetLOkMKgudZU/xrQgYkOd6cI4o/jAZhKCqihv1uRP2Av8DTCmBmRFCADMjpXQJGHopZWbknEFE21jOGQAwHW5tiIgUgMYYD89EpDXtVFVgjLEJu6oqcARmxXl1CM1sKKy3wz0crRiAAlAimluhu9JZN8oKLJ1nSfwNls1xOVIOiMhmUQtqMLPR5ni2S3db2EeJaLeSsmcG9CS760MJ6a3cG5zur21EzAwAEJHue0tPC1fCTz1wyhucZUB19nGppUS0O8pqWhYar553xXiBjwd+AcNJBdtYqr/JAAAAAElFTkSuQmCC', 'explain': True}
+2026-06-30 14:02:03,108 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:03,108 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:03,175 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:03,175 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:07,186 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:07,190 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:08,261 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAOFJREFUSIntlkEOQyEIRMeejH8zboY3m7+iMVajov3porNzQV6AAUwkiQf1ehL2B/4WMOeMnPN6IAMyMwJgJHw5QlUJgCJCM/se0MwoIm9YVFNAzwoAVTUMGwLrrCIlnAKWoBNZdYE16FRWXeCuA2fUHHwRgYhEd8La4HtJRxmaGVV1ub9N03gPa2jd48i26bq0dGjLTP4+kmENbbnWDbaqYYSZfZTWYZH5DF0LL2dE4WsR3T5LwF3YEvAEjCQTJ/+lKSVfFFuLZupPc10XAEBVt2DAwGrlwJ86UV3gyStf6gZceZiG+0k/eAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:02:08,315 - INFO - [BACKEND] Digit Detected - Details: Prediction: 9, Conf: 42.84%
+2026-06-30 14:02:08,344 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 200 OK
+2026-06-30 14:02:11,174 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:11,175 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:15,020 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:15,021 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:15,021 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:15,178 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:15,180 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:16,393 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:16,395 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:16,395 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:16,601 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:16,603 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:16,603 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:16,763 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:16,764 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:16,764 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:16,946 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:16,947 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:16,947 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:17,117 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:17,117 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:17,117 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:17,293 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:17,294 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:17,294 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:17,456 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:17,456 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:17,456 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:17,665 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:17,667 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:17,667 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:17,815 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:17,815 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:17,815 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:17,983 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:17,983 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:17,983 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:18,165 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:18,165 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:18,165 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:18,332 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:18,332 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:18,332 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:18,551 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:18,551 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:18,551 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:18,719 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:18,719 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:18,719 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:18,915 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:18,915 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:18,915 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:19,087 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:19,087 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:19,087 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:19,174 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:19,174 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:19,276 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP1JREFUSIntllGOwyAMRIfV3ovJyWJOZnwy70+pWghJYdNKu+1ISCSBvIxtrAR3d7xQX6+EvQfwu76Rc4aZYV3XqRfmnK9zksfAlNLdptv5I5BbiUjz4aGu0hDCIaCodlCuY4zdNfBKquoknWT96BQ1QHd3kg7AVfV04GaVzhbMI2pyWLQsCwBAVU8FNlVaRBIigpTSXRHUa4a1F28RcQC7Q0SGcth1iEsuY4wws8almUFEhg3uAnEJ21bozGwYBhyEdE8z4fTesThSSmnO3YzDUkgz7rzXabZUWh6AX7W9TaCqXl0UyOwxGAKWQfK0vtptbc/S//+n+QD/PvAHPE9krwAWAxYAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:02:19,276 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:02:19,276 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:02:23,172 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:23,175 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:27,167 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:27,171 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:31,180 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:31,183 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:35,173 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:35,177 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:39,170 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:39,172 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:41,551 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAN1JREFUSIntlkEOwyAMBJ2q/4rzMszL1nmZe6ioiFrAQsiHqCvlFPDgzQbYzMwoUI9I2B/4kaqSqsYBj+Og8zxjgKs6cwNLZ/u+xwCLmDkGGG7paoUDnzOTis05Z6Lq+6aUxpNtIBExIjIAJiLGzEZEzUdEuvWGQACXgsxsAAzA18LK4npQd4ely5GKA62xXWANY+YhzCpHWsBuSlWVmJkAuDfw4Z7rWvb7VuDqsjjSfO8FegKxJDStgr9SuuS3aEHrMJVkeizfbPLWlnO+hCil5DpRpoGzuv9pcX/gC1rSJ/H123ueAAAAAElFTkSuQmCC', 'explain': True}
+2026-06-30 14:02:41,555 - INFO - [BACKEND] Digit Detected - Details: Prediction: 6, Conf: 99.94%
+2026-06-30 14:02:41,581 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 200 OK
+2026-06-30 14:02:43,172 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:43,172 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:47,170 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:47,173 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:51,172 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:51,176 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:55,175 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:55,178 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:02:58,994 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAN1JREFUSIntlkEOwyAMBJ2q/4rzMszL1nmZe6ioiFrAQsiHqCvlFPDgzQbYzMwoUI9I2B/4kaqSqsYBj+Og8zxjgKs6cwNLZ/u+xwCLmDkGGG7paoUDnzOTis05Z6Lq+6aUxpNtIBExIjIAJiLGzEZEzUdEuvWGQACXgsxsAAzA18LK4npQd4ely5GKA62xXWANY+YhzCpHWsBuSlWVmJkAuDfw4Z7rWvb7VuDqsjjSfO8FegKxJDStgr9SuuS3aEHrMJVkeizfbPLWlnO+hCil5DpRpoGzuv9pcX/gC1rSJ/H123ueAAAAAElFTkSuQmCC', 'explain': True}
+2026-06-30 14:02:58,999 - INFO - [BACKEND] Digit Detected - Details: Prediction: 6, Conf: 99.94%
+2026-06-30 14:02:59,013 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 200 OK
+2026-06-30 14:02:59,673 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:02:59,677 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:02,252 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAOJJREFUSIntVdEKwzAINGP/VftlvT/TfJl7WYR1yRYTulG2A6GEmuP0jMnMjD6IyyfJfoPw2vOTqvo3M88xWgMAjJmNiKoBoJX6Eqnm0nVdSVVdzV6VqrpqALRt27hCAF0KAHhE8ERYytgDEQmRmZkNu1RVvfQRNAl7L8o5zxEWA7y7KErkqNW59LFliGKskfGoDr6IUEqJAPjZsiyUc/aRYOZw/5oKa0r2Qy8iQwq7/C8iHg/JRxE2k4mMmUM5U9ti5CE/3z4MO3Wmh8WpkTd1itDuoxNBdR8eifOZ5k/4dcIbz2nIFw+l3o0AAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:03:02,258 - INFO - [BACKEND] Digit Detected - Details: Prediction: 9, Conf: 99.94%
+2026-06-30 14:03:02,287 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 200 OK
+2026-06-30 14:03:03,269 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:03,272 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:07,184 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:07,186 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:11,251 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:11,252 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:15,172 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:15,174 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:19,205 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:19,205 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:23,188 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:23,191 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:27,173 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:27,176 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:31,195 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:31,197 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:35,173 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:35,185 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:39,187 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:39,188 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:03:43,197 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:03:43,199 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:06:49,760 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:06:49,762 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:06:50,510 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:06:50,510 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-30 14:06:53,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:06:53,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:06:57,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:06:57,873 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:06:59,506 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAP9JREFUSIntld0OgzAIhU+XvZf4ZMUnA5+MXWxt/GulOk2W7Eu8MAHxFA4NZma4kcedxf4Fm1BV9H2PEAJUtRxoJxERIyIDkJ8az6NqxnGEqq7UMHM9uUXJUg0RmYjYx1rGzLvfqSosKSEixBhBRACAYRj8x1P6k2lPiGimZivWo66qkJnRdV1WVKJJXU2hl3QCXk75MKmrncCSrxg/xuiODXbitgghAO+2uHMOKVTVXGzX6EtaBmRrjZWsUhwybyAz5yLMnN9bcWWIyGqVpWVwScFUdJbYsF2muIdm6rXqfbfD7974bpqbMOnhpUOz5FJblGg1vZnZqV16hNuH5gWP9ZzKfaZ6BgAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:06:59,510 - INFO - [BACKEND] Digit Detected - Details: Prediction: 7, Conf: 99.84%
+2026-06-30 14:06:59,549 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 200 OK
+2026-06-30 14:07:01,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:01,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:05,064 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAOVJREFUSIntlUEOwzAIBJeq/wp+WfDLzM/oCR+iuCY4zakrWcoBMmKxgczM8KBeT8L+wD/weaCqQlVRSkEpBUQEIkKt9T6gA4iog1QVAMDM0/x3BAAAtdb+7T9nZmzb1kHHmFPZQK01Y2YD0A8zW2ttlNJjvukU6CBmnkJcImIAprGnQBEJQY4wEZnGkt0wvInI2zONXX6H/gREJJYQ9m2gqJWupQq/PfCfVHi1Ohvd0oj8Zl5VGpipzrI9TPVupYc+iTJKZWXttIylS3auTJp933OJGTtnK+hWSxHc7CNdAk63eUAfjPlB/Vq4oKIAAAAASUVORK5CYII=', 'explain': True}
+2026-06-30 14:07:05,070 - INFO - [BACKEND] Digit Detected - Details: Prediction: 7, Conf: 100.00%
+2026-06-30 14:07:05,126 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 200 OK
+2026-06-30 14:07:05,883 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:05,901 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:08,956 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAARdJREFUSInd1luOwyAMBdBLNfvCO4tZmWFlnp86chhIIEH5GEuVqqT1MS/hoKqKF+PzJva/wJwzcs5/nv+sSl5K2YEaOmwTnQwRURFRIlIiUgDdDxGpiBz+PwT2AHvGzJfQENhKxMx7MivE3jPzZfGnoK+2rtgXMwINgb2wUZ1N3TLQsHpUrVl4BPr1Mmz5Gh5+6JLW0MzUDoF+ze5Cw2B9NO5CQ+DMgX4MishS6BT02Myhvg3qd1euxlRVm/dhSmnFrdWOVhW29Z/E1G1hG+UuZAW30CUjbN2XvfVvthjbtiHnjBACmBkAEGNEKQVwLUTdShARRARE1F3CoJ2+NKXUbYQsuf8eYzyFLkEfHh1J+hhcGa83wr9+Op/UjIqhvAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:08,956 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:08,956 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:09,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:09,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:10,166 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAARdJREFUSInd1luOwyAMBdBLNfvCO4tZmWFlnp86chhIIEH5GEuVqqT1MS/hoKqKF+PzJva/wJwzcs5/nv+sSl5K2YEaOmwTnQwRURFRIlIiUgDdDxGpiBz+PwT2AHvGzJfQENhKxMx7MivE3jPzZfGnoK+2rtgXMwINgb2wUZ1N3TLQsHpUrVl4BPr1Mmz5Gh5+6JLW0MzUDoF+ze5Cw2B9NO5CQ+DMgX4MishS6BT02Myhvg3qd1euxlRVm/dhSmnFrdWOVhW29Z/E1G1hG+UuZAW30CUjbN2XvfVvthjbtiHnjBACmBkAEGNEKQVwLUTdShARRARE1F3CoJ2+NKXUbYQsuf8eYzyFLkEfHh1J+hhcGa83wr9+Op/UjIqhvAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:10,166 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:10,166 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:10,306 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAARdJREFUSInd1luOwyAMBdBLNfvCO4tZmWFlnp86chhIIEH5GEuVqqT1MS/hoKqKF+PzJva/wJwzcs5/nv+sSl5K2YEaOmwTnQwRURFRIlIiUgDdDxGpiBz+PwT2AHvGzJfQENhKxMx7MivE3jPzZfGnoK+2rtgXMwINgb2wUZ1N3TLQsHpUrVl4BPr1Mmz5Gh5+6JLW0MzUDoF+ze5Cw2B9NO5CQ+DMgX4MishS6BT02Myhvg3qd1euxlRVm/dhSmnFrdWOVhW29Z/E1G1hG+UuZAW30CUjbN2XvfVvthjbtiHnjBACmBkAEGNEKQVwLUTdShARRARE1F3CoJ2+NKXUbYQsuf8eYzyFLkEfHh1J+hhcGa83wr9+Op/UjIqhvAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:10,306 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:10,306 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:10,440 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAARdJREFUSInd1luOwyAMBdBLNfvCO4tZmWFlnp86chhIIEH5GEuVqqT1MS/hoKqKF+PzJva/wJwzcs5/nv+sSl5K2YEaOmwTnQwRURFRIlIiUgDdDxGpiBz+PwT2AHvGzJfQENhKxMx7MivE3jPzZfGnoK+2rtgXMwINgb2wUZ1N3TLQsHpUrVl4BPr1Mmz5Gh5+6JLW0MzUDoF+ze5Cw2B9NO5CQ+DMgX4MishS6BT02Myhvg3qd1euxlRVm/dhSmnFrdWOVhW29Z/E1G1hG+UuZAW30CUjbN2XvfVvthjbtiHnjBACmBkAEGNEKQVwLUTdShARRARE1F3CoJ2+NKXUbYQsuf8eYzyFLkEfHh1J+hhcGa83wr9+Op/UjIqhvAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:10,440 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:10,440 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:12,489 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAARRJREFUSIntlk2yhCAMhNtXcy/DyWhOFjxZ3goLFTCOU9YspqtYCDFfwk9gMjPDg/p7EgYAL69hzhkAkFLafNciCQCIMfYd2UCqaiRNRAzA2kTERKQ5BsBIdn02gaq6cVScq+rGjuQBUvr2tl1g7UREmj/WAbVsSHazPABHoALzTF1PTWDPWQ3rBXQZWDvdg+/CmsCiei3LNL87jS5gD3wX6q40JNeDTRLTNK1F4JK8Ge77WmfQo1NgWbtRMFegp8CyYc6COrMpcq2hiHTHcs7IOQ9tag2BrRuhHgshIIQAAJjn2QUcXk/LshzgKaVNICKCGKM7Q/em2RcBVX2r4kzmeGLsM7ojF/CTevxN8wP+gN8P/AdWEZQgc0G4qgAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:12,489 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:12,489 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:13,547 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAARRJREFUSIntlk2yhCAMhNtXcy/DyWhOFjxZ3goLFTCOU9YspqtYCDFfwk9gMjPDg/p7EgYAL69hzhkAkFLafNciCQCIMfYd2UCqaiRNRAzA2kTERKQ5BsBIdn02gaq6cVScq+rGjuQBUvr2tl1g7UREmj/WAbVsSHazPABHoALzTF1PTWDPWQ3rBXQZWDvdg+/CmsCiei3LNL87jS5gD3wX6q40JNeDTRLTNK1F4JK8Ge77WmfQo1NgWbtRMFegp8CyYc6COrMpcq2hiHTHcs7IOQ9tag2BrRuhHgshIIQAAJjn2QUcXk/LshzgKaVNICKCGKM7Q/em2RcBVX2r4kzmeGLsM7ojF/CTevxN8wP+gN8P/AdWEZQgc0G4qgAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:13,556 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:13,556 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:13,695 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAARRJREFUSIntlk2yhCAMhNtXcy/DyWhOFjxZ3goLFTCOU9YspqtYCDFfwk9gMjPDg/p7EgYAL69hzhkAkFLafNciCQCIMfYd2UCqaiRNRAzA2kTERKQ5BsBIdn02gaq6cVScq+rGjuQBUvr2tl1g7UREmj/WAbVsSHazPABHoALzTF1PTWDPWQ3rBXQZWDvdg+/CmsCiei3LNL87jS5gD3wX6q40JNeDTRLTNK1F4JK8Ge77WmfQo1NgWbtRMFegp8CyYc6COrMpcq2hiHTHcs7IOQ9tag2BrRuhHgshIIQAAJjn2QUcXk/LshzgKaVNICKCGKM7Q/em2RcBVX2r4kzmeGLsM7ojF/CTevxN8wP+gN8P/AdWEZQgc0G4qgAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:13,698 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:13,698 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:13,856 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAARRJREFUSIntlk2yhCAMhNtXcy/DyWhOFjxZ3goLFTCOU9YspqtYCDFfwk9gMjPDg/p7EgYAL69hzhkAkFLafNciCQCIMfYd2UCqaiRNRAzA2kTERKQ5BsBIdn02gaq6cVScq+rGjuQBUvr2tl1g7UREmj/WAbVsSHazPABHoALzTF1PTWDPWQ3rBXQZWDvdg+/CmsCiei3LNL87jS5gD3wX6q40JNeDTRLTNK1F4JK8Ge77WmfQo1NgWbtRMFegp8CyYc6COrMpcq2hiHTHcs7IOQ9tag2BrRuhHgshIIQAAJjn2QUcXk/LshzgKaVNICKCGKM7Q/em2RcBVX2r4kzmeGLsM7ojF/CTevxN8wP+gN8P/AdWEZQgc0G4qgAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:13,856 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:13,856 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:13,888 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:13,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:15,976 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:15,976 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:15,976 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:17,010 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:17,010 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:17,010 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:17,156 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:17,156 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:17,156 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:17,313 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:17,315 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:17,315 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:17,420 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:07:17,420 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:07:17,420 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:07:17,870 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:17,870 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:21,887 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:21,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:25,870 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:25,871 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:29,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:29,875 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:33,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:33,873 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:37,893 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:37,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:41,869 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:41,871 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:45,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:45,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:49,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:49,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:53,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:53,873 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:07:57,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:07:57,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:00,802 - INFO - [API_REQUEST] GET / - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:08:00,840 - INFO - [API_RESPONSE] GET / - Details: Status: 200 OK
+2026-06-30 14:08:00,934 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:08:00,935 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:08:00,936 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:00,937 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-30 14:08:01,227 - INFO - [API_REQUEST] GET /favicon.ico - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:08:01,227 - INFO - [API_RESPONSE] GET /favicon.ico - Details: Status: 404 NOT FOUND
+2026-06-30 14:08:01,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:01,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:02,323 - INFO - [API_REQUEST] POST /api/move/stop - Details: IP: 192.168.4.132, Payload: {'speed': 100}
+2026-06-30 14:08:02,724 - INFO - [ROBOT] stopLR
+2026-06-30 14:08:03,126 - INFO - [ROBOT] stopFB
+2026-06-30 14:08:03,126 - INFO - [BACKEND] Movement Command Executed - Details: Action: stop, Speed: 100
+2026-06-30 14:08:03,126 - INFO - [API_RESPONSE] POST /api/move/stop - Details: Status: 200 OK
+2026-06-30 14:08:04,187 - INFO - [API_REQUEST] GET /lenet - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:08:04,189 - INFO - [API_RESPONSE] GET /lenet - Details: Status: 404 NOT FOUND
+2026-06-30 14:08:05,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:05,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:09,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:09,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:13,904 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:13,907 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:17,861 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:17,861 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:20,222 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:20,222 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:20,222 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:20,953 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:20,954 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:20,956 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:21,165 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:21,168 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:21,168 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:21,355 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:21,356 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:21,357 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:21,581 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:21,583 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:21,583 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:21,820 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:21,823 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:21,823 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:21,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:21,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:25,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:25,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:29,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:29,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:33,869 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:33,869 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:37,870 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:37,871 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:39,528 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:39,530 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:39,530 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:40,206 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:40,206 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:40,206 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:40,800 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:08:40,800 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:08:40,800 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:08:41,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:41,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:45,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:45,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:49,870 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:49,870 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:53,870 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:53,872 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:57,892 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:08:57,893 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:58,470 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:08:58,471 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:08:59,557 - INFO - [API_REQUEST] GET /lenet - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:08:59,558 - INFO - [API_RESPONSE] GET /lenet - Details: Status: 404 NOT FOUND
+2026-06-30 14:09:01,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:01,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:05,870 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:05,872 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:09,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:09,871 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:13,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:13,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:17,868 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:17,868 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:21,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:21,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:25,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:25,875 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:29,481 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:09:29,483 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:09:29,483 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:09:29,833 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAQ5JREFUSInlllsOxCAIRelk9lV2VlyZ3RnzMxjq+LiYpj9D0qSxlcNVBDdVVXrQXk/C/gP4Hn08z5OIiFJKZYyZy/txHHGidoyZlYguT2tMRFREem5+rAkUkQLIOTcnGsiDl4DmJBK1Ke8FNwSasqih8y5ZakniEwM1ESnzR9Y8Fvu+h4FmU2gtmZnDS5pzLskzXfreZBTqYUtJoy5TZ9nq/0NgXWDtzMDeKXJWQ0DvuFVhVmAQsIa3wLX624Cm1O9rdB9h4KjkRTIbAiL11dTfAkSit6BmNu341nxX6itU2lYjR1vaVCHSAfwV5DaFvexsHZXhSiA/1QfeOkr0egED9avGlzmDRkvbpg9f9T/ekt8XT9MZPAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:09:29,835 - INFO - [BACKEND] Digit Detection Failed - Details: ROI border detected instead of a digit
+2026-06-30 14:09:29,835 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 400 BAD REQUEST
+2026-06-30 14:09:29,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:29,873 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:32,273 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.19, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAONJREFUSIntlksOgzAMRCdVDzY3I5zM5mTuyhGNELUTilSpI7EC52X8E8XMDDfqcSfsDwxLVeMf26RqrZY5ZgrosFprOKbYxFiUUjxL4ZjhGq7rCgAgmYobdujucIfD3l2mS4eADliWJR8825nZLh1umr27rw5+74ikkfyOQ2+WodqNODyqF8m22kTERKS5PqrtM+uuF0mo6ttc4mwhRN15d+5dAGgPyfbuNEsZWP946vwiEYWAfqgD9oeLSAoYqqGIQFXTi/pI4bH4BNu27Vrg6EUuB7qi6+0SYMblb/4mIpHSF642Sk+MBir7AAAAAElFTkSuQmCC', 'explain': True}
+2026-06-30 14:09:32,273 - INFO - [BACKEND] Digit Detected - Details: Prediction: 4, Conf: 99.04%
+2026-06-30 14:09:32,334 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 200 OK
+2026-06-30 14:09:33,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:33,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:37,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:37,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:41,889 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:41,891 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:45,889 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:45,892 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:49,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:49,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:53,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:53,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:09:57,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:09:57,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:01,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:01,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:05,889 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:05,897 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:09,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:09,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:13,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:13,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:17,867 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:17,867 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:21,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:21,888 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:25,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:25,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:29,870 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:29,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:33,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:33,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:37,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:37,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:41,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:41,871 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:45,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:45,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:49,897 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:49,902 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:53,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:53,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:10:57,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:10:57,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:01,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:01,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:05,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:05,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:09,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:09,871 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:13,868 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:13,868 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:17,867 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:17,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:21,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:21,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:25,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:25,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:29,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:29,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:33,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:33,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:37,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:37,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:41,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:41,886 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:45,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:45,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:49,938 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:49,938 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:53,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:53,893 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:11:57,897 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:11:57,901 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:01,866 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:01,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:05,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:05,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:09,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:09,872 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:13,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:13,872 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:17,865 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:17,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:21,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:21,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:25,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:25,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:29,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:29,888 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:33,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:33,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:37,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:37,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:41,869 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:41,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:45,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:45,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:49,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:49,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:53,863 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:53,863 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:12:57,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:12:57,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:01,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:01,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:05,859 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:05,859 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:09,868 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:09,868 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:13,986 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:13,986 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:17,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:17,889 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:21,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:21,886 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:25,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:25,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:29,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:29,875 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:33,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:33,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:37,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:37,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:41,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:41,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:45,869 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:45,873 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:49,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:49,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:53,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:53,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:13:57,892 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:13:57,892 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:01,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:01,888 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:05,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:05,899 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:09,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:09,891 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:13,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:13,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:17,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:17,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:21,890 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:21,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:25,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:25,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:29,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:29,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:33,883 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:34,151 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:37,865 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:37,865 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:41,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:41,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:45,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:45,956 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:49,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:49,898 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:53,893 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:53,903 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:14:57,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:14:57,871 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:01,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:01,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:05,544 - INFO - [API_REQUEST] GET /lenet - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:15:05,549 - INFO - [API_RESPONSE] GET /lenet - Details: Status: 404 NOT FOUND
+2026-06-30 14:15:05,864 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:05,864 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:09,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:09,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:13,909 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:13,918 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:17,860 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:17,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:21,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:21,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:25,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:25,873 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:29,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:29,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:33,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:33,872 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:37,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:37,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:41,866 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:41,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:45,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:45,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:49,865 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:49,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:53,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:53,886 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:15:57,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:15:57,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:01,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:01,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:05,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:05,875 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:09,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:09,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:13,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:13,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:17,595 - INFO - [API_REQUEST] GET /lenet - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:16:17,602 - INFO - [API_RESPONSE] GET /lenet - Details: Status: 404 NOT FOUND
+2026-06-30 14:16:17,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:17,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:21,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:21,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:25,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:25,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:29,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:29,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:33,875 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:33,875 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:37,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:37,893 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:45,922 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:45,925 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:47,020 - INFO - [API_REQUEST] GET /lenet - Details: IP: 192.168.4.132, Payload: None
+2026-06-30 14:16:47,060 - INFO - [API_RESPONSE] GET /lenet - Details: Status: 200 OK
+2026-06-30 14:16:49,202 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:49,206 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:49,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:49,896 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:51,766 - INFO - [API_REQUEST] POST /api/detect_digit - Details: IP: 192.168.4.132, Payload: {'image': 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAA4klEQVR4AeySYQqEIBCFffWnU0U3q87RaaK7dAdB2N0JdEfdXLUIiYTR0XHeh+NUr4tHJS4eZQLneRYALFvXNas2P184jqMl3nWdEf98+eZP07StqZMHBCCGYTA6BOBmApmOB+Ti5Gfq7qZ5wN2bTqDve+ckbpsNjJP3bx0Cus0FwCc4J9HApmlM55IG8G2uuq4F/TcZxUIWBQQgpJSWDolrU0pZsdAmCqiF9RoS/BeLAnKRtm35NtlPBi7LkgzhCclAnpzjlw882jjlvzDn33jO80JejVP8p6SnlJGL3L+kbwAAAP//OK4rrQAAAAZJREFUAwA13MPJ92tRMAAAAABJRU5ErkJggg==', 'explain': True}
+2026-06-30 14:16:52,480 - INFO - [BACKEND] Digit Detected - Details: Prediction: 7, Conf: 99.58%
+2026-06-30 14:16:52,528 - INFO - [API_RESPONSE] POST /api/detect_digit - Details: Status: 200 OK
+2026-06-30 14:16:53,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:53,949 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:16:57,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:16:57,889 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:01,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:01,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:05,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:05,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:09,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:09,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:13,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:13,905 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:17,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:17,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:21,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:21,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:25,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:25,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:29,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:29,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:33,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:33,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:37,865 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:37,865 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:41,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:41,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:45,867 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:45,867 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:49,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:49,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:53,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:53,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:17:57,887 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:17:57,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:01,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:01,886 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:05,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:05,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:09,883 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:09,891 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:13,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:13,909 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:17,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:17,873 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:21,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:21,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:25,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:25,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:29,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:29,888 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:33,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:33,886 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:37,889 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:37,892 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:41,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:41,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:45,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:45,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:49,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:49,872 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:53,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:53,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:18:56,279 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:57,286 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-30 14:18:57,868 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:18:57,868 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:01,334 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 192.168.4.19, Payload: {'command': 'hello'}
+2026-06-30 14:19:11,697 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:11,697 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:11,706 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:11,706 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:11,706 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:11,706 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:11,716 - INFO - [BACKEND] Chatbot Gemma3 Generation Started - Details: Prompt length: 2396
+2026-06-30 14:19:13,917 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:13,963 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:15,271 - INFO - [BACKEND] Chatbot Gemma3 Response - Details: Hello! I am Whisper, an AI-powered bionic robotic dog created to educate, inspire, and demonstrate the capabilities of artificial intelligence and robotics.
+
+2026-06-30 14:19:15,272 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-30 14:19:17,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:17,871 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:21,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:21,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:25,056 - INFO - [API_REQUEST] POST /api/chatbot/command - Details: IP: 192.168.4.19, Payload: {'command': 'who created u?'}
+2026-06-30 14:19:25,283 - INFO - [BACKEND] Chatbot Gemma3 Generation Started - Details: Prompt length: 2403
+2026-06-30 14:19:26,000 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:26,005 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:29,723 - INFO - [BACKEND] Chatbot Gemma3 Response - Details: Whisper was created by Abbilaash at the National Institute of Technology Karnataka to inspire young children to learn about artificial intelligence and robotics.
+2026-06-30 14:19:29,723 - INFO - [API_RESPONSE] POST /api/chatbot/command - Details: Status: 200 OK
+2026-06-30 14:19:29,887 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:29,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:33,883 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:33,888 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:37,870 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:37,870 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:41,883 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:41,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:45,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:45,888 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:49,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:49,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:53,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:53,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:57,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:57,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:19:59,193 - INFO - [API_REQUEST] GET /api/bluetooth/scan - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:19:59,193 - INFO - [API_RESPONSE] GET /api/bluetooth/scan - Details: Status: 200 OK
+2026-06-30 14:20:01,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:01,875 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:04,381 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:04,382 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-30 14:20:05,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:05,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:09,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:09,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:13,872 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:13,872 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:17,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:17,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:21,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:21,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:25,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:25,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:29,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:29,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:33,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:33,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:37,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:37,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:41,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:41,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:45,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:45,900 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:49,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:49,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:53,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:53,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:20:57,910 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:20:57,911 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:01,898 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:01,898 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:05,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:05,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:09,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:09,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:13,899 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:13,901 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:17,902 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:17,905 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:21,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:21,901 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:26,018 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:26,018 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:30,152 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:30,155 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:33,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:33,888 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:37,864 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:37,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:41,901 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:41,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:45,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:45,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:49,936 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:49,937 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:53,905 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:53,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:21:57,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:21:57,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:01,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:01,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:05,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:05,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:09,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:09,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:13,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:13,896 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:17,883 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:17,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:21,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:21,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:25,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:25,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:29,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:29,880 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:33,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:33,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:37,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:37,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:41,889 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:41,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:45,869 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:45,869 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:49,889 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:49,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:53,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:53,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:22:57,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:22:57,875 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:01,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:01,875 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:05,876 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:05,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:09,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:09,874 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:13,874 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:13,876 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:17,887 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:17,889 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:20,423 - INFO - [API_REQUEST] GET /video_feed - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:20,423 - INFO - [API_RESPONSE] GET /video_feed - Details: Status: 503 SERVICE UNAVAILABLE
+2026-06-30 14:23:21,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:21,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:25,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:25,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:29,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:29,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:33,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:33,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:37,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:37,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:42,214 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:42,216 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:45,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:45,877 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:49,892 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:49,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:53,890 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:53,891 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:23:57,889 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:23:57,891 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:01,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:01,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:05,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:05,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:10,005 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:10,043 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:13,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:13,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:17,887 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:17,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:21,869 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:21,869 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:25,972 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:25,975 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:29,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:29,893 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:33,903 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:33,908 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:37,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:37,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:41,914 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:41,959 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:45,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:45,911 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:49,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:49,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:53,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:53,889 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:24:57,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:24:57,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:01,887 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:01,890 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:05,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:05,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:09,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:09,889 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:13,871 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:13,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:17,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:17,904 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:21,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:21,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:25,903 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:25,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:29,909 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:29,914 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:33,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:33,909 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:37,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:37,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:41,912 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:41,914 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:45,867 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:45,883 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:49,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:49,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:53,923 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:53,929 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:25:57,952 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:25:57,954 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:01,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:01,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:05,886 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:05,886 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:09,866 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:09,866 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:13,912 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:13,915 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:17,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:17,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:21,914 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:21,914 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:25,917 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:25,940 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:29,869 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:29,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:33,904 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:33,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:37,962 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:38,045 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:41,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:41,898 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:45,877 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:45,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:49,944 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:49,944 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:53,898 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:53,899 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:26:57,916 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:26:57,920 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:01,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:01,886 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:05,929 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:05,931 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:09,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:09,911 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:13,898 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:13,900 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:17,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:17,905 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:21,885 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:21,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:25,899 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:25,899 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:29,892 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:29,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:33,880 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:33,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:37,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:37,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:41,914 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:41,914 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:45,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:45,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:49,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:49,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:53,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:53,909 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:27:57,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:27:57,912 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:28:01,910 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:28:01,910 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:28:05,909 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:28:05,912 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:28:09,930 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:28:09,935 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:28:13,910 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:28:13,910 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:21,852 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:21,856 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:21,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:21,886 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:25,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:25,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:29,922 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:29,925 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:33,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:33,898 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:37,908 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:37,915 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:41,883 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:41,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:45,911 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:45,912 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:49,897 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:49,899 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:53,914 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:53,918 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:29:57,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:29:57,910 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:04,047 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:04,048 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:05,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:05,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:09,867 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:09,867 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:13,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:13,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:17,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:17,885 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:21,878 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:21,878 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:25,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:25,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:29,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:29,898 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:33,873 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:33,873 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:38,369 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:38,370 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:41,899 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:41,903 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:45,892 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:45,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:49,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:49,884 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:53,898 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:53,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:35:57,882 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:35:57,882 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:36:01,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:36:01,887 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:36:05,879 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:36:05,879 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:36:09,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:36:09,891 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:36:13,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:36:13,889 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:36:17,884 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:36:17,888 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:54:41,198 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:54:41,206 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:54:41,881 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:54:41,881 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:54:45,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:54:45,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:54:49,904 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:54:49,908 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:54:53,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:54:53,893 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:54:57,892 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:54:57,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:01,892 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:01,896 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:05,892 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:05,894 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:09,917 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:09,917 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:13,893 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:13,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:17,915 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:17,919 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:21,902 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:21,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:25,896 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:25,896 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:29,896 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:29,899 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:33,906 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:33,907 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:37,907 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:37,907 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:41,928 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:41,929 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:45,895 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:45,895 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:55:49,911 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:55:49,911 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:56:30,737 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:56:30,740 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:56:33,898 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:56:33,900 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:56:37,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:56:37,893 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:56:41,896 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:56:41,906 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:56:45,894 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:56:45,896 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:56:49,891 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:56:49,893 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK
+2026-06-30 14:56:53,912 - INFO - [API_REQUEST] GET /api/status - Details: IP: 192.168.4.19, Payload: None
+2026-06-30 14:56:53,916 - INFO - [API_RESPONSE] GET /api/status - Details: Status: 200 OK

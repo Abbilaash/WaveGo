@@ -101,10 +101,18 @@ class BotApiClient {
     return jsonDecode(response.body);
   }
 
-  // Handwriting Recognition
-  Future<Map<String, dynamic>> detectHandwriting() async {
+  // Handwriting/Digit Recognition
+  Future<Map<String, dynamic>> detectHandwriting({String? base64Image, bool explain = false}) async {
+    final body = <String, dynamic>{};
+    if (base64Image != null) {
+      body["image"] = base64Image;
+    }
+    body["explain"] = explain;
+
     final response = await http.post(
-      Uri.parse("$baseUrl/api/detect_hand_writing"),
+      Uri.parse("$baseUrl/api/detect_digit"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(body),
     );
     return jsonDecode(response.body);
   }
@@ -115,7 +123,69 @@ class BotApiClient {
       Uri.parse("$baseUrl/api/chatbot/command"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"command": command}),
-    );
+    ).timeout(const Duration(seconds: 45));
     return jsonDecode(response.body);
+  }
+
+  // Chatbot Command audio upload (WAV format)
+  Future<Map<String, dynamic>> sendChatbotAudio(String filePath) async {
+    final uri = Uri.parse("$baseUrl/api/chatbot/audio");
+    final request = http.MultipartRequest("POST", uri);
+    
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'audio',
+        filePath,
+      ),
+    );
+    
+    final streamedResponse = await request.send().timeout(const Duration(seconds: 45));
+    final response = await http.Response.fromStream(streamedResponse);
+    
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Audio upload failed (${response.statusCode}): ${response.body}");
+    }
+  }
+
+  // Bluetooth Scan Nearby Devices
+  Future<Map<String, dynamic>> scanBluetoothDevices() async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/api/bluetooth/scan"),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Bluetooth scan failed (${response.statusCode}): ${response.body}");
+    }
+  }
+
+  // Bluetooth Connect Device
+  Future<Map<String, dynamic>> connectBluetoothDevice(String mac) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/api/bluetooth/connect"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"mac": mac}),
+    ).timeout(const Duration(seconds: 25));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Bluetooth connection failed (${response.statusCode}): ${response.body}");
+    }
+  }
+
+  // Bluetooth Disconnect Device
+  Future<Map<String, dynamic>> disconnectBluetoothDevice(String mac) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/api/bluetooth/disconnect"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"mac": mac}),
+    ).timeout(const Duration(seconds: 15));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Bluetooth disconnection failed (${response.statusCode}): ${response.body}");
+    }
   }
 }

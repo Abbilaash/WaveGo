@@ -1,9 +1,18 @@
+import sys
 import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+
+# Load the local persistent Vosk package
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+VOSK_PKG_DIR = os.path.join(THIS_DIR, "vosk_package")
+if os.path.exists(VOSK_PKG_DIR) and VOSK_PKG_DIR not in sys.path:
+	sys.path.insert(0, VOSK_PKG_DIR)
+
+from vosk import Model, KaldiRecognizer
 import wave
 import json
 import struct
 import numpy as np
-from vosk import Model, KaldiRecognizer
 
 VOSK_SAMPLE_RATE = 16000
 

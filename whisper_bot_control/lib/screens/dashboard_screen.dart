@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../services/bot_api_client.dart';
 import '../widgets/mjpeg_viewer.dart';
 import 'ip_connection_screen.dart';
+import 'character_recognition_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final BotApiClient client;
@@ -23,6 +28,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Timer? _statusTimer;
   double _speed = 100.0;
   bool _isConnecting = true;
+  bool _isRedirecting = false;
+
+  // Bluetooth State
+  bool _bluetoothScanning = false;
+  bool _bluetoothConnecting = false;
+  String _bluetoothConnectingMac = '';
+  List<dynamic> _bluetoothDevices = [];
+  String? _bluetoothError;
 
   // Face Learning State
   bool _isLearning = false;
@@ -55,12 +68,86 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final ScrollController _chatScrollController = ScrollController();
   bool _chatLoading = false;
 
+  // Voice Recording State
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  bool _isRecording = false;
+  final FlutterTts _flutterTts = FlutterTts();
+
   @override
   void initState() {
     super.initState();
     _status = widget.initialStatus;
     _isConnecting = false;
     _startStatusPolling();
+    _initTts();
+  }
+
+  Future<void> _initTts() async {
+    try {
+      await _flutterTts.setLanguage("en-US");
+      await _flutterTts.setSpeechRate(0.5); // 0.5 is normal speed for flutter_tts
+      await _flutterTts.setVolume(1.0);
+      await _flutterTts.setPitch(1.0);
+    } catch (e) {
+      debugPrint("Failed to initialize TTS: $e");
+    }
+  }
+
+  Future<void> _speak(String text) async {
+    try {
+      // Remove actions/markup inside brackets (e.g. "[handshake]") so they are not read aloud
+      String cleanText = text.replaceAll(RegExp(r'\[.*?\]'), '').replaceAll(RegExp(r'<.*?>'), '').trim();
+      if (cleanText.isNotEmpty) {
+        await _flutterTts.speak(cleanText);
+      }
+    } catch (e) {
+      debugPrint("TTS error: $e");
+    }
+  }
+
+  bool _isConnectionError(dynamic e) {
+    final str = e.toString().toLowerCase();
+    return str.contains("socketexception") || 
+           str.contains("connection refused") || 
+           str.contains("connection timed out") || 
+           str.contains("failed host lookup") || 
+           str.contains("network is unreachable") ||
+           str.contains("connection closed");
+  }
+
+  void _handleOfflineState() {
+    if (_isRedirecting) return;
+    _isRedirecting = true;
+    _statusTimer?.cancel();
+    
+    // Clear SnackBars
+    ScaffoldMessenger.of(context).clearSnackBars();
+    
+    // Show toast message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Connection refused. The WaveGo bot is offline.",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.redAccent,
+        duration: Duration(seconds: 4),
+      ),
+    );
+
+    // Return to connection page
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const IPConnectionScreen()),
+    );
+  }
+
+  void _handleApiError(dynamic e, String actionName) {
+    if (_isConnectionError(e)) {
+      _handleOfflineState();
+    } else {
+      _showNotification("$actionName failed: $e", isError: true);
+    }
   }
 
   void _startStatusPolling() {
@@ -75,9 +162,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       } catch (e) {
         if (mounted) {
+          // If we are currently loading/processing a chat request (text or voice),
+          // the server is busy running heavy model initialization, so ignore status check failures.
+          if (_chatLoading) {
+            return;
+          }
           setState(() {
             _isConnecting = true;
           });
+          if (_isConnectionError(e)) {
+            _handleOfflineState();
+          }
         }
       }
     });
@@ -90,6 +185,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _faceFollowController.dispose();
     _chatController.dispose();
     _chatScrollController.dispose();
+    _audioRecorder.dispose();
+    _flutterTts.stop();
     super.dispose();
   }
 
@@ -103,13 +200,230 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  void _showBluetoothDevicesDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            
+            Future<void> runScan() async {
+              setDialogState(() {
+                _bluetoothScanning = true;
+                _bluetoothError = null;
+              });
+              try {
+                final res = await widget.client.scanBluetoothDevices();
+                if (res['success'] == true && mounted) {
+                  setDialogState(() {
+                    _bluetoothDevices = List<dynamic>.from(res['devices'] ?? []);
+                    _bluetoothScanning = false;
+                  });
+                } else if (mounted) {
+                  setDialogState(() {
+                    _bluetoothError = res['error'] ?? "Unknown scan error";
+                    _bluetoothScanning = false;
+                  });
+                }
+              } catch (e) {
+                if (mounted) {
+                  setDialogState(() {
+                    _bluetoothError = e.toString();
+                    _bluetoothScanning = false;
+                  });
+                }
+              }
+            }
+
+            Future<void> toggleConnection(Map<String, dynamic> device) async {
+              final mac = device['mac'];
+              final isConnected = device['connected'] == true;
+              
+              setDialogState(() {
+                _bluetoothConnecting = true;
+                _bluetoothConnectingMac = mac;
+                _bluetoothError = null;
+              });
+
+              try {
+                if (isConnected) {
+                  final res = await widget.client.disconnectBluetoothDevice(mac);
+                  if (res['success'] == true) {
+                    _showNotification("Disconnected from ${device['name'] ?? mac}");
+                  } else {
+                    _showNotification("Failed to disconnect: ${res['error']}", isError: true);
+                  }
+                } else {
+                  final res = await widget.client.connectBluetoothDevice(mac);
+                  if (res['success'] == true) {
+                    _showNotification("Connected to speaker: ${device['name'] ?? mac}");
+                  } else {
+                    _showNotification("Failed to connect: ${res['error']}", isError: true);
+                  }
+                }
+                await runScan();
+              } catch (e) {
+                _showNotification("Bluetooth action failed: $e", isError: true);
+              } finally {
+                if (mounted) {
+                  setDialogState(() {
+                    _bluetoothConnecting = false;
+                    _bluetoothConnectingMac = '';
+                  });
+                }
+              }
+            }
+
+            if (_bluetoothDevices.isEmpty && !_bluetoothScanning && _bluetoothError == null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) => runScan());
+            }
+
+            return AlertDialog(
+              backgroundColor: const Color(0xFF0C1526),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: const Color(0xFF7DD3FC).withOpacity(0.3), width: 1.5),
+              ),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '📻 Bluetooth Speakers',
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  if (!_bluetoothScanning)
+                    IconButton(
+                      icon: const Icon(Icons.refresh, color: Color(0xFF7DD3FC), size: 20),
+                      onPressed: runScan,
+                    )
+                  else
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7DD3FC))),
+                    ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 300,
+                child: Column(
+                  children: [
+                    if (_bluetoothError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          _bluetoothError!,
+                          style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    Expanded(
+                      child: _bluetoothScanning && _bluetoothDevices.isEmpty
+                          ? const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4DE3B7))),
+                                  SizedBox(height: 12),
+                                  Text("Scanning for speakers...", style: TextStyle(color: Color(0xFF9FB1CE), fontSize: 13)),
+                                ],
+                              ),
+                            )
+                          : _bluetoothDevices.isEmpty
+                              ? const Center(
+                                  child: Text("No devices found", style: TextStyle(color: Color(0xFF9FB1CE), fontSize: 14)),
+                                )
+                              : ListView.builder(
+                                  itemCount: _bluetoothDevices.length,
+                                  itemBuilder: (context, index) {
+                                    final dev = Map<String, dynamic>.from(_bluetoothDevices[index]);
+                                    final isConnected = dev['connected'] == true;
+                                    final isConnectingThis = _bluetoothConnecting && _bluetoothConnectingMac == dev['mac'];
+
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF07111F),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isConnected
+                                              ? const Color(0xFF4DE3B7).withOpacity(0.3)
+                                              : Colors.white.withOpacity(0.05),
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        leading: Icon(
+                                          isConnected ? Icons.volume_up : Icons.speaker,
+                                          color: isConnected ? const Color(0xFF4DE3B7) : Colors.white60,
+                                        ),
+                                        title: Text(
+                                          dev['name'] ?? 'Unknown Device',
+                                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                                        ),
+                                        subtitle: Text(
+                                          dev['mac'] ?? '',
+                                          style: const TextStyle(color: Color(0xFF9FB1CE), fontSize: 11),
+                                        ),
+                                        trailing: isConnectingThis
+                                            ? const SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7DD3FC))),
+                                              )
+                                            : Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: isConnected
+                                                      ? const Color(0xFF4DE3B7).withOpacity(0.15)
+                                                      : Colors.white.withOpacity(0.05),
+                                                  borderRadius: BorderRadius.circular(20),
+                                                  border: Border.all(
+                                                    color: isConnected
+                                                        ? const Color(0xFF4DE3B7)
+                                                        : Colors.transparent,
+                                                    width: 0.8,
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  isConnected ? 'Connected' : 'Connect',
+                                                  style: TextStyle(
+                                                    color: isConnected ? const Color(0xFF4DE3B7) : Colors.white60,
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                        onTap: _bluetoothConnecting ? null : () => toggleConnection(dev),
+                                      ),
+                                    );
+                                  },
+                                ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close', style: TextStyle(color: Colors.grey)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   // --- API Call wrappers ---
 
   Future<void> _move(String action) async {
     try {
       await widget.client.sendMove(action, _speed.toInt());
     } catch (e) {
-      _showNotification("Move failed: $e", isError: true);
+      _handleApiError(e, "Move");
     }
   }
 
@@ -117,7 +431,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       await widget.client.sendTilt(direction, action);
     } catch (e) {
-      _showNotification("Tilt failed: $e", isError: true);
+      _handleApiError(e, "Tilt");
     }
   }
 
@@ -126,7 +440,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       await widget.client.sendDefaultAction(action);
       _showNotification("Preset action '$action' triggered!");
     } catch (e) {
-      _showNotification("Preset failed: $e", isError: true);
+      _handleApiError(e, "Preset");
     }
   }
 
@@ -135,7 +449,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final res = await widget.client.toggleFaceDetection(start ? 'start' : 'stop');
       _showNotification("Face Detection: ${res['mode'] ?? 'updated'}");
     } catch (e) {
-      _showNotification("Error: $e", isError: true);
+      _handleApiError(e, "Face Detection");
     }
   }
 
@@ -161,7 +475,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _showNotification("Following face: $name");
       }
     } catch (e) {
-      _showNotification("Error: $e", isError: true);
+      _handleApiError(e, "Face follow");
     }
   }
 
@@ -185,7 +499,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     } catch (e) {
-      _showNotification("Error: $e", isError: true);
+      _handleApiError(e, "Face learn");
       setState(() {
         _isLearning = false;
       });
@@ -284,7 +598,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _showNotification("Ball search started.");
       }
     } catch (e) {
-      _showNotification("Error: $e", isError: true);
+      _handleApiError(e, "Ball search");
     }
   }
 
@@ -296,7 +610,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
       _showNotification("Color Tracking: ${res['status'] ?? 'Updated'}");
     } catch (e) {
-      _showNotification("Error: $e", isError: true);
+      _handleApiError(e, "Color Tracking");
     }
   }
 
@@ -310,14 +624,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final res = await widget.client.detectHandwriting();
       if (res['success'] == true) {
         setState(() {
-          _ocrResults = res['results'] ?? [];
+          final prediction = res['prediction']?.toString() ?? 'Unknown';
+          final confidence = (res['confidence'] ?? 0.0) / 100.0;
+          _ocrResults = [[prediction, confidence]];
         });
-        _showNotification("Handwriting scanned successfully!");
+        _showNotification("Digit detected successfully!");
       } else {
         _showNotification(res['error'] ?? "OCR failed.", isError: true);
       }
     } catch (e) {
-      _showNotification("Error: $e", isError: true);
+      _handleApiError(e, "OCR");
     } finally {
       setState(() {
         _isOcrScanning = false;
@@ -344,25 +660,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       final res = await widget.client.sendChatbotCommand(text);
       if (mounted) {
+        final replyText = res['action_taken'] ?? "No response";
         setState(() {
           _messages.add({
             "sender": "bot",
-            "text": res['action_taken'] ?? "No response",
+            "text": replyText,
             "time": "Model"
           });
         });
         _scrollToBottom();
+        _speak(replyText);
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _messages.add({
-            "sender": "bot",
-            "text": "Failed to reach AI model: $e",
-            "time": "System Error"
+        if (_isConnectionError(e)) {
+          _handleOfflineState();
+        } else {
+          setState(() {
+            _messages.add({
+              "sender": "bot",
+              "text": "Failed to reach AI model: $e",
+              "time": "System Error"
+            });
           });
-        });
-        _scrollToBottom();
+          _scrollToBottom();
+        }
       }
     } finally {
       if (mounted) {
@@ -383,6 +705,140 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       }
     });
+  }
+
+  Future<void> _startRecording() async {
+    try {
+      await _flutterTts.stop(); // Stop ongoing speech when user starts recording
+      if (await _audioRecorder.hasPermission()) {
+        final tempDir = await getTemporaryDirectory();
+        final path = '${tempDir.path}/temp_voice_${DateTime.now().millisecondsSinceEpoch}.wav';
+        
+        await _audioRecorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.wav,
+            sampleRate: 16000,
+            numChannels: 1,
+          ),
+          path: path,
+        );
+        
+        setState(() {
+          _isRecording = true;
+        });
+      } else {
+        _showNotification("Microphone permission denied", isError: true);
+      }
+    } catch (e) {
+      _showNotification("Failed to start recording: $e", isError: true);
+    }
+  }
+
+  Future<void> _stopRecordingAndSend() async {
+    try {
+      final path = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+      });
+      
+      if (path != null) {
+        final file = File(path);
+        if (await file.exists()) {
+          setState(() {
+            _messages.add({
+              "sender": "user",
+              "text": "🎤 Sent voice message...",
+              "time": "${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}"
+            });
+            _chatLoading = true;
+          });
+          _scrollToBottom();
+
+          try {
+            final res = await widget.client.sendChatbotAudio(path);
+            if (mounted) {
+              final replyText = res['action_taken'] ?? 'No response';
+              setState(() {
+                _messages.add({
+                  "sender": "bot",
+                  "text": "🗣️ Transcription: \"${res['command'] ?? ''}\"\n\n🤖 Response: $replyText",
+                  "time": "Model"
+                });
+              });
+              _scrollToBottom();
+              _speak(replyText);
+            }
+          } catch (e) {
+            if (mounted) {
+              if (_isConnectionError(e)) {
+                _handleOfflineState();
+              } else {
+                setState(() {
+                  _messages.add({
+                    "sender": "bot",
+                    "text": "Failed to upload or process audio: $e",
+                    "time": "System Error"
+                  });
+                });
+                _scrollToBottom();
+              }
+            }
+          } finally {
+            try {
+              if (await file.exists()) {
+                await file.delete();
+              }
+            } catch (_) {}
+          }
+        }
+      }
+    } catch (e) {
+      _showNotification("Failed to stop recording: $e", isError: true);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _chatLoading = false;
+        });
+      }
+    }
+  }
+
+  Widget _buildMicButton() {
+    return GestureDetector(
+      onTap: () {
+        if (_isRecording) {
+          _stopRecordingAndSend();
+        } else {
+          _startRecording();
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: _isRecording ? Colors.redAccent.withOpacity(0.2) : const Color(0xFF0C1526),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: _isRecording ? Colors.redAccent : const Color(0xFF7DD3FC).withOpacity(0.4),
+            width: 1.5,
+          ),
+          boxShadow: _isRecording
+              ? [
+                  BoxShadow(
+                    color: Colors.redAccent.withOpacity(0.4),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  )
+                ]
+              : [],
+        ),
+        child: Icon(
+          _isRecording ? Icons.mic : Icons.mic_none,
+          color: _isRecording ? Colors.redAccent : const Color(0xFF7DD3FC),
+          size: 20,
+        ),
+      ),
+    );
   }
 
   // --- UI Components ---
@@ -499,6 +955,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           actions: [
             _buildStatusBadge(),
+            IconButton(
+              icon: const Icon(Icons.bluetooth, color: Colors.blueAccent, size: 20),
+              onPressed: _showBluetoothDevicesDialog,
+            ),
             IconButton(
               icon: const Icon(Icons.logout, size: 20),
               onPressed: () {
@@ -776,6 +1236,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Camera Feed
+                  AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Container(
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFF9DB1CE).withOpacity(0.15)),
+                      ),
+                      child: MjpegStreamReader(streamUrl: streamUrl),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
                   // Face Detection Module
                   Container(
                     padding: const EdgeInsets.all(18),
@@ -935,7 +1409,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Handwriting Recognition Module
+                  // CNN Digit Detector Module / Neural Net Visualizer
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -946,14 +1420,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('HANDWRITING OCR SCANNER', style: TextStyle(color: Color(0xFF4DE3B7), fontWeight: FontWeight.bold, fontSize: 12)),
+                        const Text('CNN DIGIT RECOGNITION', style: TextStyle(color: Color(0xFF4DE3B7), fontWeight: FontWeight.bold, fontSize: 12)),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Analyze how the LeNet-5 Convolutional Neural Network sees and detects handwritten characters using intermediate weights and activations.',
+                          style: TextStyle(color: Color(0xFF9FB1CE), fontSize: 12, height: 1.4),
+                        ),
                         const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: _isOcrScanning ? null : _runOcr,
-                            icon: const Icon(Icons.document_scanner),
-                            label: const Text('Scan Handwriting'),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CharacterRecognitionScreen(client: widget.client),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.psychology),
+                            label: const Text('Launch Neural Net Visualizer'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF7DD3FC),
                               foregroundColor: const Color(0xFF07111F),
@@ -961,39 +1447,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                         ),
-                        if (_isOcrScanning) ...[
-                          const SizedBox(height: 14),
-                          const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                        ],
-                        if (_ocrResults.isNotEmpty) ...[
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF4DE3B7).withOpacity(0.10),
-                              border: Border.all(color: const Color(0xFF4DE3B7).withOpacity(0.3)),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('OCR Results:', style: TextStyle(color: Color(0xFF4DE3B7), fontWeight: FontWeight.bold, fontSize: 11)),
-                                const SizedBox(height: 8),
-                                ..._ocrResults.map((res) {
-                                  final text = res[0] ?? '';
-                                  final conf = (res[1] ?? 0.0) * 100;
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 2.0),
-                                    child: Text(
-                                      '- "$text" (Confidence: ${conf.toStringAsFixed(1)}%)',
-                                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                                    ),
-                                  );
-                                }).toList(),
-                              ],
-                            ),
-                          )
-                        ],
                       ],
                     ),
                   ),
@@ -1068,13 +1521,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   child: Row(
                     children: [
+                      _buildMicButton(),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _chatController,
+                          enabled: !_isRecording,
                           style: const TextStyle(color: Colors.white, fontSize: 14),
                           decoration: InputDecoration(
-                            hintText: 'Enter AI command assistant request...',
-                            hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
+                            hintText: _isRecording
+                                ? 'Recording... Tap mic again to send'
+                                : 'Enter AI command assistant request...',
+                            hintStyle: TextStyle(
+                              color: _isRecording ? Colors.redAccent : Colors.white30,
+                              fontSize: 13,
+                              fontWeight: _isRecording ? FontWeight.bold : FontWeight.normal,
+                            ),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                             filled: true,
                             fillColor: const Color(0xFF040A12),
@@ -1086,7 +1548,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(width: 8),
                       IconButton(
                         icon: const Icon(Icons.send, color: Color(0xFF4DE3B7)),
-                        onPressed: _sendMessage,
+                        onPressed: _isRecording ? null : _sendMessage,
                       ),
                     ],
                   ),

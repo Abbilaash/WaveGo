@@ -19,6 +19,7 @@ class _IPConnectionScreenState extends State<IPConnectionScreen> {
   void initState() {
     super.initState();
     _loadSavedIP();
+    _autoDetectAPMode();
   }
 
   Future<void> _loadSavedIP() async {
@@ -28,6 +29,22 @@ class _IPConnectionScreenState extends State<IPConnectionScreen> {
       setState(() {
         _ipController.text = savedIP;
       });
+    }
+  }
+
+  Future<void> _autoDetectAPMode() async {
+    try {
+      // Quick check if the bot is reachable on the static AP IP
+      await BotApiClient('192.168.4.1:5000')
+          .getStatus()
+          .timeout(const Duration(milliseconds: 1500));
+      if (mounted) {
+        setState(() {
+          _ipController.text = '192.168.4.1:5000';
+        });
+      }
+    } catch (_) {
+      // Ignore if not on the WAVE_BOT network
     }
   }
 
@@ -279,7 +296,7 @@ class _IPConnectionScreenState extends State<IPConnectionScreen> {
                         SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'AP Mode: Connect to WiFi network "WAVE_BOT" (password: 12345678) and enter "192.168.12.1:5000"',
+                            'AP Mode: Connect to WiFi network "WAVE_BOT" (password: 12345678) and enter "192.168.4.1:5000"',
                             style: TextStyle(
                               color: Color(0xFF9FB1CE),
                               fontSize: 12,

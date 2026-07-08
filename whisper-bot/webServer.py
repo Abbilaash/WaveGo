@@ -5,8 +5,15 @@ from __future__ import annotations
 
 import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
-import vosk  # Must be imported first to prevent OpenBLAS library conflicts
+
 import sys
+# Load the local persistent Vosk package
+THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+VOSK_PKG_DIR = os.path.join(THIS_DIR, "whisper", "vosk_package")
+if os.path.exists(VOSK_PKG_DIR) and VOSK_PKG_DIR not in sys.path:
+	sys.path.insert(0, VOSK_PKG_DIR)
+
+import vosk  # Must be imported first to prevent OpenBLAS library conflicts
 import socket
 import subprocess
 import threading
