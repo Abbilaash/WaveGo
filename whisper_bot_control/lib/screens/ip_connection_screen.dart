@@ -241,7 +241,36 @@ class _IPConnectionScreenState extends State<IPConnectionScreen> {
                             ),
                           ),
                         ],
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: OutlinedButton.icon(
+                            onPressed: _isLoading ? null : () {
+                              setState(() {
+                                _ipController.text = '192.168.4.1:5000';
+                              });
+                              _connectToBot();
+                            },
+                            icon: const Icon(Icons.wifi_tethering, size: 18, color: Color(0xFF7DD3FC)),
+                            label: const Text(
+                              'USE DEFAULT WAVE_BOT NETWORK',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF7DD3FC),
+                              side: const BorderSide(color: Color(0xFF7DD3FC)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
                           height: 52,

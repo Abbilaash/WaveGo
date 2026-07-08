@@ -128,8 +128,8 @@ class BotApiClient {
   }
 
   // Chatbot Command audio upload (WAV format)
-  Future<Map<String, dynamic>> sendChatbotAudio(String filePath) async {
-    final uri = Uri.parse("$baseUrl/api/chatbot/audio");
+  Future<Map<String, dynamic>> sendChatbotAudio(String filePath, {String mode = 'chat'}) async {
+    final uri = Uri.parse("$baseUrl/api/chatbot/audio?mode=$mode");
     final request = http.MultipartRequest("POST", uri);
     
     request.files.add(

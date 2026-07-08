@@ -73,6 +73,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _isRecording = false;
   final FlutterTts _flutterTts = FlutterTts();
   String? _previousDetectedFace;
+  bool _showVoiceSettings = false;
+  double _ttsSpeed = 0.5;
+  String _chatMode = 'chat'; // 'chat' or 'command'
 
   @override
   void initState() {
@@ -86,7 +89,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _initTts() async {
     try {
       await _flutterTts.setLanguage("en-US");
-      await _flutterTts.setSpeechRate(0.5); // 0.5 is normal speed for flutter_tts
+      await _flutterTts.setSpeechRate(_ttsSpeed);
       await _flutterTts.setVolume(1.0);
       await _flutterTts.setPitch(1.0);
     } catch (e) {
@@ -658,10 +661,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (text.isEmpty) return;
 
     _chatController.clear();
+
+    // If in command mode, prepend the "command " prefix
+    String targetText = text;
+    if (_chatMode == 'command' && !targetText.toLowerCase().startsWith('command ')) {
+      targetText = "command $targetText";
+    }
+
     setState(() {
       _messages.add({
         "sender": "user",
-        "text": text,
+        "text": _chatMode == 'command' ? "🤖 Command: \"$text\"" : text,
         "time": "${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}"
       });
       _chatLoading = true;
@@ -670,7 +680,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _scrollToBottom();
 
     try {
-      final res = await widget.client.sendChatbotCommand(text);
+      final res = await widget.client.sendChatbotCommand(targetText);
       if (mounted) {
         final replyText = res['action_taken'] ?? "No response";
         setState(() {
@@ -767,7 +777,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _scrollToBottom();
 
           try {
-            final res = await widget.client.sendChatbotAudio(path);
+            final res = await widget.client.sendChatbotAudio(path, mode: _chatMode);
             if (mounted) {
               final replyText = res['action_taken'] ?? 'No response';
               setState(() {
@@ -897,7 +907,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildHUDCard(String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFF0C1526).withOpacity(0.5),
         borderRadius: BorderRadius.circular(16),
@@ -1006,7 +1016,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 10,
-                    childAspectRatio: 2.2,
+                    childAspectRatio: 1.7,
                     children: [
                       _buildHUDCard('CPU TEMP', _isConnecting ? 'unknown' : '${_status["cpu_temp"] ?? "unknown"}'),
                       _buildHUDCard('RAM USE', _isConnecting ? 'unknown' : '${_status["ram_info"] ?? "unknown"}%'),
@@ -1358,24 +1368,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text('TARGET COLOR TRACKING', style: TextStyle(color: Color(0xFF4DE3B7), fontWeight: FontWeight.bold, fontSize: 12)),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: _toggleBallSearch,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _isBallSearching ? Colors.redAccent : const Color(0xFF4DE3B7),
-                                  foregroundColor: const Color(0xFF07111F),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                                child: Text(_isBallSearching ? 'Stop Ball Search' : '🔍 Find Green Ball'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        const Divider(color: Colors.white10),
                         const SizedBox(height: 12),
                         const Text('Follow Custom Color Filters', style: TextStyle(color: Colors.white, fontSize: 13)),
                         const SizedBox(height: 12),
@@ -1469,6 +1461,83 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Tab 3: AI Assistant Terminal
             Column(
               children: [
+                // Collapsible Voice Settings Panel
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF0C1526),
+                    border: Border(bottom: BorderSide(color: Colors.white10)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.settings_voice, color: Color(0xFF4DE3B7), size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            'VOICE SETTINGS',
+                            style: TextStyle(
+                              color: Color(0xFF4DE3B7),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          _showVoiceSettings ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          color: const Color(0xFF4DE3B7),
+                          size: 18,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _showVoiceSettings = !_showVoiceSettings;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                if (_showVoiceSettings) ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0C1526).withOpacity(0.95),
+                      border: const Border(bottom: BorderSide(color: Colors.white10)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Text('Speech Speed:  ', style: TextStyle(color: Color(0xFF9FB1CE), fontSize: 13)),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${(_ttsSpeed * 100).toInt()}%',
+                              style: const TextStyle(color: Color(0xFF4DE3B7), fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                        Slider(
+                          value: _ttsSpeed,
+                          min: 0.2,
+                          max: 1.0,
+                          activeColor: const Color(0xFF4DE3B7),
+                          inactiveColor: const Color(0xFF07111F),
+                          onChanged: (val) {
+                            setState(() {
+                              _ttsSpeed = val;
+                            });
+                            _flutterTts.setSpeechRate(val);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 // Chat Message List
                 Expanded(
                   child: ListView.builder(
@@ -1524,6 +1593,104 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const LinearProgressIndicator(minHeight: 2, valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4DE3B7)), backgroundColor: Colors.transparent),
                 ],
 
+                // Mode Selector Bar (Command vs Chat)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF0C1526),
+                    border: Border(top: BorderSide(color: Colors.white10)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _chatMode = 'command';
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: _chatMode == 'command'
+                                  ? const Color(0xFF0C2B4E)
+                                  : const Color(0xFF040A12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: _chatMode == 'command'
+                                    ? const Color(0xFF7DD3FC)
+                                    : Colors.transparent,
+                                width: 1,
+                              ),
+                            ),
+                            child: const Center(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.terminal, size: 14, color: Color(0xFF7DD3FC)),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Robot Control',
+                                    style: TextStyle(
+                                      color: Color(0xFF7DD3FC),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _chatMode = 'chat';
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: _chatMode == 'chat'
+                                  ? const Color(0xFF0E322A)
+                                  : const Color(0xFF040A12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: _chatMode == 'chat'
+                                    ? const Color(0xFF4DE3B7)
+                                    : Colors.transparent,
+                                width: 1,
+                              ),
+                            ),
+                            child: const Center(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.chat_bubble_outline, size: 14, color: Color(0xFF4DE3B7)),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'AI Talk Q&A',
+                                    style: TextStyle(
+                                      color: Color(0xFF4DE3B7),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 // Input Bar
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1543,7 +1710,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           decoration: InputDecoration(
                             hintText: _isRecording
                                 ? 'Recording... Tap mic again to send'
-                                : 'Enter AI command assistant request...',
+                                : (_chatMode == 'command'
+                                    ? 'Enter robot command (e.g. forward 5)...'
+                                    : 'Ask the AI Assistant a question...'),
                             hintStyle: TextStyle(
                               color: _isRecording ? Colors.redAccent : Colors.white30,
                               fontSize: 13,
