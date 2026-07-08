@@ -1204,6 +1204,12 @@ def api_chatbot_audio():
 	normalized_text = convert_words_to_numbers(transcribed_text)
 	log_action("BACKEND", "Speech-to-Text Normalized", f"Original: '{transcribed_text}', Normalized: '{normalized_text}'")
 
+	# Prepend "command" prefix if the mobile app is in command mode
+	mode = request.args.get('mode', '').lower()
+	if mode == 'command' and not normalized_text.lower().startswith('command '):
+		normalized_text = f"command {normalized_text}"
+		log_action("BACKEND", "Speech-to-Text Command Prepended", f"Command Prepended: '{normalized_text}'")
+
 	res = process_chatbot_text(normalized_text, request.remote_addr)
 	if not res.get("success", True):
 		return jsonify(res), 500
