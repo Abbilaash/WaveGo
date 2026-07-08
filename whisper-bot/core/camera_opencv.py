@@ -436,8 +436,17 @@ class CVThread(threading.Thread):
         self.faces = face_detection.recognize_faces(frame_image)
         if len(self.faces):
             robot.lightCtrl('red', 0)
+            # Find the first recognized face that is not "Unknown"
+            detected_name = ""
+            for face in self.faces:
+                name = face.get("name", "Unknown")
+                if name != "Unknown":
+                    detected_name = name
+                    break
+            Camera.latest_face_name = detected_name
         else:
             robot.lightCtrl('blue', 0)
+            Camera.latest_face_name = ""
         self.pause()
 
 
@@ -576,6 +585,7 @@ class CVThread(threading.Thread):
             name = face.get("name", "Unknown")
             if name.lower() == target_name:
                 target_face = face
+                Camera.latest_face_name = name
                 break
                 
         if target_face:
@@ -603,6 +613,7 @@ class CVThread(threading.Thread):
             else:
                 robot.lookStopLR()
         else:
+            Camera.latest_face_name = ""
             robot.lightCtrl('blue', 0)
             robot.lookStopUD()
             robot.lookStopLR()
@@ -984,6 +995,7 @@ class Camera(BaseCamera):
     followColor = 'none'
     ball_search_info = None
     latest_bgr_frame = None
+    latest_face_name = ''
     # modeSelect = 'findlineCV'
     # modeSelect = 'findColor'
     # modeSelect = 'watchDog'

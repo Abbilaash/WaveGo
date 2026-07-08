@@ -246,6 +246,11 @@ def get_state() -> dict:
 			state["cpu_temp"] = hardware_info.get_cpu_tempfunc()
 			state["cpu_use"] = hardware_info.get_cpu_use()
 			state["ram_info"] = hardware_info.get_ram_info()
+			try:
+				import camera_opencv
+				state["last_detected_face"] = camera_opencv.Camera.latest_face_name
+			except Exception:
+				state["last_detected_face"] = ""
 			return state
 
 	ip_address, mode = ensure_network()
@@ -256,6 +261,11 @@ def get_state() -> dict:
 		state["cpu_temp"] = hardware_info.get_cpu_tempfunc()
 		state["cpu_use"] = hardware_info.get_cpu_use()
 		state["ram_info"] = hardware_info.get_ram_info()
+		try:
+			import camera_opencv
+			state["last_detected_face"] = camera_opencv.Camera.latest_face_name
+		except Exception:
+			state["last_detected_face"] = ""
 		return state
 
 

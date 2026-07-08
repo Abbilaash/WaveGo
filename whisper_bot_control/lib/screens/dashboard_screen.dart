@@ -72,6 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final AudioRecorder _audioRecorder = AudioRecorder();
   bool _isRecording = false;
   final FlutterTts _flutterTts = FlutterTts();
+  String? _previousDetectedFace;
 
   @override
   void initState() {
@@ -155,6 +156,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       try {
         final data = await widget.client.getStatus();
         if (mounted) {
+          // Speak Hello <name> if a new face is recognized
+          final lastFace = data['last_detected_face'] as String?;
+          if (lastFace != null && lastFace.trim().isNotEmpty) {
+            if (lastFace != _previousDetectedFace) {
+              _previousDetectedFace = lastFace;
+              _speak("Hello $lastFace");
+            }
+          } else {
+            _previousDetectedFace = null;
+          }
+
           setState(() {
             _status = data;
             _isConnecting = false;
